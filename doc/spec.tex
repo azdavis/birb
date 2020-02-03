@@ -174,7 +174,7 @@ We use some notational conveniences: $\forall$ for ``for all'', $\exists$ for
 }{
   \Gamma \vdash \textsf{newchan}[\tau] :
   \langle 1 : \textsf{Sender}[\tau], 2 : \textsf{Receiver}[\tau] \rangle
-  !\{ \textsf{newchan} : \textsf{Unit} \rightarrow \textsf{Nat} \}
+  !\{ \textsf{newchan} : \langle \rangle \rightarrow \textsf{Nat} \}
 }
 
 \inferrule*[right=T-ChanSend]{
@@ -184,7 +184,7 @@ We use some notational conveniences: $\forall$ for ``for all'', $\exists$ for
   \textsf{Sender}[\tau]
   !\{
     \textsf{send} :
-    \langle 1 : \textsf{Nat}, 2 : \tau \rangle \rightarrow \textsf{Unit}
+    \langle 1 : \textsf{Nat}, 2 : \tau \rangle \rightarrow \langle \rangle
   \}
 }
 
