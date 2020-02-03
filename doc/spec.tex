@@ -1,0 +1,200 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage[parfill]{parskip}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{mathpartir}
+\title{Birb Spec}
+\author{Ariel Davis, Vivian Huang}
+\date{\today}
+\begin{document}
+\maketitle
+
+This is the specification for the Birb language, a programming language
+featuring an effects system and channels.
+
+\newpage
+\section{AST}
+
+We introduce sorts for types, values, and computations.
+
+We use $x$ for variables and $L$ for labels. When there is an $i$ subscript, the
+idea is that there are 0 or more of the thing with the subscript. This means we
+allow for the empty product type (``unit''), the empty product literal (also
+``unit''), the empty sum type (``void'' or ``never''), and the empty case
+analysis (which, when used on a value of empty sum type, is a computation with
+any type -- but that's fine, since there are no values of empty sum type).
+
+An effect signature $\Delta$ has the form $\{ L_i : \tau_{i,1} \rightarrow
+\tau_{i,2} \}$. Again, since there can be 0 or more items in the signature, this
+allows for the empty effect signature.
+
+This abstract syntax introduces a modal separation between values and
+computations, but an ideal concrete syntax would make the distinction as
+unintrusive as possible. We don't want to have to be explicitly sequencing and
+\textsf{pure}ing all over the place in the concrete syntax.
+
+\[
+\begin{array}{l r l l}
+\textsf{Type}   &   \tau ::= & \textsf{Nat}                      & \text{natural numbers} \\
+                &            & \textsf{Str}                      & \text{strings} \\
+                &            & \langle L_i : \tau_i \rangle      & \text{products} \\
+                &            & [ L_i : \tau_i ]                  & \text{sums} \\
+                &            & \tau_1 \rightarrow \tau_2!\Delta  & \text{procedures} \\
+                &            & \textsf{Sender}[\tau]             & \text{channel sender} \\
+                &            & \textsf{Receiver}[\tau]           & \text{channel receiver} \\
+\\
+\textsf{Val}    &      v ::= & x                                 & \text{variable} \\
+                &            & \overline{n}                      & \text{natural number literal} \\
+                &            & \overline{s}                      & \text{string literal} \\
+                &            & \langle
+                               L_i \hookrightarrow v_i
+                               \rangle                           & \text{product literal} \\
+                &            & L \cdot v                         & \text{sum literal} \\
+                &            & \lambda (x : \tau) \ c            & \text{procedure literal} \\
+\\
+\textsf{Comp}   &      c ::= & \textsf{pure} \ v                 & \text{enter the monad} \\
+                &            & \textsf{bind} \ x \leftarrow c_1
+                               \ \textsf{in} \ c_2               & \text{sequencing} \\
+                &            & v \cdot L                         & \text{product projection} \\
+                &            & \textsf{match} \ v \ \{
+                               L_i \cdot x_i \hookrightarrow c_i
+                               \}                                & \text{sum case analysis} \\
+                &            & v_1 (v_2)                         & \text{procedure application} \\
+                &            & \textsf{newchan}[\tau]            & \text{channel creation} \\
+                &            & \textsf{send}(v)                  & \text{channel send} \\
+                &            & \textsf{recv}(v)                  & \text{channel receive} \\
+\end{array}
+\]
+
+\newpage
+\section{Judgement Form}
+
+We introduce the judgements
+\begin{enumerate}
+\item $\Gamma \vdash v : \tau$, the typing judgement for values, which do not
+step and do not engender effects.
+\item $\Gamma \vdash c : \tau!\Delta$, the typing judgement for computations,
+which do step and may engender effects.
+\end{enumerate}
+
+\newpage
+\section{Sample Rules}
+
+We use some notational conveniences: $\forall$ for ``for all'', $\exists$ for
+``there exists'', $\cup$ for ``union''.
+
+\subsection{$\Gamma \vdash v : \tau$}
+
+\begin{mathpar}
+\inferrule*[right=T-Var]{
+  % axiom
+}{
+  \Gamma, x : \tau \vdash x : \tau
+}
+
+\inferrule*[right=T-Nat]{
+  % axiom
+}{
+  \Gamma \vdash \overline{n} : \textsf{Nat}
+}
+
+\inferrule*[right=T-Str]{
+  % axiom
+}{
+  \Gamma \vdash \overline{s} : \textsf{Str}
+}
+
+\inferrule*[right=T-Prod]{
+  (\forall i) \ \Gamma \vdash v_i : \tau_i
+}{
+  \Gamma \vdash \langle L_i \hookrightarrow v_i \rangle :
+  \langle L_i : \tau_i \rangle
+}
+
+\inferrule*[right=T-Sum]{
+  (\exists j, 0 \leq j \leq i) \ \Gamma \vdash v : \tau_j
+}{
+  \Gamma \vdash L_j \cdot v : [ L_i : \tau_i ]
+}
+
+\inferrule*[right=T-Proc]{
+  \Gamma, x : \tau_1 \vdash c : \tau_2!\Delta
+}{
+  \Gamma \vdash \lambda (x : \tau_1) \ c : \tau_1 \rightarrow \tau_2!\Delta
+}
+\end{mathpar}
+
+\subsection{$\Gamma \vdash c : \tau!\Delta$}
+
+\begin{mathpar}
+\inferrule*[right=T-Pure]{
+  \Gamma \vdash v : \tau
+}{
+  \Gamma \vdash \textsf{pure} \ v : \tau!\{ \}
+}
+
+\inferrule*[right=T-Bind]{
+  \Gamma \vdash c_1 : \tau_1!\Delta_1 \\
+  \Gamma, x : \tau_1 \vdash c_2 : \tau_2!\Delta_2 \\
+  \Delta = \Delta_1 \cup \Delta_2
+}{
+  \Gamma \vdash \textsf{bind} \ x \leftarrow c_1 \ \textsf{in} \ c_2 :
+  \tau_2!\Delta
+}
+
+\inferrule*[right=T-Proj]{
+  \Gamma \vdash v : \langle L_i : \tau_i \rangle \\
+  (\exists j, 0 \leq j \leq i)
+}{
+  \Gamma \vdash v \cdot L_j : \tau_j!\{ \}
+}
+
+\inferrule*[right=T-Match]{
+  \Gamma \vdash v : [ L_i : \tau_i ] \\
+  (\forall i) \ \Gamma, x_i : \tau_i \vdash c_i : \tau!\Delta_i \\
+  \Delta = \bigcup \Delta_i
+}{
+  \Gamma \vdash \textsf{match} \ v \ \{
+  L_i \cdot x_i \hookrightarrow c_i
+  \} : \tau!\Delta
+}
+
+\inferrule*[right=T-App]{
+  \Gamma \vdash v_1 : \tau_1 \rightarrow \tau_2!\Delta \\
+  \Gamma \vdash v_2 : \tau_1
+}{
+  \Gamma \vdash v_1 (v_2) : \tau_2!\Delta
+}
+
+\inferrule*[right=T-ChanNew]{
+  % axiom
+}{
+  \Gamma \vdash \textsf{newchan}[\tau] :
+  \langle 1 : \textsf{Sender}[\tau], 2 : \textsf{Receiver}[\tau] \rangle
+  !\{ \textsf{newchan} : \textsf{Unit} \rightarrow \textsf{Nat} \}
+}
+
+\inferrule*[right=T-ChanSend]{
+  \Gamma \vdash v : \langle 1 : \textsf{Sender}[\tau], 2 : \tau \rangle
+}{
+  \Gamma \vdash \textsf{send}(v) :
+  \textsf{Sender}[\tau]
+  !\{
+    \textsf{send} :
+    \langle 1 : \textsf{Nat}, 2 : \tau \rangle \rightarrow \textsf{Unit}
+  \}
+}
+
+\inferrule*[right=T-ChanRecv]{
+  \Gamma \vdash v : \textsf{Receiver}[\tau]
+}{
+  \Gamma \vdash \textsf{recv}(v) :
+  \langle 1 : \textsf{Receiver}[\tau], 2 : \tau \rangle
+  !\{ \textsf{recv} : \textsf{Nat} \rightarrow \tau \}
+}
+\end{mathpar}
+
+\end{document}
