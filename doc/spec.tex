@@ -48,7 +48,7 @@ The interplay of type lambdas, forall types, and kinds is inspired by System F.
                 &            & \langle L_i : \tau_i \rangle      & \text{labeled product} \\
                 &            & [ L_i : \tau_i ]                  & \text{labeled sum} \\
                 &            & \tau_1 \rightarrow \tau_2!\Delta  & \text{function} \\
-                &            & \forall (t : \kappa) \tau         & \text{universal} \\
+                &            & \forall (t : \kappa) \ \tau       & \text{universal} \\
                 &            & \textsf{Sender}[\tau]             & \text{channel sender} \\
                 &            & \textsf{Receiver}[\tau]           & \text{channel receiver} \\
 \\
@@ -134,7 +134,7 @@ which do step and may engender effects.
 \inferrule*[right=K-Forall]{
   \Gamma, t : \kappa \vdash \tau : \star
 }{
-  \Gamma \vdash \forall t. \tau : \star
+  \Gamma \vdash \forall (t : \kappa) \ \tau : \star
 }
 
 \inferrule*[right=K-Sender]{
@@ -194,7 +194,7 @@ which do step and may engender effects.
 \inferrule*[right=T-TypeFunc]{
   \Gamma, t : \kappa \vdash v : \tau
 }{
-  \Gamma \vdash \Lambda (t : \kappa) \ v : \forall (t : \kappa) \tau
+  \Gamma \vdash \Lambda (t : \kappa) \ v : \forall (t : \kappa) \ \tau
 }
 
 \end{mathpar}
