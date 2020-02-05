@@ -70,6 +70,7 @@ The interplay of type lambdas, forall types, and kinds is inspired by System F.
                                L_i \cdot x_i \hookrightarrow c_i
                                \}                                & \text{sum case analysis} \\
                 &            & v_1 (v_2)                         & \text{function application} \\
+                &            & v [\tau]                          & \text{type function application} \\
                 &            & \textsf{newchan}[\tau]            & \text{channel creation} \\
                 &            & \textsf{send}(v)                  & \text{channel send} \\
                 &            & \textsf{recv}(v)                  & \text{channel receive} \\
@@ -239,6 +240,13 @@ which do step and may engender effects.
   \Gamma \vdash v_2 : \tau_1
 }{
   \Gamma \vdash v_1 (v_2) : \tau_2!\Delta
+}
+
+\inferrule*[right=T-TypeApp]{
+  \Gamma \vdash v : \forall (t : \kappa) \ \tau_2 \\
+  \Gamma \vdash \tau_1 : \kappa
+}{
+  \Gamma \vdash v [\tau_1] : ([\tau_1/t] \tau_2)!\{ \}
 }
 
 \inferrule*[right=T-ChanNew]{
