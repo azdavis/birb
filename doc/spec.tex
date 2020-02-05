@@ -18,7 +18,7 @@ featuring an effects system and channels.
 \newpage
 \section{AST}
 
-We introduce sorts for types, values, and computations.
+We introduce sorts for kinds, types, values, and computations.
 
 When there is an $i$ subscript, the idea is that there are 0 or more of the
 thing with the subscript. This means we allow for the empty product type
@@ -38,7 +38,10 @@ unintrusive as possible. We don't want to have to be explicitly sequencing and
 
 \[
 \begin{array}{l r l l}
-\textsf{Type}   &   \tau ::= & \textsf{Nat}                      & \text{natural number} \\
+\textsf{Kind}   & \kappa ::= & \star                             & \text{base} \\
+\\
+\textsf{Type}   &   \tau ::= & t                                 & \text{variable} \\
+                &            & \textsf{Nat}                      & \text{natural number} \\
                 &            & \textsf{Str}                      & \text{string} \\
                 &            & \langle L_i : \tau_i \rangle      & \text{labeled product} \\
                 &            & [ L_i : \tau_i ]                  & \text{labeled sum} \\
@@ -74,6 +77,7 @@ unintrusive as possible. We don't want to have to be explicitly sequencing and
 
 We introduce the judgements
 \begin{enumerate}
+\item $\Gamma \vdash \tau : \kappa$, the kind judgement for types.
 \item $\Gamma \vdash v : \tau$, the typing judgement for values, which do not
 step and do not engender effects.
 \item $\Gamma \vdash c : \tau!\Delta$, the typing judgement for computations,
@@ -82,6 +86,59 @@ which do step and may engender effects.
 
 \newpage
 \section{Sample Rules}
+
+\subsection{$\Gamma \vdash \tau : \kappa$}
+
+\begin{mathpar}
+\inferrule*[right=K-Var]{
+  % axiom
+}{
+  \Gamma, t : \kappa \vdash t : \kappa
+}
+
+\inferrule*[right=K-Nat]{
+  % axiom
+}{
+  \Gamma \vdash \textsf{Nat} : \star
+}
+
+\inferrule*[right=K-Str]{
+  % axiom
+}{
+  \Gamma \vdash \textsf{Str} : \star
+}
+
+\inferrule*[right=K-Prod]{
+  (\forall i) \ \Gamma \vdash \tau_i : \star
+}{
+  \Gamma \vdash \langle L_i : \tau_i \rangle : \star
+}
+
+\inferrule*[right=K-Sum]{
+  (\forall i) \ \Gamma \vdash \tau_i : \star
+}{
+  \Gamma \vdash [ L_i : \tau_i ] : \star
+}
+
+\inferrule*[right=K-Func]{
+  \Gamma \vdash \tau_1 : \star \\
+  \Gamma \vdash \tau_2 : \star
+}{
+  \Gamma \vdash \tau_1 \rightarrow \tau_2!\Delta : \star
+}
+
+\inferrule*[right=K-Sender]{
+  \Gamma \vdash \tau : \star
+}{
+  \Gamma \vdash \textsf{Sender}[\tau] : \star
+}
+
+\inferrule*[right=K-Receiver]{
+  \Gamma \vdash \tau : \star
+}{
+  \Gamma \vdash \textsf{Receiver}[\tau] : \star
+}
+\end{mathpar}
 
 \subsection{$\Gamma \vdash v : \tau$}
 
@@ -118,6 +175,7 @@ which do step and may engender effects.
 }
 
 \inferrule*[right=T-Func]{
+  \Gamma \vdash \tau_1 : \star \\
   \Gamma, x : \tau_1 \vdash c : \tau_2!\Delta
 }{
   \Gamma \vdash \lambda (x : \tau_1) \ c : \tau_1 \rightarrow \tau_2!\Delta
@@ -167,7 +225,7 @@ which do step and may engender effects.
 }
 
 \inferrule*[right=T-ChanNew]{
-  % axiom
+  \Gamma \vdash \tau : \star
 }{
   \Gamma \vdash \textsf{newchan}[\tau] :
   \langle 1 : \textsf{Sender}[\tau], 2 : \textsf{Receiver}[\tau] \rangle
