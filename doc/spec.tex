@@ -38,11 +38,11 @@ unintrusive as possible. We don't want to have to be explicitly sequencing and
 
 \[
 \begin{array}{l r l l}
-\textsf{Type}   &   \tau ::= & \textsf{Nat}                      & \text{natural numbers} \\
-                &            & \textsf{Str}                      & \text{strings} \\
-                &            & \langle L_i : \tau_i \rangle      & \text{products} \\
-                &            & [ L_i : \tau_i ]                  & \text{sums} \\
-                &            & \tau_1 \rightarrow \tau_2!\Delta  & \text{procedures} \\
+\textsf{Type}   &   \tau ::= & \textsf{Nat}                      & \text{natural number} \\
+                &            & \textsf{Str}                      & \text{string} \\
+                &            & \langle L_i : \tau_i \rangle      & \text{labeled product} \\
+                &            & [ L_i : \tau_i ]                  & \text{labeled sum} \\
+                &            & \tau_1 \rightarrow \tau_2!\Delta  & \text{procedure} \\
                 &            & \textsf{Sender}[\tau]             & \text{channel sender} \\
                 &            & \textsf{Receiver}[\tau]           & \text{channel receiver} \\
 \\
