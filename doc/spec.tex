@@ -20,12 +20,12 @@ featuring an effects system and channels.
 
 We introduce sorts for types, values, and computations.
 
-We use $x$ for variables and $L$ for labels. When there is an $i$ subscript, the
-idea is that there are 0 or more of the thing with the subscript. This means we
-allow for the empty product type (``unit''), the empty product literal (also
-``unit''), the empty sum type (``void'' or ``never''), and the empty case
-analysis (which, when used on a value of empty sum type, is a computation with
-any type -- but that's fine, since there are no values of empty sum type).
+When there is an $i$ subscript, the idea is that there are 0 or more of the
+thing with the subscript. This means we allow for the empty product type
+(``unit''), the empty product literal (also ``unit''), the empty sum type
+(``void'' or ``never''), and the empty case analysis (which, when used on a
+value of empty sum type, is a computation with any type -- but that's fine,
+since there are no values of empty sum type).
 
 An effect signature $\Delta$ has the form $\{ L_i : \tau_{i,1} \rightarrow
 \tau_{i,2} \}$. Again, since there can be 0 or more items in the signature, this
