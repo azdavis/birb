@@ -36,11 +36,13 @@ computations, but an ideal concrete syntax would make the distinction as
 unintrusive as possible. We don't want to have to be explicitly sequencing and
 \textsf{pure}ing all over the place in the concrete syntax.
 
-The interplay of type lambdas, forall types, and kinds is inspired by System F.
+The interplay of type lambdas, forall types, and kinds is inspired by System
+$F_\omega$.
 
 \[
 \begin{array}{l r l l}
 \textsf{Kind}   & \kappa ::= & \star                             & \text{base} \\
+                &            & \kappa_1 \rightarrow \kappa_2     & \text{higher-order} \\
 \\
 \textsf{Type}   &   \tau ::= & t                                 & \text{variable} \\
                 &            & \textsf{Nat}                      & \text{natural number} \\
@@ -49,6 +51,8 @@ The interplay of type lambdas, forall types, and kinds is inspired by System F.
                 &            & [ L_i : \tau_i ]                  & \text{labeled sum} \\
                 &            & \tau_1 \rightarrow \tau_2!\Delta  & \text{function} \\
                 &            & \forall (t : \kappa) \ \tau       & \text{universal} \\
+                &            & \lambda (t : \kappa) \ \tau       & \text{type function} \\
+                &            & \tau_1[\tau_2]                    & \text{type application} \\
                 &            & \textsf{Sender}[\tau]             & \text{channel sender} \\
                 &            & \textsf{Receiver}[\tau]           & \text{channel receiver} \\
 \\
@@ -136,6 +140,19 @@ which do step and may engender effects.
   \Gamma, t : \kappa \vdash \tau : \star
 }{
   \Gamma \vdash \forall (t : \kappa) \ \tau : \star
+}
+
+\inferrule*[right=K-TypeFunc]{
+  \Gamma, t : \kappa_1 \vdash \tau : \kappa_2
+}{
+  \Gamma \vdash \lambda (t : \kappa_1) \ \tau : \kappa_1 \rightarrow \kappa_2
+}
+
+\inferrule*[right=K-TypeApp]{
+  \Gamma \vdash \tau_1 : \kappa_1 \rightarrow \kappa_2 \\
+  \Gamma \vdash \tau_2 : \kappa_1
+}{
+  \Gamma \vdash \tau_1[\tau_2] : \kappa_2
 }
 
 \inferrule*[right=K-Sender]{
