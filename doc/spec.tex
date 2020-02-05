@@ -36,6 +36,8 @@ computations, but an ideal concrete syntax would make the distinction as
 unintrusive as possible. We don't want to have to be explicitly sequencing and
 \textsf{pure}ing all over the place in the concrete syntax.
 
+The interplay of type lambdas, forall types, and kinds is inspired by System F.
+
 \[
 \begin{array}{l r l l}
 \textsf{Kind}   & \kappa ::= & \star                             & \text{base} \\
@@ -46,6 +48,7 @@ unintrusive as possible. We don't want to have to be explicitly sequencing and
                 &            & \langle L_i : \tau_i \rangle      & \text{labeled product} \\
                 &            & [ L_i : \tau_i ]                  & \text{labeled sum} \\
                 &            & \tau_1 \rightarrow \tau_2!\Delta  & \text{function} \\
+                &            & \forall (t : \kappa) \tau         & \text{universal} \\
                 &            & \textsf{Sender}[\tau]             & \text{channel sender} \\
                 &            & \textsf{Receiver}[\tau]           & \text{channel receiver} \\
 \\
@@ -57,6 +60,7 @@ unintrusive as possible. We don't want to have to be explicitly sequencing and
                                \rangle                           & \text{product literal} \\
                 &            & L \cdot v                         & \text{sum literal} \\
                 &            & \lambda (x : \tau) \ c            & \text{function literal} \\
+                &            & \Lambda (t : \kappa) \ v          & \text{type function literal} \\
 \\
 \textsf{Comp}   &      c ::= & \textsf{pure} \ v                 & \text{enter the monad} \\
                 &            & \textsf{bind} \ x \leftarrow c_1
@@ -127,6 +131,12 @@ which do step and may engender effects.
   \Gamma \vdash \tau_1 \rightarrow \tau_2!\Delta : \star
 }
 
+\inferrule*[right=K-Forall]{
+  \Gamma, t : \kappa \vdash \tau : \star
+}{
+  \Gamma \vdash \forall t. \tau : \star
+}
+
 \inferrule*[right=K-Sender]{
   \Gamma \vdash \tau : \star
 }{
@@ -180,6 +190,13 @@ which do step and may engender effects.
 }{
   \Gamma \vdash \lambda (x : \tau_1) \ c : \tau_1 \rightarrow \tau_2!\Delta
 }
+
+\inferrule*[right=T-TypeFunc]{
+  \Gamma, t : \kappa \vdash v : \tau
+}{
+  \Gamma \vdash \Lambda (t : \kappa) \ v : \forall (t : \kappa) \tau
+}
+
 \end{mathpar}
 
 \subsection{$\Gamma \vdash c : \tau!\Delta$}
