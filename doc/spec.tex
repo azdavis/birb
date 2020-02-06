@@ -99,69 +99,69 @@ which do step and may engender effects.
 \subsection{$\Gamma \vdash \tau : \kappa$}
 
 \begin{mathpar}
-\inferrule*[right=K-Var]{
+\inferrule*[right=T-Var]{
   % axiom
 }{
   \Gamma, t : \kappa \vdash t : \kappa
 }
 
-\inferrule*[right=K-Nat]{
+\inferrule*[right=T-Nat]{
   % axiom
 }{
   \Gamma \vdash \textsf{Nat} : \star
 }
 
-\inferrule*[right=K-Str]{
+\inferrule*[right=T-Str]{
   % axiom
 }{
   \Gamma \vdash \textsf{Str} : \star
 }
 
-\inferrule*[right=K-Prod]{
+\inferrule*[right=T-Prod]{
   (\forall i) \ \Gamma \vdash \tau_i : \star
 }{
   \Gamma \vdash \langle L_i : \tau_i \rangle : \star
 }
 
-\inferrule*[right=K-Sum]{
+\inferrule*[right=T-Sum]{
   (\forall i) \ \Gamma \vdash \tau_i : \star
 }{
   \Gamma \vdash [ L_i : \tau_i ] : \star
 }
 
-\inferrule*[right=K-Func]{
+\inferrule*[right=T-Func]{
   \Gamma \vdash \tau_1 : \star \\
   \Gamma \vdash \tau_2 : \star
 }{
   \Gamma \vdash \tau_1 \rightarrow \tau_2!\Delta : \star
 }
 
-\inferrule*[right=K-Forall]{
+\inferrule*[right=T-Forall]{
   \Gamma, t : \kappa \vdash \tau : \star
 }{
   \Gamma \vdash \forall (t : \kappa) \ \tau : \star
 }
 
-\inferrule*[right=K-TypeFunc]{
+\inferrule*[right=T-TypeFunc]{
   \Gamma, t : \kappa_1 \vdash \tau : \kappa_2
 }{
   \Gamma \vdash \lambda (t : \kappa_1) \ \tau : \kappa_1 \rightarrow \kappa_2
 }
 
-\inferrule*[right=K-TypeApp]{
+\inferrule*[right=T-TypeApp]{
   \Gamma \vdash \tau_1 : \kappa_1 \rightarrow \kappa_2 \\
   \Gamma \vdash \tau_2 : \kappa_1
 }{
   \Gamma \vdash \tau_1[\tau_2] : \kappa_2
 }
 
-\inferrule*[right=K-Sender]{
+\inferrule*[right=T-Sender]{
   \Gamma \vdash \tau : \star
 }{
   \Gamma \vdash \textsf{Sender}[\tau] : \star
 }
 
-\inferrule*[right=K-Receiver]{
+\inferrule*[right=T-Receiver]{
   \Gamma \vdash \tau : \star
 }{
   \Gamma \vdash \textsf{Receiver}[\tau] : \star
@@ -171,45 +171,45 @@ which do step and may engender effects.
 \subsection{$\Gamma \vdash v : \tau$}
 
 \begin{mathpar}
-\inferrule*[right=T-Var]{
+\inferrule*[right=V-Var]{
   % axiom
 }{
   \Gamma, x : \tau \vdash x : \tau
 }
 
-\inferrule*[right=T-Nat]{
+\inferrule*[right=V-Nat]{
   % axiom
 }{
   \Gamma \vdash \overline{n} : \textsf{Nat}
 }
 
-\inferrule*[right=T-Str]{
+\inferrule*[right=V-Str]{
   % axiom
 }{
   \Gamma \vdash \overline{s} : \textsf{Str}
 }
 
-\inferrule*[right=T-Prod]{
+\inferrule*[right=V-Prod]{
   (\forall i) \ \Gamma \vdash v_i : \tau_i
 }{
   \Gamma \vdash \langle L_i \hookrightarrow v_i \rangle :
   \langle L_i : \tau_i \rangle
 }
 
-\inferrule*[right=T-Sum]{
+\inferrule*[right=V-Sum]{
   (\exists j, 0 \leq j \leq i) \ \Gamma \vdash v : \tau_j
 }{
   \Gamma \vdash L_j \cdot v : [ L_i : \tau_i ]
 }
 
-\inferrule*[right=T-Func]{
+\inferrule*[right=V-Func]{
   \Gamma \vdash \tau_1 : \star \\
   \Gamma, x : \tau_1 \vdash c : \tau_2!\Delta
 }{
   \Gamma \vdash \lambda (x : \tau_1) \ c : \tau_1 \rightarrow \tau_2!\Delta
 }
 
-\inferrule*[right=T-TypeFunc]{
+\inferrule*[right=V-TypeFunc]{
   \Gamma, t : \kappa \vdash v : \tau
 }{
   \Gamma \vdash \Lambda (t : \kappa) \ v : \forall (t : \kappa) \ \tau
@@ -220,13 +220,13 @@ which do step and may engender effects.
 \subsection{$\Gamma \vdash c : \tau!\Delta$}
 
 \begin{mathpar}
-\inferrule*[right=T-Pure]{
+\inferrule*[right=C-Pure]{
   \Gamma \vdash v : \tau
 }{
   \Gamma \vdash \textsf{pure} \ v : \tau!\{ \}
 }
 
-\inferrule*[right=T-Bind]{
+\inferrule*[right=C-Bind]{
   \Gamma \vdash c_1 : \tau_1!\Delta_1 \\
   \Gamma, x : \tau_1 \vdash c_2 : \tau_2!\Delta_2 \\
   \Delta = \Delta_1 \cup \Delta_2
@@ -235,14 +235,14 @@ which do step and may engender effects.
   \tau_2!\Delta
 }
 
-\inferrule*[right=T-Proj]{
+\inferrule*[right=C-Proj]{
   \Gamma \vdash v : \langle L_i : \tau_i \rangle \\
   (\exists j, 0 \leq j \leq i)
 }{
   \Gamma \vdash v \cdot L_j : \tau_j!\{ \}
 }
 
-\inferrule*[right=T-Match]{
+\inferrule*[right=C-Match]{
   \Gamma \vdash v : [ L_i : \tau_i ] \\
   (\forall i) \ \Gamma, x_i : \tau_i \vdash c_i : \tau!\Delta_i \\
   \Delta = \bigcup \Delta_i
@@ -252,21 +252,21 @@ which do step and may engender effects.
   \} : \tau!\Delta
 }
 
-\inferrule*[right=T-App]{
+\inferrule*[right=C-App]{
   \Gamma \vdash v_1 : \tau_1 \rightarrow \tau_2!\Delta \\
   \Gamma \vdash v_2 : \tau_1
 }{
   \Gamma \vdash v_1 (v_2) : \tau_2!\Delta
 }
 
-\inferrule*[right=T-TypeApp]{
+\inferrule*[right=C-TypeApp]{
   \Gamma \vdash v : \forall (t : \kappa) \ \tau_2 \\
   \Gamma \vdash \tau_1 : \kappa
 }{
   \Gamma \vdash v [\tau_1] : ([\tau_1/t] \tau_2)!\{ \}
 }
 
-\inferrule*[right=T-ChanNew]{
+\inferrule*[right=C-ChanNew]{
   \Gamma \vdash \tau : \star
 }{
   \Gamma \vdash \textsf{newchan}[\tau] :
@@ -274,7 +274,7 @@ which do step and may engender effects.
   !\{ \textsf{newchan} : \langle \rangle \rightarrow \textsf{Nat} \}
 }
 
-\inferrule*[right=T-ChanSend]{
+\inferrule*[right=C-ChanSend]{
   \Gamma \vdash v : \langle 1 : \textsf{Sender}[\tau], 2 : \tau \rangle
 }{
   \Gamma \vdash \textsf{send}(v) :
@@ -285,7 +285,7 @@ which do step and may engender effects.
   \}
 }
 
-\inferrule*[right=T-ChanRecv]{
+\inferrule*[right=C-ChanRecv]{
   \Gamma \vdash v : \textsf{Receiver}[\tau]
 }{
   \Gamma \vdash \textsf{recv}(v) :
