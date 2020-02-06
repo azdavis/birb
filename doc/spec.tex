@@ -41,43 +41,43 @@ $F_\omega$.
 
 \[
 \begin{array}{l r l l}
-\textsf{Kind}   & \kappa ::= & \star                             & \text{base} \\
-                &            & \kappa_1 \rightarrow \kappa_2     & \text{arrow} \\
+\textsf{Kind} & \kappa ::= & \star                             & \text{base} \\
+              &            & \kappa_1 \rightarrow \kappa_2     & \text{arrow} \\
 \\
-\textsf{Type}   &   \tau ::= & t                                 & \text{variable} \\
-                &            & \textsf{Nat}                      & \text{natural number} \\
-                &            & \textsf{Str}                      & \text{string} \\
-                &            & \langle L_i : \tau_i \rangle      & \text{labeled product} \\
-                &            & [ L_i : \tau_i ]                  & \text{labeled sum} \\
-                &            & \tau_1 \rightarrow \tau_2!\Delta  & \text{function} \\
-                &            & \forall (t : \kappa) \ \tau       & \text{universal} \\
-                &            & \lambda (t : \kappa) \ \tau       & \text{type function} \\
-                &            & \tau_1[\tau_2]                    & \text{type application} \\
-                &            & \textsf{Sender}[\tau]             & \text{channel sender} \\
-                &            & \textsf{Receiver}[\tau]           & \text{channel receiver} \\
+\textsf{Type} &   \tau ::= & t                                 & \text{variable} \\
+              &            & \textsf{Nat}                      & \text{natural number} \\
+              &            & \textsf{Str}                      & \text{string} \\
+              &            & \langle L_i : \tau_i \rangle      & \text{labeled product} \\
+              &            & [ L_i : \tau_i ]                  & \text{labeled sum} \\
+              &            & \tau_1 \rightarrow \tau_2!\Delta  & \text{function} \\
+              &            & \forall (t : \kappa) \ \tau       & \text{universal} \\
+              &            & \lambda (t : \kappa) \ \tau       & \text{type function} \\
+              &            & \tau_1[\tau_2]                    & \text{type application} \\
+              &            & \textsf{Sender}[\tau]             & \text{channel sender} \\
+              &            & \textsf{Receiver}[\tau]           & \text{channel receiver} \\
 \\
-\textsf{Val}    &      v ::= & x                                 & \text{variable} \\
-                &            & \overline{n}                      & \text{natural number literal} \\
-                &            & \overline{s}                      & \text{string literal} \\
-                &            & \langle
-                               L_i \hookrightarrow v_i
-                               \rangle                           & \text{product literal} \\
-                &            & L \cdot v                         & \text{sum literal} \\
-                &            & \lambda (x : \tau) \ c            & \text{function literal} \\
-                &            & \Lambda (t : \kappa) \ v          & \text{type function literal} \\
+\textsf{Val}  &      v ::= & x                                 & \text{variable} \\
+              &            & \overline{n}                      & \text{natural number literal} \\
+              &            & \overline{s}                      & \text{string literal} \\
+              &            & \langle
+                             L_i \hookrightarrow v_i
+                             \rangle                           & \text{product literal} \\
+              &            & L \cdot v                         & \text{sum literal} \\
+              &            & \lambda (x : \tau) \ c            & \text{function literal} \\
+              &            & \Lambda (t : \kappa) \ v          & \text{type function literal} \\
 \\
-\textsf{Comp}   &      c ::= & \textsf{pure} \ v                 & \text{enter the monad} \\
-                &            & \textsf{bind} \ x \leftarrow c_1
-                               \ \textsf{in} \ c_2               & \text{sequencing} \\
-                &            & v \cdot L                         & \text{product projection} \\
-                &            & \textsf{match} \ v \ \{
-                               L_i \cdot x_i \hookrightarrow c_i
-                               \}                                & \text{sum case analysis} \\
-                &            & v_1 (v_2)                         & \text{function application} \\
-                &            & v [\tau]                          & \text{type function application} \\
-                &            & \textsf{newchan}[\tau]            & \text{channel creation} \\
-                &            & \textsf{send}(v)                  & \text{channel send} \\
-                &            & \textsf{recv}(v)                  & \text{channel receive} \\
+\textsf{Comp} &      c ::= & \textsf{pure} \ v                 & \text{enter the monad} \\
+              &            & \textsf{bind} \ x \leftarrow c_1
+                             \ \textsf{in} \ c_2               & \text{sequencing} \\
+              &            & v \cdot L                         & \text{product projection} \\
+              &            & \textsf{match} \ v \ \{
+                             L_i \cdot x_i \hookrightarrow c_i
+                             \}                                & \text{sum case analysis} \\
+              &            & v_1 (v_2)                         & \text{function application} \\
+              &            & v [\tau]                          & \text{type function application} \\
+              &            & \textsf{newchan}[\tau]            & \text{channel creation} \\
+              &            & \textsf{send}(v)                  & \text{channel send} \\
+              &            & \textsf{recv}(v)                  & \text{channel receive} \\
 \end{array}
 \]
 
