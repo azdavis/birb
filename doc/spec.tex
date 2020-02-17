@@ -55,10 +55,10 @@ $F_\omega$.
               &            & \textsf{Str}                      & \text{string} \\
               &            & \langle L_i : \tau_i \rangle      & \text{labeled product} \\
               &            & [ L_i : \tau_i ]                  & \text{labeled sum} \\
-              &            & \tau_1 \rightarrow \tau_2!E       & \text{function} \\
+              &            & \tau_1 \rightarrow \tau_2!E       & \text{arrow} \\
               &            & \forall (t : \kappa) \ \tau       & \text{universal} \\
-              &            & \lambda (t : \kappa) \ \tau       & \text{type function} \\
-              &            & \tau_1[\tau_2]                    & \text{type application} \\
+              &            & \lambda (t : \kappa) \ \tau       & \text{function} \\
+              &            & \tau_1[\tau_2]                    & \text{application} \\
               &            & \textsf{Sender}[\tau]             & \text{channel sender} \\
               &            & \textsf{Receiver}[\tau]           & \text{channel receiver} \\
 \\
@@ -135,7 +135,7 @@ do step and may engender effects.
   \Gamma \vdash [ L_i : \tau_i ] : \textsf{Type}
 }
 
-\inferrule*[right=T-Func]{
+\inferrule*[right=T-Arrow]{
   \Gamma \vdash \tau_1 : \textsf{Type} \\
   \Gamma \vdash \tau_2 : \textsf{Type}
 }{
@@ -148,13 +148,13 @@ do step and may engender effects.
   \Gamma \vdash \forall (t : \kappa) \ \tau : \textsf{Type}
 }
 
-\inferrule*[right=T-TypeFunc]{
+\inferrule*[right=T-Func]{
   \Gamma, t : \kappa_1 \vdash \tau : \kappa_2
 }{
   \Gamma \vdash \lambda (t : \kappa_1) \ \tau : \kappa_1 \rightarrow \kappa_2
 }
 
-\inferrule*[right=T-TypeApp]{
+\inferrule*[right=T-App]{
   \Gamma \vdash \tau_1 : \kappa_1 \rightarrow \kappa_2 \\
   \Gamma \vdash \tau_2 : \kappa_1
 }{
