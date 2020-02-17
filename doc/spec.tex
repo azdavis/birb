@@ -64,7 +64,7 @@ $F_\omega$.
                              \rangle                           & \text{product literal} \\
               &            & L \cdot v                         & \text{sum literal} \\
               &            & \lambda (x : \tau) \ c            & \text{function literal} \\
-              &            & \Lambda (t : \kappa) \ v          & \text{type function literal} \\
+              &            & \Lambda (t : \kappa) \ v          & \text{big function literal} \\
 \\
 \textsf{Comp} &      c ::= & \textsf{pure} \ v                 & \text{enter the monad} \\
               &            & \textsf{bind} \ x \leftarrow c_1
@@ -209,7 +209,7 @@ which do step and may engender effects.
   \Gamma \vdash \lambda (x : \tau_1) \ c : \tau_1 \rightarrow \tau_2!\Delta
 }
 
-\inferrule*[right=V-TypeFunc]{
+\inferrule*[right=V-BigFunc]{
   \Gamma, t : \kappa \vdash v : \tau
 }{
   \Gamma \vdash \Lambda (t : \kappa) \ v : \forall (t : \kappa) \ \tau
