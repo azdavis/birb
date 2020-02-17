@@ -23,6 +23,7 @@ We introduce sorts for kinds, types, effects, values, and computations.
 When there is an $i$ subscript, the idea is that there are 0 or more of the
 thing with the subscript. This means we allow for:
 \begin{itemize}
+\item the empty product effect (``pure'')
 \item the empty product type (``unit'')
 \item the empty product literal (also ``unit'')
 \item the empty sum type (``void'' or ``never'')
@@ -33,10 +34,6 @@ Note that the empty case analysis, when used on a value of empty sum type, is a
 computation with any type -- but that's fine, since there are no values of empty
 sum type).
 
-An effect signature $E$ has the form $\langle L_i : \tau_{i,1} \rightarrow
-\tau_{i,2} \rangle$. Again, since there can be 0 or more items in the signature,
-this allows for the empty effect signature.
-
 This abstract syntax introduces a modal separation between values and
 computations, but an ideal concrete syntax would make the distinction as
 unintrusive as possible. We don't want to have to be explicitly sequencing and
@@ -45,9 +42,15 @@ unintrusive as possible. We don't want to have to be explicitly sequencing and
 The interplay of type lambdas, forall types, and kinds is inspired by System
 $F_\omega$.
 
+Many constructs were somewhat duplicated in both the type and effect sorts, to
+allow for genericity over both types and effects. But note that the big-lambda
+function in the value sort works for both generic types and generic effects,
+even though we suggestively use $t$ as the variable name.
+
 \[
 \begin{array}{l r l l}
 \textsf{Kind} & \kappa ::= & \textsf{Type}                     & \text{type} \\
+              &            & \textsf{Eff}                      & \text{effect} \\
               &            & \kappa_1 \rightarrow \kappa_2     & \text{arrow} \\
 \\
 \textsf{Type} &   \tau ::= & t                                 & \text{variable} \\
@@ -61,6 +64,15 @@ $F_\omega$.
               &            & \tau_1[\tau_2]                    & \text{application} \\
               &            & \textsf{Sender}[\tau]             & \text{channel sender} \\
               &            & \textsf{Receiver}[\tau]           & \text{channel receiver} \\
+\\
+\textsf{Eff}  &      E ::= & e                                 & \text{variable} \\
+              &            & \langle L_i :
+                             \tau_{i,1}
+                             \rightarrow \tau_{i,2}
+                             \rangle                           & \text{labeled product} \\
+              &            & \forall (e : \kappa) \ E          & \text{universal} \\
+              &            & \lambda (e : \kappa) \ E          & \text{function} \\
+              &            & E_1[E_2]                          & \text{application} \\
 \\
 \textsf{Val}  &      v ::= & x                                 & \text{variable} \\
               &            & \overline{n}                      & \text{natural number literal} \\
@@ -93,6 +105,7 @@ $F_\omega$.
 We introduce the judgements
 \begin{enumerate}
 \item $\Gamma \vdash \tau : \kappa$, the kind judgement for types.
+\item $\Gamma \vdash E : \kappa$, the kind judgement for effects.
 \item $\Gamma \vdash v : \tau$, the typing judgement for values, which do not
 step and do not engender effects.
 \item $\Gamma \vdash c : \tau!E$, the typing judgement for computations, which
@@ -171,6 +184,44 @@ do step and may engender effects.
   \Gamma \vdash \tau : \textsf{Type}
 }{
   \Gamma \vdash \textsf{Receiver}[\tau] : \textsf{Type}
+}
+\end{mathpar}
+
+\subsection{$\Gamma \vdash E : \kappa$}
+
+\begin{mathpar}
+\inferrule*[right=E-Var]{
+  % axiom
+}{
+  \Gamma, e : \kappa \vdash e : \kappa
+}
+
+\inferrule*[right=E-Prod]{
+  (\forall i) \Gamma \vdash \tau_{i,1} : \textsf{Type} \\
+  (\forall i) \Gamma \vdash \tau_{i,2} : \textsf{Type} \\
+}{
+  \Gamma \vdash
+  \langle L_i : \tau_{i,1} \rightarrow \tau_{i,2} \rangle
+  : \textsf{Eff}
+}
+
+\inferrule*[right=E-Forall]{
+  \Gamma, e : \kappa \vdash E : \textsf{Eff}
+}{
+  \Gamma \vdash \forall (e : \kappa) \ E : \textsf{Eff}
+}
+
+\inferrule*[right=E-Func]{
+  \Gamma, t : \kappa_1 \vdash E : \kappa_2
+}{
+  \Gamma \vdash \lambda (t : \kappa_1) \ E : \kappa_1 \rightarrow \kappa_2
+}
+
+\inferrule*[right=E-App]{
+  \Gamma \vdash E_1 : \kappa_1 \rightarrow \kappa_2 \\
+  \Gamma \vdash E_2 : \kappa_1
+}{
+  \Gamma \vdash E_1[E_2] : \kappa_2
 }
 \end{mathpar}
 
