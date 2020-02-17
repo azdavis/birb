@@ -33,9 +33,9 @@ Note that the empty case analysis, when used on a value of empty sum type, is a
 computation with any type -- but that's fine, since there are no values of empty
 sum type).
 
-An effect signature $E$ has the form $\{ L_i : \tau_{i,1} \rightarrow \tau_{i,2}
-\}$. Again, since there can be 0 or more items in the signature, this allows for
-the empty effect signature.
+An effect signature $E$ has the form $\langle L_i : \tau_{i,1} \rightarrow
+\tau_{i,2} \rangle$. Again, since there can be 0 or more items in the signature,
+this allows for the empty effect signature.
 
 This abstract syntax introduces a modal separation between values and
 computations, but an ideal concrete syntax would make the distinction as
@@ -229,7 +229,7 @@ do step and may engender effects.
 \inferrule*[right=C-Pure]{
   \Gamma \vdash v : \tau
 }{
-  \Gamma \vdash \textsf{pure} \ v : \tau!\{ \}
+  \Gamma \vdash \textsf{pure} \ v : \tau!\langle \rangle
 }
 
 \inferrule*[right=C-Bind]{
@@ -245,7 +245,7 @@ do step and may engender effects.
   \Gamma \vdash v : \langle L_i : \tau_i \rangle \\
   (\exists j, 0 \leq j \leq i)
 }{
-  \Gamma \vdash v \cdot L_j : \tau_j!\{ \}
+  \Gamma \vdash v \cdot L_j : \tau_j!\langle \rangle
 }
 
 \inferrule*[right=C-Match]{
@@ -269,7 +269,7 @@ do step and may engender effects.
   \Gamma \vdash v : \forall (t : \kappa) \ \tau_2 \\
   \Gamma \vdash \tau_1 : \kappa
 }{
-  \Gamma \vdash v [\tau_1] : ([\tau_1/t] \tau_2)!\{ \}
+  \Gamma \vdash v [\tau_1] : ([\tau_1/t] \tau_2)!\langle \rangle
 }
 
 \inferrule*[right=C-ChanNew]{
@@ -277,7 +277,8 @@ do step and may engender effects.
 }{
   \Gamma \vdash \textsf{newchan}[\tau] :
   \langle 1 : \textsf{Sender}[\tau], 2 : \textsf{Receiver}[\tau] \rangle
-  !\{ \textsf{newchan} : \langle \rangle \rightarrow \textsf{Nat} \}
+  !
+  \langle \textsf{newchan} : \langle \rangle \rightarrow \textsf{Nat} \rangle
 }
 
 \inferrule*[right=C-ChanSend]{
@@ -285,10 +286,12 @@ do step and may engender effects.
 }{
   \Gamma \vdash \textsf{send}(v) :
   \textsf{Sender}[\tau]
-  !\{
+  !
+  \langle
     \textsf{send} :
-    \langle 1 : \textsf{Nat}, 2 : \tau \rangle \rightarrow \langle \rangle
-  \}
+      \langle 1 : \textsf{Nat}, 2 : \tau \rangle
+      \rightarrow \langle \rangle
+  \rangle
 }
 
 \inferrule*[right=C-ChanRecv]{
@@ -296,7 +299,8 @@ do step and may engender effects.
 }{
   \Gamma \vdash \textsf{recv}(v) :
   \langle 1 : \textsf{Receiver}[\tau], 2 : \tau \rangle
-  !\{ \textsf{recv} : \textsf{Nat} \rightarrow \tau \}
+  !
+  \langle \textsf{recv} : \textsf{Nat} \rightarrow \tau \rangle
 }
 \end{mathpar}
 
