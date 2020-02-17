@@ -27,9 +27,9 @@ thing with the subscript. This means we allow for the empty product type
 value of empty sum type, is a computation with any type -- but that's fine,
 since there are no values of empty sum type).
 
-An effect signature $\Delta$ has the form $\{ L_i : \tau_{i,1} \rightarrow
-\tau_{i,2} \}$. Again, since there can be 0 or more items in the signature, this
-allows for the empty effect signature.
+An effect signature $E$ has the form $\{ L_i : \tau_{i,1} \rightarrow \tau_{i,2}
+\}$. Again, since there can be 0 or more items in the signature, this allows for
+the empty effect signature.
 
 This abstract syntax introduces a modal separation between values and
 computations, but an ideal concrete syntax would make the distinction as
@@ -49,7 +49,7 @@ $F_\omega$.
               &            & \textsf{Str}                      & \text{string} \\
               &            & \langle L_i : \tau_i \rangle      & \text{labeled product} \\
               &            & [ L_i : \tau_i ]                  & \text{labeled sum} \\
-              &            & \tau_1 \rightarrow \tau_2!\Delta  & \text{function} \\
+              &            & \tau_1 \rightarrow \tau_2!E       & \text{function} \\
               &            & \forall (t : \kappa) \ \tau       & \text{universal} \\
               &            & \lambda (t : \kappa) \ \tau       & \text{type function} \\
               &            & \tau_1[\tau_2]                    & \text{type application} \\
@@ -89,8 +89,8 @@ We introduce the judgements
 \item $\Gamma \vdash \tau : \kappa$, the kind judgement for types.
 \item $\Gamma \vdash v : \tau$, the typing judgement for values, which do not
 step and do not engender effects.
-\item $\Gamma \vdash c : \tau!\Delta$, the typing judgement for computations,
-which do step and may engender effects.
+\item $\Gamma \vdash c : \tau!E$, the typing judgement for computations, which
+do step and may engender effects.
 \end{enumerate}
 
 \newpage
@@ -133,7 +133,7 @@ which do step and may engender effects.
   \Gamma \vdash \tau_1 : \textsf{Type} \\
   \Gamma \vdash \tau_2 : \textsf{Type}
 }{
-  \Gamma \vdash \tau_1 \rightarrow \tau_2!\Delta : \textsf{Type}
+  \Gamma \vdash \tau_1 \rightarrow \tau_2!E : \textsf{Type}
 }
 
 \inferrule*[right=T-Forall]{
@@ -204,9 +204,9 @@ which do step and may engender effects.
 
 \inferrule*[right=V-Func]{
   \Gamma \vdash \tau_1 : \textsf{Type} \\
-  \Gamma, x : \tau_1 \vdash c : \tau_2!\Delta
+  \Gamma, x : \tau_1 \vdash c : \tau_2!E
 }{
-  \Gamma \vdash \lambda (x : \tau_1) \ c : \tau_1 \rightarrow \tau_2!\Delta
+  \Gamma \vdash \lambda (x : \tau_1) \ c : \tau_1 \rightarrow \tau_2!E
 }
 
 \inferrule*[right=V-BigFunc]{
@@ -217,7 +217,7 @@ which do step and may engender effects.
 
 \end{mathpar}
 
-\subsection{$\Gamma \vdash c : \tau!\Delta$}
+\subsection{$\Gamma \vdash c : \tau!E$}
 
 \begin{mathpar}
 \inferrule*[right=C-Pure]{
@@ -227,12 +227,12 @@ which do step and may engender effects.
 }
 
 \inferrule*[right=C-Bind]{
-  \Gamma \vdash c_1 : \tau_1!\Delta_1 \\
-  \Gamma, x : \tau_1 \vdash c_2 : \tau_2!\Delta_2 \\
-  \Delta = \Delta_1 \cup \Delta_2
+  \Gamma \vdash c_1 : \tau_1!E_1 \\
+  \Gamma, x : \tau_1 \vdash c_2 : \tau_2!E_2 \\
+  E = E_1 \cup E_2
 }{
   \Gamma \vdash \textsf{bind} \ x \leftarrow c_1 \ \textsf{in} \ c_2 :
-  \tau_2!\Delta
+  \tau_2!E
 }
 
 \inferrule*[right=C-Proj]{
@@ -244,19 +244,19 @@ which do step and may engender effects.
 
 \inferrule*[right=C-Match]{
   \Gamma \vdash v : [ L_i : \tau_i ] \\
-  (\forall i) \ \Gamma, x_i : \tau_i \vdash c_i : \tau!\Delta_i \\
-  \Delta = \bigcup \Delta_i
+  (\forall i) \ \Gamma, x_i : \tau_i \vdash c_i : \tau!E_i \\
+  E = \bigcup E_i
 }{
   \Gamma \vdash \textsf{match} \ v \ \{
   L_i \cdot x_i \hookrightarrow c_i
-  \} : \tau!\Delta
+  \} : \tau!E
 }
 
 \inferrule*[right=C-App]{
-  \Gamma \vdash v_1 : \tau_1 \rightarrow \tau_2!\Delta \\
+  \Gamma \vdash v_1 : \tau_1 \rightarrow \tau_2!E \\
   \Gamma \vdash v_2 : \tau_1
 }{
-  \Gamma \vdash v_1 (v_2) : \tau_2!\Delta
+  \Gamma \vdash v_1 (v_2) : \tau_2!E
 }
 
 \inferrule*[right=C-TypeApp]{
