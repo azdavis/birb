@@ -150,7 +150,8 @@ do step and may engender effects.
 
 \inferrule*[right=T-Arrow]{
   \Gamma \vdash \tau_1 : \textsf{Type} \\
-  \Gamma \vdash \tau_2 : \textsf{Type}
+  \Gamma \vdash \tau_2 : \textsf{Type} \\
+  \Gamma \vdash E : \textsf{Eff}
 }{
   \Gamma \vdash \tau_1 \rightarrow \tau_2!E : \textsf{Type}
 }
