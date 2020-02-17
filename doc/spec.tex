@@ -41,7 +41,7 @@ $F_\omega$.
 
 \[
 \begin{array}{l r l l}
-\textsf{Kind} & \kappa ::= & \star                             & \text{base} \\
+\textsf{Kind} & \kappa ::= & \textsf{Type}                     & \text{type} \\
               &            & \kappa_1 \rightarrow \kappa_2     & \text{arrow} \\
 \\
 \textsf{Type} &   \tau ::= & t                                 & \text{variable} \\
@@ -108,38 +108,38 @@ which do step and may engender effects.
 \inferrule*[right=T-Nat]{
   % axiom
 }{
-  \Gamma \vdash \textsf{Nat} : \star
+  \Gamma \vdash \textsf{Nat} : \textsf{Type}
 }
 
 \inferrule*[right=T-Str]{
   % axiom
 }{
-  \Gamma \vdash \textsf{Str} : \star
+  \Gamma \vdash \textsf{Str} : \textsf{Type}
 }
 
 \inferrule*[right=T-Prod]{
-  (\forall i) \ \Gamma \vdash \tau_i : \star
+  (\forall i) \ \Gamma \vdash \tau_i : \textsf{Type}
 }{
-  \Gamma \vdash \langle L_i : \tau_i \rangle : \star
+  \Gamma \vdash \langle L_i : \tau_i \rangle : \textsf{Type}
 }
 
 \inferrule*[right=T-Sum]{
-  (\forall i) \ \Gamma \vdash \tau_i : \star
+  (\forall i) \ \Gamma \vdash \tau_i : \textsf{Type}
 }{
-  \Gamma \vdash [ L_i : \tau_i ] : \star
+  \Gamma \vdash [ L_i : \tau_i ] : \textsf{Type}
 }
 
 \inferrule*[right=T-Func]{
-  \Gamma \vdash \tau_1 : \star \\
-  \Gamma \vdash \tau_2 : \star
+  \Gamma \vdash \tau_1 : \textsf{Type} \\
+  \Gamma \vdash \tau_2 : \textsf{Type}
 }{
-  \Gamma \vdash \tau_1 \rightarrow \tau_2!\Delta : \star
+  \Gamma \vdash \tau_1 \rightarrow \tau_2!\Delta : \textsf{Type}
 }
 
 \inferrule*[right=T-Forall]{
-  \Gamma, t : \kappa \vdash \tau : \star
+  \Gamma, t : \kappa \vdash \tau : \textsf{Type}
 }{
-  \Gamma \vdash \forall (t : \kappa) \ \tau : \star
+  \Gamma \vdash \forall (t : \kappa) \ \tau : \textsf{Type}
 }
 
 \inferrule*[right=T-TypeFunc]{
@@ -156,15 +156,15 @@ which do step and may engender effects.
 }
 
 \inferrule*[right=T-Sender]{
-  \Gamma \vdash \tau : \star
+  \Gamma \vdash \tau : \textsf{Type}
 }{
-  \Gamma \vdash \textsf{Sender}[\tau] : \star
+  \Gamma \vdash \textsf{Sender}[\tau] : \textsf{Type}
 }
 
 \inferrule*[right=T-Receiver]{
-  \Gamma \vdash \tau : \star
+  \Gamma \vdash \tau : \textsf{Type}
 }{
-  \Gamma \vdash \textsf{Receiver}[\tau] : \star
+  \Gamma \vdash \textsf{Receiver}[\tau] : \textsf{Type}
 }
 \end{mathpar}
 
@@ -203,7 +203,7 @@ which do step and may engender effects.
 }
 
 \inferrule*[right=V-Func]{
-  \Gamma \vdash \tau_1 : \star \\
+  \Gamma \vdash \tau_1 : \textsf{Type} \\
   \Gamma, x : \tau_1 \vdash c : \tau_2!\Delta
 }{
   \Gamma \vdash \lambda (x : \tau_1) \ c : \tau_1 \rightarrow \tau_2!\Delta
@@ -267,7 +267,7 @@ which do step and may engender effects.
 }
 
 \inferrule*[right=C-ChanNew]{
-  \Gamma \vdash \tau : \star
+  \Gamma \vdash \tau : \textsf{Type}
 }{
   \Gamma \vdash \textsf{newchan}[\tau] :
   \langle 1 : \textsf{Sender}[\tau], 2 : \textsf{Receiver}[\tau] \rangle
