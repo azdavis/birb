@@ -18,14 +18,20 @@ featuring an effects system and channels.
 \newpage
 \section{AST}
 
-We introduce sorts for kinds, types, values, and computations.
+We introduce sorts for kinds, types, effects, values, and computations.
 
 When there is an $i$ subscript, the idea is that there are 0 or more of the
-thing with the subscript. This means we allow for the empty product type
-(``unit''), the empty product literal (also ``unit''), the empty sum type
-(``void'' or ``never''), and the empty case analysis (which, when used on a
-value of empty sum type, is a computation with any type -- but that's fine,
-since there are no values of empty sum type).
+thing with the subscript. This means we allow for:
+\begin{itemize}
+\item the empty product type (``unit'')
+\item the empty product literal (also ``unit'')
+\item the empty sum type (``void'' or ``never'')
+\item the empty case analysis
+\end{itemize}
+
+Note that the empty case analysis, when used on a value of empty sum type, is a
+computation with any type -- but that's fine, since there are no values of empty
+sum type).
 
 An effect signature $E$ has the form $\{ L_i : \tau_{i,1} \rightarrow \tau_{i,2}
 \}$. Again, since there can be 0 or more items in the signature, this allows for
