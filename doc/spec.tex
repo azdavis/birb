@@ -93,6 +93,7 @@ even though we suggestively use $t$ as the variable name.
                              \}                                & \text{case analysis} \\
               &            & v_1(v_2)                          & \text{value application} \\
               &            & v[\tau]                           & \text{type application} \\
+              &            & v[E]                              & \text{effect application} \\
               &            & \textsf{newchan}[\tau]            & \text{channel creation} \\
               &            & \textsf{send}(v)                  & \text{channel send} \\
               &            & \textsf{recv}(v)                  & \text{channel receive} \\
@@ -322,6 +323,13 @@ do step and may engender effects.
   \Gamma \vdash \tau_1 : \kappa
 }{
   \Gamma \vdash v[\tau_1] : ([\tau_1/t] \tau_2)!\langle \rangle
+}
+
+\inferrule*[right=C-EffApp]{
+  \Gamma \vdash v : \forall (e : \kappa) \ E_2 \\
+  \Gamma \vdash E_1 : \kappa
+}{
+  \Gamma \vdash v[E_1] : ([E_1/e] E_2)!\langle \rangle
 }
 
 \inferrule*[right=C-ChanNew]{
