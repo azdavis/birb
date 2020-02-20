@@ -75,24 +75,24 @@ even though we suggestively use $t$ as the variable name.
               &            & E_1[E_2]                          & \text{application} \\
 \\
 \textsf{Val}  &      v ::= & x                                 & \text{variable} \\
-              &            & \overline{n}                      & \text{natural number literal} \\
-              &            & \overline{s}                      & \text{string literal} \\
+              &            & \overline{n}                      & \text{natural number} \\
+              &            & \overline{s}                      & \text{string} \\
               &            & \langle
                              L_i \hookrightarrow v_i
-                             \rangle                           & \text{product literal} \\
-              &            & L \cdot v                         & \text{sum literal} \\
-              &            & \lambda (x : \tau) \ c            & \text{function literal} \\
-              &            & \Lambda (t : \kappa) \ v          & \text{big function literal} \\
+                             \rangle                           & \text{labeled product} \\
+              &            & L \cdot v                         & \text{labeled sum} \\
+              &            & \lambda (x : \tau) \ c            & \text{function} \\
+              &            & \Lambda (t : \kappa) \ v          & \text{big function} \\
 \\
 \textsf{Comp} &      c ::= & \textsf{pure} \ v                 & \text{enter the monad} \\
               &            & \textsf{bind} \ x \leftarrow c_1
                              \ \textsf{in} \ c_2               & \text{sequencing} \\
-              &            & v \cdot L                         & \text{product projection} \\
+              &            & v \cdot L                         & \text{projection} \\
               &            & \textsf{match} \ v \ \{
                              L_i \cdot x_i \hookrightarrow c_i
-                             \}                                & \text{sum case analysis} \\
-              &            & v_1(v_2)                          & \text{function application} \\
-              &            & v[\tau]                           & \text{type function application} \\
+                             \}                                & \text{case analysis} \\
+              &            & v_1(v_2)                          & \text{value application} \\
+              &            & v[\tau]                           & \text{type application} \\
               &            & \textsf{newchan}[\tau]            & \text{channel creation} \\
               &            & \textsf{send}(v)                  & \text{channel send} \\
               &            & \textsf{recv}(v)                  & \text{channel receive} \\
