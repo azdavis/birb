@@ -429,9 +429,10 @@ The following theorems ought to hold:
 
 \begin{itemize}
 \item (Progress) If $\Gamma \vdash c : \tau!E$, then $c = \textsf{pure} \ v$ or
-$c \mapsto c'$.
+$c \mapsto c'$. Prove by rule induction on $\Gamma \vdash c : \tau!E$.
 \item (Preservation) If $\Gamma \vdash c : \tau!E$ and $c \mapsto c'$, then
-$\Gamma \vdash c' : \tau!E'$ where $E' \subseteq E$.
+$\Gamma \vdash c' : \tau!E'$ where $E' \subseteq E$. Prove by rule induction on
+$c \mapsto c'$.
 \end{itemize}
 
 TODO define subset relation for effects?
