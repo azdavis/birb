@@ -275,6 +275,8 @@ do step and may engender effects.
   \Gamma \vdash \Lambda (t : \kappa) \ v : \forall (t : \kappa) \ \tau
 }
 
+TODO define union of effects?
+
 \end{mathpar}
 
 \subsection{$\Gamma \vdash c : \tau!E$}
@@ -420,5 +422,21 @@ do step and may engender effects.
 \end{mathpar}
 
 TODO add rules for newchan, send, recv
+
+TODO define subst?
+
+\newpage
+\section{Safety}
+
+The following theorems ought to hold:
+
+\begin{itemize}
+\item (Progress) If $\Gamma \vdash c : \tau!E$, then $c = \textsf{pure} \ v$ or
+$c \mapsto c'$.
+\item (Preservation) If $\Gamma \vdash c : \tau!E$ and $c \mapsto c'$, then
+$\Gamma \vdash c' : \tau!E'$ where $E' \subseteq E$.
+\end{itemize}
+
+TODO define subset relation for effects?
 
 \end{document}
