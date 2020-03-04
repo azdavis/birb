@@ -111,6 +111,7 @@ We introduce the judgements
 step and do not engender effects.
 \item $\Gamma \vdash c : \tau!E$, the typing judgement for computations, which
 do step and may engender effects.
+\item $c \mapsto c'$, the stepping judgement for computations.
 \end{enumerate}
 
 \newpage
@@ -363,5 +364,61 @@ do step and may engender effects.
   \langle \textsf{recv} : \textsf{Nat} \rightarrow \tau \rangle
 }
 \end{mathpar}
+
+\subsection{$c \mapsto c'$}
+
+\begin{mathpar}
+\inferrule*[right=S-BindArg]{
+  c_1 \mapsto c_1'
+}{
+  \textsf{bind} \ x \leftarrow c_1 \ \textsf{in} \ c_2
+  \mapsto
+  \textsf{bind} \ x \leftarrow c_1' \ \textsf{in} \ c_2
+}
+
+\inferrule*[right=S-Bind]{
+  % axiom
+}{
+  \textsf{bind} \ x \leftarrow \textsf{pure} \ v \ \textsf{in} \ c_2
+  \mapsto
+  [v/x] c_2
+}
+
+\inferrule*[right=S-Proj]{
+  \exists j, 0 \leq j \leq i
+}{
+  \langle L_i \hookrightarrow v_i \rangle \cdot L_j \mapsto \textsf{pure} \ v_j
+}
+
+\inferrule*[right=S-Match]{
+  \exists j, 0 \leq j \leq i
+}{
+  \textsf{match} \ L_j \cdot v \ \{
+    L_i \cdot x_i \hookrightarrow c_i
+  \}
+  \mapsto
+  [v/x_j] c_j
+}
+
+\inferrule*[right=S-App]{
+  % axiom
+}{
+  (\lambda (x : \tau) c) (v_2) \mapsto [v_2/x] c
+}
+
+\inferrule*[right=S-TypeApp]{
+  % axiom
+}{
+  (\Lambda (t : \kappa) v)[\tau] \mapsto \textsf{pure} \ [\tau/t] v
+}
+
+\inferrule*[right=S-EffApp]{
+  % axiom
+}{
+  (\Lambda (t : \kappa) v)[E] \mapsto \textsf{pure} \ [E/t] v
+}
+\end{mathpar}
+
+TODO add rules for newchan, send, recv
 
 \end{document}
