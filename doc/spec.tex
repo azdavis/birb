@@ -6,7 +6,6 @@
 \usepackage{mathtools}
 \usepackage{amssymb}
 \usepackage{mathpartir}
-\newcommand{\OR}[0]{\ \textbar \ }
 \newcommand{\E}[0]{$\epsilon$}
 \newcommand{\T}[1]{\texttt{#1}}
 \newcommand{\N}[1]{\textlangle#1\textrangle}
@@ -19,6 +18,172 @@
 
 This is the specification for Birb, a programming language featuring an effects
 system and channels.
+
+\newpage
+\section{Concrete Syntax}
+
+\subsection{Reserved Words}
+
+The reserved words follow, separated by spaces. An identifier may not be a
+reserved word. Not all reserved words are currently used in the grammar.
+
+\T{affects}
+\T{become}
+\T{ensures}
+\T{enum}
+\T{exists}
+\T{fn}
+\T{forall}
+\T{if}
+\T{impl}
+\T{let}
+\T{match}
+\T{mut}
+\T{priv}
+\T{pub}
+\T{requires}
+\T{return}
+\T{struct}
+\T{trait}
+\T{type}
+\T{use}
+\T{where}
+
+\subsection{Lexical Tokens}
+
+\begin{tabular}{lll}
+\N{big-ident} & =
+  & [A-Z][A-Za-z0-9]* \\
+\N{ident} & =
+  & [a-z][a-z0-9\_]* \\
+\N{string} & =
+  & ``...'' \\
+\N{number} & =
+  & [0-9][0-9\_]*
+\end{tabular}
+
+\subsection{Grammar}
+
+\begin{tabular}{lll}
+\N{program} & =
+  & \E \\
+& & \N{top-defn} \N{program} \\
+\N{top-defn} & =
+  & \N{type-defn} \\
+& & \N{fn-defn} \\
+\N{type-defn} & =
+  & \T{type} \N{big-ident} \T{=} \N{type} \T{;} \\
+\N{type} & =
+  & \N{big-ident} \\
+& & \T{(} \N{type-list} \T{)} \\
+& & \T{struct} \T{\{} \N{field-list} \T{\}} \\
+& & \T{enum} \T{\{} \N{ctor-list} \T{\}} \\
+& & \N{type} \T{->} \N{type} \\
+& & \N{type} \T{affects} \N{effect-list} \\
+\N{type-list} & =
+  & \E \\
+& & \N{type} \\
+& & \N{type} \T{,} \N{type-list} \\
+\N{field-list} & =
+  & \E \\
+& & \N{ident} \T{:} \N{type} \\
+& & \N{ident} \T{:} \N{type} \T{,} \N{field-list} \\
+\N{ctor-list} & =
+  & \E \\
+& & \N{ctor} \\
+& & \N{ctor} \T{,} \N{ctor-list} \\
+\N{ctor} & =
+  & \N{ident} \\
+& & \N{ident} \T{(} \N{type-list} \T{)} \\
+\N{effect-list} & =
+  & \N{big-ident} \\
+& & \N{big-ident} \T{,} \\
+& & \N{big-ident} \T{,} \N{effect-list} \\
+\N{fn-defn} & =
+  & \T{fn} \N{ident} \N{type-params} \N{params} \N{ret-type} \\
+& & \N{requires-clause} \N{ensures-clause} \N{block} \\
+\N{type-params} & =
+  & \E \\
+& & \T{[} \N{type-param-list} \T{]} \\
+\N{type-param-list} & =
+  & \N{big-ident} \\
+& & \N{big-ident} \T{,} \\
+& & \N{big-ident} \T{,} \N{type-param-list} \\
+\N{params} & =
+  & \T{(} \N{param-list} \T{)} \\
+\N{param-list} & =
+  & \E \\
+& & \N{pat} \\
+& & \N{pat} \T{,} \N{param-list} \\
+\end{tabular}
+
+\begin{tabular}{lll}
+\N{ret-type} & =
+  & \E \\
+& & \T{:} \N{type} \\
+\N{requires-clause} & =
+  & \E \\
+& & \T{requires} \N{expr} \\
+\N{ensures-clause} & =
+  & \E \\
+& & \T{ensures} \N{expr} \\
+\N{block} & =
+  & \T{\{} \N{stmt-list} \T{\}} \\
+\N{stmt-list} & =
+  & \E \\
+& & \N{expr} \\
+& & \N{stmt} \N{stmt-list} \\
+\N{stmt} & =
+  & \T{let} \N{pat} \T{=} \N{expr} \\
+& & \N{expr} \T{;} \\
+\N{pat} & =
+  & \T{\_} \\
+& & \N{string} \\
+& & \N{number} \\
+& & \N{ident} \\
+& & \N{ident} \T{(} \N{pat-list} \T{)} \\
+& & \N{big-ident} \T{\{} \N{field-pat-list} \T{\}} \\
+& & \T{(} \N{pat-list} \T{)} \\
+& & \N{pat} \T{\textbar} \N{pat} \\
+& & \N{pat} \T{:} \N{type} \\
+\N{field-pat-list} & =
+  & \E \\
+& & \N{field-pat} \\
+& & \N{field-pat} \T{,} \N{field-pat-list} \\
+\N{field-pat} & =
+  & \N{ident} \\
+& & \N{ident} \T{:} \N{pat} \\
+\end{tabular}
+
+\begin{tabular}{lll}
+\N{expr} & =
+  & \N{ident} \\
+& & \N{string} \\
+& & \N{number} \\
+& & \T{(} \N{expr-list} \T{)} \\
+& & \N{big-ident} \T{\{} \N{field-expr-list} \T{\}} \\
+& & \N{ident} \N{type-list} \T{(} \N{expr-list} \T{)} \\
+& & \N{expr} \T{.} \T{ident} \\
+& & \N{expr} \T{.} \N{ident} \N{type-list} \T{(} \N{expr-list} \T{)} \\
+& & \T{return} \N{expr} \\
+& & \T{match} \N{expr} \T{\{} \N{arm-list} \T{\}} \\
+\N{expr-list} & =
+  & \E \\
+& & \N{expr} \\
+& & \N{expr} \T{,} \N{expr-list} \\
+\N{field-expr-list} & =
+  & \E \\
+& & \N{field-expr} \\
+& & \N{field-expr} \T{,} \N{field-expr-list} \\
+\N{field-expr} & =
+  & \N{ident} \\
+& & \N{ident} \T{:} \N{expr} \\
+\N{arm-list} & =
+  & \E \\
+& & \N{arm} \N{arm-list} \\
+\N{arm} & =
+  & \N{pat} \N{block}
+\end{tabular}
 
 \newpage
 \section{Abstract Syntax}
