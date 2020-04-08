@@ -6,6 +6,11 @@
 \usepackage{mathtools}
 \usepackage{amssymb}
 \usepackage{mathpartir}
+\newcommand{\OR}[0]{\ \textbar \ }
+\newcommand{\E}[0]{$\epsilon$}
+\newcommand{\T}[1]{\texttt{#1}}
+\newcommand{\N}[1]{\textlangle#1\textrangle}
+\renewcommand{\arraystretch}{1.2}
 \title{Birb}
 \author{Ariel Davis (azdavis), Vivian Huang (vivianh)}
 \date{\today}
@@ -47,58 +52,77 @@ allow for genericity over both types and effects. But note that the big-lambda
 function in the value sort works for both generic types and generic effects,
 even though we suggestively use $t$ as the variable name.
 
-\[
-\begin{array}{l r l l}
-\textsf{Kind} & \kappa ::= & \textsf{Type}                     & \text{type} \\
-              &            & \textsf{Eff}                      & \text{effect} \\
-              &            & \kappa_1 \rightarrow \kappa_2     & \text{arrow} \\
-\\
-\textsf{Type} &   \tau ::= & t                                 & \text{variable} \\
-              &            & \textsf{Nat}                      & \text{natural number} \\
-              &            & \textsf{Str}                      & \text{string} \\
-              &            & \langle L_i : \tau_i \rangle      & \text{labeled product} \\
-              &            & [ L_i : \tau_i ]                  & \text{labeled sum} \\
-              &            & \tau_1 \rightarrow \tau_2!E       & \text{arrow} \\
-              &            & \forall (t : \kappa) \ \tau       & \text{universal} \\
-              &            & \lambda (t : \kappa) \ \tau       & \text{function} \\
-              &            & \tau_1[\tau_2]                    & \text{application} \\
-              &            & \textsf{Sender}[\tau]             & \text{channel sender} \\
-              &            & \textsf{Receiver}[\tau]           & \text{channel receiver} \\
-\\
-\textsf{Eff}  &      E ::= & e                                 & \text{variable} \\
-              &            & \langle L_i :
-                             \tau_{i,1}
-                             \rightarrow \tau_{i,2}
-                             \rangle                           & \text{labeled product} \\
-              &            & \forall (e : \kappa) \ E          & \text{universal} \\
-              &            & \lambda (e : \kappa) \ E          & \text{function} \\
-              &            & E_1[E_2]                          & \text{application} \\
-\\
-\textsf{Val}  &      v ::= & x                                 & \text{variable} \\
-              &            & \overline{n}                      & \text{natural number} \\
-              &            & \overline{s}                      & \text{string} \\
-              &            & \langle
-                             L_i \hookrightarrow v_i
-                             \rangle                           & \text{labeled product} \\
-              &            & L \cdot v                         & \text{labeled sum} \\
-              &            & \lambda (x : \tau) \ c            & \text{function} \\
-              &            & \Lambda (t : \kappa) \ v          & \text{big function} \\
-\\
-\textsf{Comp} &      c ::= & \textsf{pure} \ v                 & \text{enter the monad} \\
-              &            & \textsf{bind} \ x \leftarrow c_1
-                             \ \textsf{in} \ c_2               & \text{sequencing} \\
-              &            & v \cdot L                         & \text{projection} \\
-              &            & \textsf{match} \ v \ \{
-                             L_i \cdot x_i \hookrightarrow c_i
-                             \}                                & \text{case analysis} \\
-              &            & v_1(v_2)                          & \text{value application} \\
-              &            & v[\tau]                           & \text{type application} \\
-              &            & v[E]                              & \text{effect application} \\
-              &            & \textsf{newchan}[\tau]            & \text{channel creation} \\
-              &            & \textsf{send}(v)                  & \text{channel send} \\
-              &            & \textsf{recv}(v)                  & \text{channel receive} \\
-\end{array}
-\]
+\subsection{Kinds}
+
+$\begin{array}{lll}
+\kappa =
+  & \textsf{Type}                 & \text{type} \\
+  & \textsf{Eff}                  & \text{effect} \\
+  & \kappa_1 \rightarrow \kappa_2 & \text{arrow}
+\end{array}$
+
+\subsection{Types}
+
+$\begin{array}{lll}
+\tau =
+  & t                            & \text{variable} \\
+  & \textsf{Nat}                 & \text{natural number} \\
+  & \textsf{Str}                 & \text{string} \\
+  & \langle L_i : \tau_i \rangle & \text{labeled product} \\
+  & [ L_i : \tau_i ]             & \text{labeled sum} \\
+  & \tau_1 \rightarrow \tau_2!E  & \text{arrow} \\
+  & \forall (t : \kappa) \ \tau  & \text{universal} \\
+  & \lambda (t : \kappa) \ \tau  & \text{function} \\
+  & \tau_1[\tau_2]               & \text{application} \\
+  & \textsf{Sender}[\tau]        & \text{channel sender} \\
+  & \textsf{Receiver}[\tau]      & \text{channel receiver}
+\end{array}$
+
+\subsection{Effects}
+
+$\begin{array}{rll}
+E =
+  & e                              & \text{variable} \\
+  & \langle L_i : \tau_{i,1}
+    \rightarrow \tau_{i,2} \rangle & \text{labeled product} \\
+  & \forall (e : \kappa) \ E       & \text{universal} \\
+  & \lambda (e : \kappa) \ E       & \text{function} \\
+  & E_1[E_2]                       & \text{application}
+\end{array}$
+
+\subsection{Values}
+
+$\begin{array}{rll}
+v =
+  & x                           & \text{variable} \\
+  & \overline{n}                & \text{natural number} \\
+  & \overline{s}                & \text{string} \\
+  & \langle L_i
+    \hookrightarrow v_i \rangle & \text{labeled product} \\
+  & L \cdot v                   & \text{labeled sum} \\
+  & \lambda (x : \tau) \ c      & \text{function} \\
+  & \Lambda (t : \kappa) \ v    & \text{big function}
+\end{array}$
+
+\subsection{Computations}
+
+$\begin{array}{rll}
+c =
+  & \textsf{pure} \ v      & \text{enter the monad} \\
+  & \textsf{bind} \
+    x \leftarrow c_1 \
+  \textsf{in} \ c_2      & \text{sequencing} \\
+  & v \cdot L              & \text{projection} \\
+  & \textsf{match} \ v \
+    \{ L_i \cdot x_i
+    \hookrightarrow c_i \} & \text{case analysis} \\
+  & v_1(v_2)               & \text{value application} \\
+  & v[\tau]                & \text{type application} \\
+  & v[E]                   & \text{effect application} \\
+  & \textsf{newchan}[\tau] & \text{channel creation} \\
+  & \textsf{send}(v)       & \text{channel send} \\
+  & \textsf{recv}(v)       & \text{channel receive}
+\end{array}$
 
 \newpage
 \section{Judgement Form}
