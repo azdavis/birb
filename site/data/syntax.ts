@@ -1,6 +1,6 @@
 import { Grammar, t, n, a, e } from "../grammar";
 
-const birb: Grammar = [
+const syntax: Grammar = [
   { name: "program", def: [e, a(n("top-defn"), n("program"))] },
   { name: "top-defn", def: [n("type-defn"), n("fn-defn")] },
   {
@@ -142,4 +142,4 @@ const birb: Grammar = [
   { name: "arm", def: [a(n("pat"), n("block"))] },
 ];
 
-export default birb;
+export default syntax;

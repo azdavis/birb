@@ -2,7 +2,7 @@ import React from "react";
 import Katex from "./Katex";
 import Grammar from "./Grammar";
 import reserved from "../data/reserved";
-import grammar from "../data/grammar";
+import syntax from "../data/syntax";
 import { mul } from "../../core/pkg/birb_core";
 
 function monoWord(x: string) {
@@ -30,7 +30,7 @@ export default function App() {
       </p>
       <div className="d-flex flex-wrap jc-center">{reserved.map(monoWord)}</div>
       <h3>Grammar</h3>
-      <Grammar g={grammar} />
+      <Grammar g={syntax} />
       <p>the answer is {mul(3, 4)}.</p>
       <Katex
         block
