@@ -1,7 +1,17 @@
 {
+  "cSpell.words": [
+    "bindgen",
+    "crossorigin",
+    "katex",
+    "rightarrow",
+    "wasm",
+    "webassembly"
+  ],
   "files.exclude": {
-    "build": true
-  },
-  "editor.insertSpaces": true,
-  "prettier.useTabs": false
+    "build": true,
+    "dist": true,
+    "node_modules": true,
+    "**/pkg": true,
+    "target": true
+  }
 }

@@ -1,1 +1,10 @@
+# tex build artifacts
 /build
+# website build artifacts
+/dist
+# js deps
+/node_modules
+# wasm build artifacts
+pkg
+# rust deps and build artifacts
+/target

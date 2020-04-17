@@ -1,0 +1,17 @@
+html {
+  font-family: Verdana, sans-serif;
+  color: #333;
+}
+
+body {
+  max-width: 70ch;
+  margin: 0 auto;
+  padding: 0.5em;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    background-color: #333;
+    color: #ddd;
+  }
+}

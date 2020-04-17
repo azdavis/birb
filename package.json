@@ -1,0 +1,27 @@
+{
+  "private": true,
+  "name": "try-wasm",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack-dev-server"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.34",
+    "@types/react-dom": "^16.9.6",
+    "copy-webpack-plugin": "^5.0.0",
+    "css-loader": "^3.5.2",
+    "style-loader": "^1.1.4",
+    "ts-loader": "^7.0.0",
+    "typescript": "^3.8.3",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5"
+  },
+  "dependencies": {
+    "@types/katex": "^0.11.0",
+    "katex": "^0.11.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  }
+}

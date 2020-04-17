@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esNext",
+    "moduleResolution": "node",
+    "lib": ["dom", "es2015"],
+    "jsx": "react",
+    "strict": true,
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true
+  }
+}
