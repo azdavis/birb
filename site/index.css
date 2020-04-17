@@ -9,9 +9,29 @@ body {
   padding: 0.5em;
 }
 
+code {
+  font-family: Menlo, Consolas, monospace;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     background-color: #333;
     color: #ddd;
   }
+}
+
+.d-flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.jc-center {
+  justify-content: center;
+}
+
+.p-0-5 {
+  padding: 0.5em;
 }
