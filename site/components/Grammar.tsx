@@ -10,9 +10,14 @@ type Props = {
 
 const eps = <Katex v="\epsilon" />;
 
-function prodKey(p: G.Prod, idx: number) {
-  // space is intentional for And
-  return <React.Fragment key={idx}>{prod(p)} </React.Fragment>;
+function prodAnd(p: G.Prod, idx: number) {
+  const sp = idx === 0 ? "" : " ";
+  return (
+    <React.Fragment key={idx}>
+      {sp}
+      {prod(p)}
+    </React.Fragment>
+  );
 }
 
 function prod(p: G.Prod): React.ReactNode {
@@ -26,7 +31,7 @@ function prod(p: G.Prod): React.ReactNode {
     case "NonTerm":
       return <em>{p.val}</em>;
     case "And":
-      return p.prods.map(prodKey);
+      return p.prods.map(prodAnd);
     default:
       return absurd(p);
   }
