@@ -10,54 +10,54 @@ type Props = {
 
 const eps = <Katex v="\epsilon" />;
 
-function prodAnd(p: G.Prod, idx: number) {
+function andItem(a: G.Alternative, idx: number) {
   const sp = idx === 0 ? "" : " ";
   return (
     <React.Fragment key={idx}>
       {sp}
-      {prod(p)}
+      {alternative(a)}
     </React.Fragment>
   );
 }
 
-function prod(p: G.Prod): React.ReactNode {
-  switch (p.t) {
+function alternative(a: G.Alternative): React.ReactNode {
+  switch (a.t) {
     case "Empty":
       return eps;
     case "Comment":
-      return p.msg;
+      return a.msg;
     case "Term":
-      return <code>{p.val}</code>;
+      return <code>{a.val}</code>;
     case "NonTerm":
-      return <em>{p.val}</em>;
+      return <em>{a.val}</em>;
     case "And":
-      return p.prods.map(prodAnd);
+      return a.as.map(andItem);
     default:
-      return absurd(p);
+      return absurd(a);
   }
 }
 
-function orOpt(p: G.Prod, idx: number) {
+function alternativeIdx(p: G.Alternative, idx: number) {
   return (
     <React.Fragment key={idx}>
       <div className="Grammar__Sep ta-c">{idx === 0 ? "=" : "|"}</div>
-      <div className="Grammar__Prod">{prod(p)}</div>
+      <div className="Grammar__Prod">{alternative(p)}</div>
     </React.Fragment>
   );
 }
 
-function grammarItem(gi: G.GrammarItem) {
+function production(gi: G.Production) {
   return (
     <React.Fragment key={gi.name}>
       <div className="Grammar__Name">
         <em>{gi.name}</em>
       </div>
-      {gi.def.map(orOpt)}
+      {gi.def.map(alternativeIdx)}
       <div className="Grammar__Space h-1-em" />
     </React.Fragment>
   );
 }
 
 export default function Grammar({ g }: Props) {
-  return <div className="Grammar">{g.map(grammarItem)}</div>;
+  return <div className="Grammar">{g.map(production)}</div>;
 }

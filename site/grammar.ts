@@ -1,32 +1,31 @@
-export type Grammar = GrammarItem[];
+export type Grammar = Production[];
 
-export type GrammarItem = {
+export type Production = {
   name: string;
-  // a big or
-  def: Prod[];
+  def: Alternative[];
 };
 
-export type Prod =
+export type Alternative =
   | { t: "Empty" }
   | { t: "Comment"; msg: string }
   | { t: "Term"; val: string }
   | { t: "NonTerm"; val: string }
-  | { t: "And"; prods: Prod[] };
+  | { t: "And"; as: Alternative[] };
 
-export const e: Prod = { t: "Empty" };
+export const e: Alternative = { t: "Empty" };
 
-export function c(msg: string): Prod {
+export function c(msg: string): Alternative {
   return { t: "Comment", msg };
 }
 
-export function t(val: string): Prod {
+export function t(val: string): Alternative {
   return { t: "Term", val };
 }
 
-export function n(val: string): Prod {
+export function n(val: string): Alternative {
   return { t: "NonTerm", val };
 }
 
-export function a(...prods: Prod[]): Prod {
-  return { t: "And", prods };
+export function a(...as: Alternative[]): Alternative {
+  return { t: "And", as };
 }
