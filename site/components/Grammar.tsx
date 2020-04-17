@@ -40,20 +40,21 @@ function prod(p: G.Prod): React.ReactNode {
 function orOpt(p: G.Prod, idx: number) {
   return (
     <React.Fragment key={idx}>
-      <div className="GrammarItem__Sep ta-c">{idx === 0 ? "=" : "|"}</div>
-      <div className="GrammarItem__Prod">{prod(p)}</div>
+      <div className="Grammar__Sep ta-c">{idx === 0 ? "=" : "|"}</div>
+      <div className="Grammar__Prod">{prod(p)}</div>
     </React.Fragment>
   );
 }
 
 function grammarItem(gi: G.GrammarItem) {
   return (
-    <div key={gi.name} className="mb-1-em">
-      <div>
+    <React.Fragment key={gi.name}>
+      <div className="Grammar__Name">
         <em>{gi.name}</em>
       </div>
-      <div className="GrammarItem">{gi.def.map(orOpt)}</div>
-    </div>
+      {gi.def.map(orOpt)}
+      <div className="Grammar__Space h-1-em" />
+    </React.Fragment>
   );
 }
 
