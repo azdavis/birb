@@ -1,0 +1,19 @@
+.AbsSyntax {
+  display: grid;
+  grid-template-columns: [begin] 2em [sep] 2em [math] auto [text] auto [end];
+}
+
+.AbsSyntax__Name,
+.AbsSyntax__Space {
+  grid-column: begin / end;
+}
+
+.AbsSyntax__Sep {
+  grid-column: sep / math;
+}
+.AbsSyntax__Math {
+  grid-column: math / text;
+}
+.AbsSyntax__Text {
+  grid-column: text / end;
+}

@@ -4,6 +4,8 @@ import Grammar from "./Grammar";
 import reserved from "../data/reserved";
 import tokens from "../data/tokens";
 import syntax from "../data/syntax";
+import AbsSyntax from "./AbsSyntax";
+import absSyntax from "../data/abs-syntax";
 import { mul } from "../../core/pkg/birb_core";
 
 function monoWord(x: string) {
@@ -39,6 +41,8 @@ export default function App() {
         separate a reserved word from an identifier.
       </p>
       <Grammar g={syntax} />
+      <h2>Abstract Syntax</h2>
+      <AbsSyntax a={absSyntax} />
       <p>the answer is {mul(3, 4)}.</p>
       <Katex
         block
