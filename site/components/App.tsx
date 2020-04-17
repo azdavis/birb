@@ -5,7 +5,7 @@ import { mul } from "../../core/pkg/birb_core";
 
 function monoWord(x: string) {
   return (
-    <code className="p-0-5" key={x}>
+    <code className="p-0-5-em" key={x}>
       {x}
     </code>
   );
