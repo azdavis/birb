@@ -113,8 +113,8 @@ export const effKind: Judgement[] = [
   {
     name: "E-Prod",
     math: String.raw`\frac{
-  (\forall i) \ \Gamma \vdash \tau_{i,1} : \textsf{Type} \\
-  (\forall i) \ \Gamma \vdash \tau_{i,2} : \textsf{Type} \\
+  (\forall i) \ \Gamma \vdash \tau_{i,1} : \textsf{Type} \hspace{1em}
+  (\forall i) \ \Gamma \vdash \tau_{i,2} : \textsf{Type} \hspace{1em}
 }{
   \Gamma \vdash
   \langle L_i : \tau_{i,1} \rightarrow \tau_{i,2} \rangle
@@ -140,7 +140,7 @@ export const effKind: Judgement[] = [
   {
     name: "E-App",
     math: String.raw`\frac{
-  \Gamma \vdash E_1 : \kappa_1 \rightarrow \kappa_2 \\
+  \Gamma \vdash E_1 : \kappa_1 \rightarrow \kappa_2 \hspace{1em}
   \Gamma \vdash E_2 : \kappa_1
 }{
   \Gamma \vdash E_1[E_2] : \kappa_2
@@ -193,7 +193,7 @@ export const valueType: Judgement[] = [
   {
     name: "V-Func",
     math: String.raw`\frac{
-  \Gamma \vdash \tau_1 : \textsf{Type} \\
+  \Gamma \vdash \tau_1 : \textsf{Type} \hspace{1em}
   \Gamma, x : \tau_1 \vdash c : \tau_2!E
 }{
   \Gamma \vdash \lambda (x : \tau_1) \ c : \tau_1 \rightarrow \tau_2!E
@@ -221,8 +221,8 @@ export const compType: Judgement[] = [
   {
     name: "C-Bind",
     math: String.raw`\frac{
-  \Gamma \vdash c_1 : \tau_1!E_1 \\
-  \Gamma, x : \tau_1 \vdash c_2 : \tau_2!E_2 \\
+  \Gamma \vdash c_1 : \tau_1!E_1 \hspace{1em}
+  \Gamma, x : \tau_1 \vdash c_2 : \tau_2!E_2 \hspace{1em}
   E = E_1 \cup E_2
 }{
   \Gamma \vdash \textsf{bind} \ x \leftarrow c_1 \ \textsf{in} \ c_2 :
@@ -232,7 +232,7 @@ export const compType: Judgement[] = [
   {
     name: "C-Proj",
     math: String.raw`\frac{
-  \Gamma \vdash v : \langle L_i : \tau_i \rangle \\
+  \Gamma \vdash v : \langle L_i : \tau_i \rangle \hspace{1em}
   \exists j, 0 \leq j \leq i
 }{
   \Gamma \vdash v \cdot L_j : \tau_j!\langle \rangle
@@ -241,8 +241,8 @@ export const compType: Judgement[] = [
   {
     name: "C-Match",
     math: String.raw`\frac{
-  \Gamma \vdash v : [ L_i : \tau_i ] \\
-  (\forall i) \ \Gamma, x_i : \tau_i \vdash c_i : \tau!E_i \\
+  \Gamma \vdash v : [ L_i : \tau_i ] \hspace{1em}
+  (\forall i) \ \Gamma, x_i : \tau_i \vdash c_i : \tau!E_i \hspace{1em}
   E = \bigcup E_i
 }{
   \Gamma \vdash \textsf{match} \ v \ \{
@@ -253,7 +253,7 @@ export const compType: Judgement[] = [
   {
     name: "C-App",
     math: String.raw`\frac{
-  \Gamma \vdash v_1 : \tau_1 \rightarrow \tau_2!E \\
+  \Gamma \vdash v_1 : \tau_1 \rightarrow \tau_2!E \hspace{1em}
   \Gamma \vdash v_2 : \tau_1
 }{
   \Gamma \vdash v_1(v_2) : \tau_2!E
@@ -262,7 +262,7 @@ export const compType: Judgement[] = [
   {
     name: "C-TypeApp",
     math: String.raw`\frac{
-  \Gamma \vdash v : \forall (t : \kappa) \ \tau_2 \\
+  \Gamma \vdash v : \forall (t : \kappa) \ \tau_2 \hspace{1em}
   \Gamma \vdash \tau_1 : \kappa
 }{
   \Gamma \vdash v[\tau_1] : ([\tau_1/t] \tau_2)!\langle \rangle
@@ -271,7 +271,7 @@ export const compType: Judgement[] = [
   {
     name: "C-EffApp",
     math: String.raw`\frac{
-  \Gamma \vdash v : \forall (e : \kappa) \ E_2 \\
+  \Gamma \vdash v : \forall (e : \kappa) \ E_2 \hspace{1em}
   \Gamma \vdash E_1 : \kappa
 }{
   \Gamma \vdash v[E_1] : ([E_1/e] E_2)!\langle \rangle
