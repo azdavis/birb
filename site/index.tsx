@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Katex from "./components/Katex";
-import { mul } from "../core/pkg/try_wasm";
+import { mul } from "../core/pkg/birb_core";
 import "./index.css";
 
 function App() {
