@@ -1,3 +1,7 @@
+// TODO define union of effects?
+// TODO add rules for newchan, send, recv. TODO define subst?
+// TODO define subset relation for effects?
+
 export type Judgement = {
   name: string;
   math: string;
