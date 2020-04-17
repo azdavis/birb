@@ -1,0 +1,12 @@
+.GrammarItem {
+  display: grid;
+  grid-template-columns: [begin] 2em [sep] 2em [prod] auto [end];
+}
+
+.GrammarItem__Sep {
+  grid-column: sep/prod;
+}
+
+.GrammarItem__Prod {
+  grid-column: prod/end;
+}

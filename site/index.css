@@ -1,5 +1,6 @@
 html {
   font-family: Verdana, sans-serif;
+  line-height: 1.4;
   color: #333;
 }
 
@@ -32,6 +33,15 @@ code {
   justify-content: center;
 }
 
-.p-0-5-em {
-  padding: 0.5em;
+.p-lr-0-5-em {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.mb-1-em {
+  margin-bottom: 1em;
+}
+
+.ta-c {
+  text-align: center;
 }
