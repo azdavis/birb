@@ -15,5 +15,5 @@ function fromTeXtoHTML(tex: string, displayMode: boolean): DangerousHTML {
 }
 
 export default function Katex({ v, block }: Props) {
-  return <div dangerouslySetInnerHTML={fromTeXtoHTML(v, block === true)} />;
+  return <span dangerouslySetInnerHTML={fromTeXtoHTML(v, block === true)} />;
 }
