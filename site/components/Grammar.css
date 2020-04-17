@@ -5,13 +5,13 @@
 
 .Grammar__Name,
 .Grammar__Space {
-  grid-column: begin/end;
+  grid-column: begin / end;
 }
 
 .Grammar__Sep {
-  grid-column: sep/prod;
+  grid-column: sep / prod;
 }
 
 .Grammar__Prod {
-  grid-column: prod/end;
+  grid-column: prod / end;
 }
