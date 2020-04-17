@@ -5,7 +5,34 @@ const syntax: Grammar = [
   { name: "top-defn", def: [n("type-defn"), n("fn-defn")] },
   {
     name: "type-defn",
-    def: [a(t("type"), n("big-ident"), t("="), n("type"), t(";"))],
+    def: [
+      a(t("type"), n("big-ident"), n("big-params"), t("="), n("type"), t(";")),
+    ],
+  },
+  { name: "big-params", def: [e, a(t("["), n("big-param-list"), t("]"))] },
+  {
+    name: "big-param-list",
+    def: [
+      e,
+      n("big-param-one"),
+      a(n("big-param-one"), t(","), n("big-param-list")),
+    ],
+  },
+  {
+    name: "big-param-one",
+    def: [a(n("big-ident"), t(":"), n("kind"))],
+  },
+  {
+    name: "kind",
+    def: [
+      n("big-ident"),
+      a(t("("), n("kind-list"), t(")")),
+      a(n("kind"), t("->"), n("kind")),
+    ],
+  },
+  {
+    name: "kind-list",
+    def: [e, n("kind"), a(n("kind"), t(","), n("kind-list"))],
   },
   {
     name: "type",
@@ -52,22 +79,15 @@ const syntax: Grammar = [
       a(
         t("fn"),
         n("ident"),
-        n("type-params"),
+        n("big-params"),
         n("params"),
         n("ret-type"),
         n("requires-clause"),
         n("ensures-clause"),
-        n("block"),
+        t("="),
+        n("expr"),
+        t(";"),
       ),
-    ],
-  },
-  { name: "type-params", def: [e, a(t("["), n("type-param-list"), t("]"))] },
-  {
-    name: "type-param-list",
-    def: [
-      n("big-ident"),
-      a(n("big-ident"), t(",")),
-      a(n("big-ident"), t(","), n("type-param-list")),
     ],
   },
   { name: "params", def: [a(t("("), n("param-list"), t(")"))] },
@@ -127,6 +147,7 @@ const syntax: Grammar = [
       ),
       a(t("return"), n("expr")),
       a(t("match"), n("expr"), t("{"), n("arm-list"), t("}")),
+      n("block"),
     ],
   },
   {
