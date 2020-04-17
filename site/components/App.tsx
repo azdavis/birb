@@ -2,6 +2,7 @@ import React from "react";
 import Katex from "./Katex";
 import Grammar from "./Grammar";
 import reserved from "../data/reserved";
+import tokens from "../data/tokens";
 import syntax from "../data/syntax";
 import { mul } from "../../core/pkg/birb_core";
 
@@ -29,7 +30,14 @@ export default function App() {
         all reserved words are currently used in the grammar.
       </p>
       <div className="d-flex flex-wrap jc-center">{reserved.map(monoWord)}</div>
+      <h3>Lexical Tokens</h3>
+      <Grammar g={tokens} />
       <h3>Grammar</h3>
+      <p>
+        Arbitrary comments and whitespace may be interspersed between tokens.
+        Sometimes, at least 1 element of whitespace is required, e.g. to
+        separate a reserved word from an identifier.
+      </p>
       <Grammar g={syntax} />
       <p>the answer is {mul(3, 4)}.</p>
       <Katex

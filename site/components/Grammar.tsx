@@ -19,6 +19,8 @@ function prod(p: G.Prod): React.ReactNode {
   switch (p.t) {
     case "Empty":
       return eps;
+    case "Comment":
+      return p.msg;
     case "Term":
       return <code>{p.val}</code>;
     case "NonTerm":
