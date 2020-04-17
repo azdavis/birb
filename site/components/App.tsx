@@ -6,6 +6,14 @@ import tokens from "../data/tokens";
 import syntax from "../data/syntax";
 import AbsSyntax from "./AbsSyntax";
 import absSyntax from "../data/abs-syntax";
+import {
+  Judgement,
+  typeKind,
+  effKind,
+  valueType,
+  compType,
+  compStep,
+} from "../data/judgements";
 import { mul } from "../../core/pkg/birb_core";
 
 function monoWord(x: string) {
@@ -13,6 +21,15 @@ function monoWord(x: string) {
     <code className="p-lr-0-5-em" key={x}>
       {x}
     </code>
+  );
+}
+
+function judgement(x: Judgement) {
+  return (
+    <React.Fragment key={x.name}>
+      <h4>{x.name}</h4>
+      <Katex block v={x.math} />
+    </React.Fragment>
   );
 }
 
@@ -43,15 +60,51 @@ export default function App() {
       <Grammar g={syntax} />
       <h2>Abstract Syntax</h2>
       <AbsSyntax a={absSyntax} />
+      <h2>Judgement Forms</h2>
+      <p>We introduce the judgements</p>
+      <ol>
+        <li>
+          <Katex v="\Gamma \vdash \tau : \kappa" />, the kinding judgement for
+          types.
+        </li>
+        <li>
+          <Katex v="\Gamma \vdash E : \kappa" />, the kinding judgement for
+          effects.
+        </li>
+        <li>
+          <Katex v="\Gamma \vdash v : \tau" />, the typing judgement for values,
+          which do not step and do not engender effects.
+        </li>
+        <li>
+          <Katex v="\Gamma \vdash c : \tau!E" />, the typing judgement for
+          computations, which do step and may engender effects.
+        </li>
+        <li>
+          <Katex v="c \mapsto c'" />, the stepping judgement for computations.
+        </li>
+      </ol>
+      <h2>Judgement Definitions</h2>
+      <h3>
+        <Katex v="\Gamma \vdash \tau : \kappa" />
+      </h3>
+      {typeKind.map(judgement)}
+      <h3>
+        <Katex v="\Gamma \vdash E : \kappa" />
+      </h3>
+      {effKind.map(judgement)}
+      <h3>
+        <Katex v="\Gamma \vdash v : \tau" />
+      </h3>
+      {valueType.map(judgement)}
+      <h3>
+        <Katex v="\Gamma \vdash c : \tau!E" />
+      </h3>
+      {compType.map(judgement)}
+      <h3>
+        <Katex v="c \mapsto c'" />
+      </h3>
+      {compStep.map(judgement)}
       <p>the answer is {mul(3, 4)}.</p>
-      <Katex
-        block
-        v="\frac{
-          \Gamma, x : \tau \vdash e : \rho
-        }{
-          \Gamma \vdash \lambda (x : \tau) e : \tau \rightarrow \rho
-        }"
-      />
     </div>
   );
 }
