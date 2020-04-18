@@ -1,17 +1,17 @@
 import { Grammar, t, c, n, a, e } from "../grammar";
 
 const tokens: Grammar = [
-  { name: "comment", def: [a(t("//"), n("comment-tail"))] },
-  { name: "comment-tail", def: [c("any character except newline")] },
-  { name: "big-ident", def: [a(n("upper"), n("big-ident-tail"))] },
+  { name: "comment", def: [a(t("//"), n("comment-tl"))] },
+  { name: "comment-tl", def: [c("any character except newline")] },
+  { name: "big-ident", def: [a(n("upper"), n("big-ident-tl"))] },
   {
-    name: "big-ident-tail",
-    def: [e, a(n("big-ident-tail-one"), n("big-ident-tail"))],
+    name: "big-ident-tl",
+    def: [e, a(n("big-ident-tl-one"), n("big-ident-tl"))],
   },
-  { name: "big-ident-tail-one", def: [n("upper"), n("lower"), n("digit")] },
-  { name: "ident", def: [a(n("lower"), n("ident-tail"))] },
-  { name: "ident-tail", def: [e, a(n("ident-tail-one"), n("ident-tail"))] },
-  { name: "ident-tail-one", def: [n("lower"), n("number"), t("_")] },
+  { name: "big-ident-tl-one", def: [n("upper"), n("lower"), n("digit")] },
+  { name: "ident", def: [a(n("lower"), n("ident-tl"))] },
+  { name: "ident-tl", def: [e, a(n("ident-tl-one"), n("ident-tl"))] },
+  { name: "ident-tl-one", def: [n("lower"), n("number"), t("_")] },
   { name: "string", def: [a(t('"'), n("string-inner"), t('"'))] },
   {
     name: "string-inner",
@@ -23,14 +23,14 @@ const tokens: Grammar = [
   },
   {
     name: "number",
-    def: [a(n("digit"), n("number-tail"))],
+    def: [a(n("digit"), n("number-tl"))],
   },
   {
-    name: "number-tail",
-    def: [e, a(n("number-tail-one"), n("number-tail"))],
+    name: "number-tl",
+    def: [e, a(n("number-tl-one"), n("number-tl"))],
   },
   {
-    name: "number-tail-one",
+    name: "number-tl-one",
     def: [n("digit"), t("_")],
   },
   {
