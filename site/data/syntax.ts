@@ -9,6 +9,23 @@ const syntax: Grammar = [
       a(t("type"), n("big-ident"), n("big-params"), t("="), n("type"), t(";")),
     ],
   },
+  {
+    name: "fn-defn",
+    def: [
+      a(
+        t("fn"),
+        n("ident"),
+        n("big-params"),
+        n("params"),
+        n("ret-type"),
+        n("requires-clause"),
+        n("ensures-clause"),
+        t("="),
+        n("expr"),
+        t(";"),
+      ),
+    ],
+  },
   { name: "big-params", def: [e, a(t("["), n("big-param-list"), t("]"))] },
   {
     name: "big-param-list",
@@ -71,23 +88,6 @@ const syntax: Grammar = [
       n("big-ident"),
       a(n("big-ident"), t(",")),
       a(n("big-ident"), t(","), n("effect-list")),
-    ],
-  },
-  {
-    name: "fn-defn",
-    def: [
-      a(
-        t("fn"),
-        n("ident"),
-        n("big-params"),
-        n("params"),
-        n("ret-type"),
-        n("requires-clause"),
-        n("ensures-clause"),
-        t("="),
-        n("expr"),
-        t(";"),
-      ),
     ],
   },
   { name: "params", def: [a(t("("), n("param-list"), t(")"))] },
