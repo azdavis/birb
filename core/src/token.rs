@@ -1,3 +1,5 @@
+use crate::ident::{BigIdent, Ident};
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Token {
   // punctuation
@@ -33,9 +35,9 @@ pub enum Token {
   Use,
   Where,
   // identifier
-  Ident(String),
+  Ident(Ident),
   // big identifier
-  BigIdent(String),
+  BigIdent(BigIdent),
   // number
   Number(u64),
   // string

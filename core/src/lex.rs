@@ -1,4 +1,5 @@
 use crate::error::{Error, Result};
+use crate::ident::{BigIdent, Ident};
 use crate::token::{Token, PUNCT, WORDS};
 
 // a guess
@@ -54,7 +55,7 @@ pub fn get(bs: &[u8]) -> Result<Vec<Token>> {
         i += 1;
       }
       let tok_utf8 = std::str::from_utf8(&bs[s..i]).unwrap();
-      ret.push(Token::Ident(tok_utf8.to_owned()));
+      ret.push(Token::Ident(Ident::new(tok_utf8)));
       continue 'outer;
     }
     // big identifier
@@ -65,7 +66,7 @@ pub fn get(bs: &[u8]) -> Result<Vec<Token>> {
         i += 1;
       }
       let tok_utf8 = std::str::from_utf8(&bs[s..i]).unwrap();
-      ret.push(Token::BigIdent(tok_utf8.to_owned()));
+      ret.push(Token::BigIdent(BigIdent::new(tok_utf8)));
       continue 'outer;
     }
     // number
@@ -123,7 +124,7 @@ fn is_ident_tl(b: u8) -> bool {
 
 #[cfg(test)]
 mod tests {
-  use super::{get, Token as T};
+  use super::{get, BigIdent, Ident, Token as T};
 
   #[test]
   fn empty() {
@@ -168,9 +169,9 @@ mod tests {
         T::RRound,
         T::Match,
         T::LCurly,
-        T::Ident("foo".to_owned()),
+        T::Ident(Ident::new("foo")),
         T::RCurly,
-        T::BigIdent("Bar".to_owned()),
+        T::BigIdent(BigIdent::new("Bar")),
         T::LSquare,
         T::Number(123),
         T::RSquare
