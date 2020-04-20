@@ -5,9 +5,7 @@ const syntax: Grammar = [
   { name: "top-defn", def: [n("type-defn"), n("fn-defn")] },
   {
     name: "type-defn",
-    def: [
-      a(t("type"), n("big-ident"), n("big-params"), t("="), n("type"), t(";")),
-    ],
+    def: [a(t("type"), n("big-ident"), n("big-params"), t("="), n("type"))],
   },
   {
     name: "fn-defn",
@@ -22,7 +20,6 @@ const syntax: Grammar = [
         n("ensures-clause"),
         t("="),
         n("expr"),
-        t(";"),
       ),
     ],
   },
@@ -102,10 +99,7 @@ const syntax: Grammar = [
   { name: "stmt-list", def: [e, n("expr"), a(n("stmt"), n("stmt-list"))] },
   {
     name: "stmt",
-    def: [
-      a(t("let"), n("pat"), t("="), n("expr"), t(";")),
-      a(n("expr"), t(";")),
-    ],
+    def: [a(t("let"), n("pat"), t("="), n("expr")), a(t("do"), n("expr"))],
   },
   {
     name: "pat",
