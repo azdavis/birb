@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Ident(String);
 
 impl Ident {
@@ -15,7 +15,7 @@ impl fmt::Display for Ident {
   }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BigIdent(String);
 
 impl BigIdent {
