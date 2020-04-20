@@ -107,7 +107,7 @@ const syntax: Grammar = [
   },
   {
     name: "ctor",
-    def: [n("ident"), a(n("ident"), t("("), n("type-list"), t(")"))],
+    def: [a(n("ident"), t("("), n("type"), t(")"))],
   },
   {
     name: "effect",
@@ -153,6 +153,7 @@ const syntax: Grammar = [
     name: "expr",
     def: [
       n("ident"),
+      a(n("big-ident"), t("::"), n("ident")),
       n("string"),
       n("number"),
       a(t("("), n("expr-list"), t(")")),
