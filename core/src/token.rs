@@ -1,4 +1,5 @@
 use crate::ident::{BigIdent, Ident};
+use std::fmt;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Token {
@@ -14,34 +15,67 @@ pub enum Token {
   Equal,
   // reserved words
   Affects,
-  Become,
+  Do,
   Ensures,
   Enum,
-  Exists,
   Fn_,
-  Forall,
-  If,
-  Impl,
   Let,
   Match,
-  Mut,
-  Priv,
-  Pub,
   Requires,
   Return,
   Struct,
-  Trait,
   Type,
-  Use,
-  Where,
-  // identifier
+  // other
   Ident(Ident),
-  // big identifier
   BigIdent(BigIdent),
-  // number
   Number(u64),
-  // string
   String_(String),
+}
+
+impl Token {
+  pub fn desc(&self) -> &'static str {
+    match *self {
+      // punctuation
+      Self::LRound => "(",
+      Self::RRound => ")",
+      Self::LSquare => "[",
+      Self::RSquare => "]",
+      Self::LCurly => "{",
+      Self::RCurly => "}",
+      Self::Comma => ",",
+      Self::Colon => ":",
+      Self::Equal => "=",
+      // reserved words
+      Self::Affects => "affects",
+      Self::Do => "do",
+      Self::Ensures => "ensures",
+      Self::Enum => "enum",
+      Self::Fn_ => "fn",
+      Self::Let => "let",
+      Self::Match => "match",
+      Self::Requires => "requires",
+      Self::Return => "return",
+      Self::Struct => "struct",
+      Self::Type => "type",
+      // other
+      Self::Ident(..) => "an identifier",
+      Self::BigIdent(..) => "a big identifier",
+      Self::Number(..) => "a number",
+      Self::String_(..) => "a string",
+    }
+  }
+}
+
+impl fmt::Display for Token {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match *self {
+      Self::Ident(ref x) => write!(f, "{}", x),
+      Self::BigIdent(ref x) => write!(f, "{}", x),
+      Self::Number(ref n) => write!(f, "{}", n),
+      Self::String_(ref s) => write!(f, "{:?}", s),
+      _ => write!(f, "{}", self.desc()),
+    }
+  }
 }
 
 // these should be sorted longest first, then alphabetically
@@ -59,33 +93,23 @@ pub const PUNCT: [(&[u8], Token); 9] = [
   (b"=", Token::Equal),
 ];
 
-pub const WORDS: [(&[u8], Token); 21] = [
+pub const WORDS: [(&[u8], Token); 11] = [
   // 8
   (b"requires", Token::Requires),
   // 7
   (b"affects", Token::Affects),
   (b"ensures", Token::Ensures),
   // 6
-  (b"become", Token::Become),
-  (b"exists", Token::Exists),
-  (b"forall", Token::Forall),
   (b"return", Token::Return),
   (b"struct", Token::Struct),
   // 5
   (b"match", Token::Match),
-  (b"trait", Token::Trait),
-  (b"where", Token::Where),
   // 4
   (b"enum", Token::Enum),
-  (b"impl", Token::Impl),
-  (b"priv", Token::Priv),
   (b"type", Token::Type),
   // 3
   (b"let", Token::Let),
-  (b"mut", Token::Mut),
-  (b"pub", Token::Pub),
-  (b"use", Token::Use),
   // 2
+  (b"do", Token::Do),
   (b"fn", Token::Fn_),
-  (b"if", Token::If),
 ];
