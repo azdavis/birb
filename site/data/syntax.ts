@@ -2,10 +2,41 @@ import { Grammar, t, n, a, e, terminals } from "../grammar";
 
 const syntax: Grammar = [
   { name: "program", def: [e, a(n("top-defn"), n("program"))] },
-  { name: "top-defn", def: [n("type-defn"), n("fn-defn")] },
+  {
+    name: "top-defn",
+    def: [n("type-defn"), n("struct-defn"), n("enum-defn"), n("fn-defn")],
+  },
   {
     name: "type-defn",
     def: [a(t("type"), n("big-ident"), n("big-params"), t("="), n("type"))],
+  },
+  {
+    name: "struct-defn",
+    def: [
+      a(
+        t("struct"),
+        n("big-ident"),
+        n("big-params"),
+        t("="),
+        t("{"),
+        n("field-list"),
+        t("}"),
+      ),
+    ],
+  },
+  {
+    name: "enum-defn",
+    def: [
+      a(
+        t("enum"),
+        n("big-ident"),
+        n("big-params"),
+        t("="),
+        t("{"),
+        n("ctor-list"),
+        t("}"),
+      ),
+    ],
   },
   {
     name: "fn-defn",
@@ -53,8 +84,6 @@ const syntax: Grammar = [
     def: [
       n("big-ident"),
       a(t("("), n("type-list"), t(")")),
-      a(t("struct"), t("{"), n("field-list"), t("}")),
-      a(t("enum"), t("{"), n("ctor-list"), t("}")),
       a(n("type"), t("->"), n("type")),
       a(n("type"), t("affects"), n("effect-list")),
     ],
