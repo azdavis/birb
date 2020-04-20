@@ -86,7 +86,7 @@ const syntax: Grammar = [
       n("big-ident"),
       a(t("("), n("type-list"), t(")")),
       a(n("type"), t("->"), n("type")),
-      a(n("type"), t("affects"), n("effect-list")),
+      a(n("type"), t("affects"), n("effect")),
     ],
   },
   {
@@ -110,12 +110,12 @@ const syntax: Grammar = [
     def: [n("ident"), a(n("ident"), t("("), n("type-list"), t(")"))],
   },
   {
-    name: "effect-list",
-    def: [
-      n("big-ident"),
-      a(n("big-ident"), t(",")),
-      a(n("big-ident"), t(","), n("effect-list")),
-    ],
+    name: "effect",
+    def: [a(n("big-ident"), n("effect-tl"))],
+  },
+  {
+    name: "effect-tl",
+    def: [e, a(t("+"), n("effect"))],
   },
   { name: "params", def: [a(t("("), n("param-list"), t(")"))] },
   {
