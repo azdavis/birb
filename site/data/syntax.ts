@@ -1,4 +1,4 @@
-import { Grammar, t, n, a, e } from "../grammar";
+import { Grammar, t, n, a, e, terminals } from "../grammar";
 
 const syntax: Grammar = [
   { name: "program", def: [e, a(n("top-defn"), n("program"))] },
@@ -157,4 +157,39 @@ const syntax: Grammar = [
   { name: "arm", def: [a(n("pat"), n("block"))] },
 ];
 
-export default syntax;
+const special: string[] = [];
+const reserved: string[] = [
+  "become",
+  "case",
+  "const",
+  "exists",
+  "extern",
+  "final",
+  "for",
+  "forall",
+  "if",
+  "impl",
+  "import",
+  "loop",
+  "mod",
+  "mut",
+  "throw",
+  "throws",
+  "trait",
+  "use",
+  "while",
+];
+const alpha = /^[a-z]+$/;
+
+terminals(syntax).forEach((t) => {
+  if (alpha.test(t)) {
+    reserved.push(t);
+  } else {
+    special.push(t);
+  }
+});
+
+special.sort();
+reserved.sort();
+
+export { special, reserved, syntax };
