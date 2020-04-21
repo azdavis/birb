@@ -120,8 +120,8 @@ const syntax: Grammar = [
   },
   { name: "requires-clause", def: [e, a(t("requires"), n("expr"))] },
   { name: "ensures-clause", def: [e, a(t("ensures"), n("expr"))] },
-  { name: "block", def: [a(t("{"), n("stmt-list"), t("}"))] },
-  { name: "stmt-list", def: [e, n("expr"), a(n("stmt"), n("stmt-list"))] },
+  { name: "block", def: [a(t("{"), n("block-inner"), t("}"))] },
+  { name: "block-inner", def: [e, n("expr"), a(n("stmt"), n("block-inner"))] },
   {
     name: "stmt",
     def: [a(t("let"), n("pat"), t("="), n("expr")), a(t("do"), n("expr"))],
