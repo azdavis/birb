@@ -56,7 +56,7 @@ pub enum Type {
 
 pub struct StructExpr {
   pub name: BigIdent,
-  pub params: Option<Vec<Param<BigIdent, Kind>>>,
+  pub params: Vec<Param<BigIdent, Kind>>,
   pub fields: Vec<Param<Ident, Type>>,
 }
 
@@ -69,11 +69,11 @@ pub enum Expr {
   String_(String),
   Number(u64),
   Tuple(Vec<Expr>),
-  Struct(BigIdent, Option<Vec<TypeOrEffect>>, Vec<Expr>),
+  Struct(BigIdent, Vec<TypeOrEffect>, Vec<Field<Expr>>),
   Var(IdentPath),
-  FnCall(IdentPath, Option<Vec<TypeOrEffect>>, Vec<Expr>),
+  FnCall(IdentPath, Vec<TypeOrEffect>, Vec<Expr>),
   FieldGet(IdentPath, Ident),
-  MethodCall(IdentPath, Ident, Option<Vec<TypeOrEffect>>, Vec<Expr>),
+  MethodCall(IdentPath, Ident, Vec<TypeOrEffect>, Vec<Expr>),
   Return(Box<Expr>),
   Match(Box<Expr>, Vec<Arm>),
   Block(Box<Block>),
