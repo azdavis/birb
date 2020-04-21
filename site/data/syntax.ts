@@ -55,10 +55,10 @@ const syntax: Grammar = [
   },
   {
     name: "big-param-list",
-    def: [e, n("big-param-one"), a(n("big-param-one"), t(","), n("big-param-list"))],
+    def: [e, n("big-param"), a(n("big-param"), t(","), n("big-param-list"))],
   },
   {
-    name: "big-param-one",
+    name: "big-param",
     def: [a(n("big-ident"), t(":"), n("kind"))],
   },
   {
