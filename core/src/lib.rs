@@ -1,5 +1,6 @@
 use wasm_bindgen::prelude::*;
 
+mod cst;
 mod error;
 mod ident;
 mod lex;
