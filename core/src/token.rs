@@ -39,7 +39,7 @@ pub enum Token {
 
 impl Token {
   pub fn desc(&self) -> &'static str {
-    match *self {
+    match self {
       // punctuation
       Self::Arrow => "->",
       Self::Bar => "|",
@@ -78,11 +78,11 @@ impl Token {
 
 impl fmt::Display for Token {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    match *self {
-      Self::BigIdent(ref x) => write!(f, "{}", x),
-      Self::Ident(ref x) => write!(f, "{}", x),
-      Self::Number(ref n) => write!(f, "{}", n),
-      Self::String_(ref s) => write!(f, "{:?}", s),
+    match self {
+      Self::BigIdent(x) => write!(f, "{}", x),
+      Self::Ident(x) => write!(f, "{}", x),
+      Self::Number(n) => write!(f, "{}", n),
+      Self::String_(s) => write!(f, "{:?}", s),
       _ => write!(f, "{}", self.desc()),
     }
   }

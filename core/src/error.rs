@@ -12,12 +12,12 @@ pub enum Error {
 
 impl fmt::Display for Error {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    match *self {
+    match self {
       Self::InvalidByte(b) => write!(f, "invalid byte: {:x}", b),
       Self::UnclosedString => write!(f, "unclosed string literal"),
-      Self::InvalidUTF8(ref e) => write!(f, "invalid utf-8: {}", e),
-      Self::InvalidNumber(ref e) => write!(f, "invalid number: {}", e),
-      Self::Parse(ref expected, ref found) => {
+      Self::InvalidUTF8(e) => write!(f, "invalid utf-8: {}", e),
+      Self::InvalidNumber(e) => write!(f, "invalid number: {}", e),
+      Self::Parse(expected, found) => {
         write!(f, "parse error: expected {}, found {}", expected, found)
       }
     }
@@ -26,9 +26,9 @@ impl fmt::Display for Error {
 
 impl std::error::Error for Error {
   fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-    match *self {
-      Self::InvalidUTF8(ref e) => Some(e),
-      Self::InvalidNumber(ref e) => Some(e),
+    match self {
+      Self::InvalidUTF8(e) => Some(e),
+      Self::InvalidNumber(e) => Some(e),
       Self::InvalidByte(_) | Self::UnclosedString | Self::Parse(..) => None,
     }
   }
