@@ -21,7 +21,6 @@ pub enum Token {
   Underscore,
   // reserved words
   Affects,
-  Do,
   Ensures,
   Enum,
   Fn_,
@@ -59,7 +58,6 @@ impl Token {
       Self::Underscore => "_",
       // reserved words
       Self::Affects => "affects",
-      Self::Do => "do",
       Self::Ensures => "ensures",
       Self::Enum => "enum",
       Self::Fn_ => "fn",
@@ -112,7 +110,7 @@ pub const PUNCT: [(&[u8], Token); 15] = [
   (b".", Token::Dot),
 ];
 
-pub const WORDS: [(&[u8], Token); 11] = [
+pub const WORDS: [(&[u8], Token); 10] = [
   // 8
   (b"requires", Token::Requires),
   // 7
@@ -129,6 +127,5 @@ pub const WORDS: [(&[u8], Token); 11] = [
   // 3
   (b"let", Token::Let),
   // 2
-  (b"do", Token::Do),
   (b"fn", Token::Fn_),
 ];

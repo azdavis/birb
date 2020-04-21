@@ -15,6 +15,6 @@ fn call[
   let _ = Guy[T] { x }
   // match the empty tuple against the single-arm match
   // and upon match, evaluate to the empty tuple
-  do match () { () { () } }
+  let _ = match () { () { () } }
   x.f()
 }

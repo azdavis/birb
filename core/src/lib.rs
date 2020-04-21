@@ -118,16 +118,19 @@ mod tests {
                     vec![Field::Ident(Ident::new("x"))],
                   )
                 ),
-                Stmt::Do(Expr::Match(
-                  Expr::Tuple(Vec::new()).into(),
-                  vec![Arm {
-                    pat: Pat::Tuple(Vec::new()),
-                    block: Block {
-                      stmts: Vec::new(),
-                      expr: Some(Expr::Tuple(Vec::new()))
-                    }
-                  }]
-                ))
+                Stmt::Let(
+                  Pat::Wildcard,
+                  Expr::Match(
+                    Expr::Tuple(Vec::new()).into(),
+                    vec![Arm {
+                      pat: Pat::Tuple(Vec::new()),
+                      block: Block {
+                        stmts: Vec::new(),
+                        expr: Some(Expr::Tuple(Vec::new()))
+                      }
+                    }]
+                  )
+                )
               ],
               expr: Some(Expr::MethodCall(
                 Expr::QualIdent(QualIdent::Ident(Ident::new("x"))).into(),

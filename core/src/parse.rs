@@ -253,17 +253,11 @@ fn block(i: usize, ts: &[Token]) -> Result<(usize, Block)> {
 }
 
 fn stmt(i: usize, ts: &[Token]) -> Result<(usize, Stmt)> {
-  if let Ok(i) = eat(i, ts, Token::Let) {
-    let (i, p) = pat(i, ts)?;
-    let i = eat(i, ts, Token::Equal)?;
-    let (i, e) = expr(i, ts)?;
-    return Ok((i, Stmt::Let(p, e)));
-  }
-  if let Ok(i) = eat(i, ts, Token::Do) {
-    let (i, e) = expr(i, ts)?;
-    return Ok((i, Stmt::Do(e)));
-  }
-  err(i, ts, "`let` or `do`")
+  let i = eat(i, ts, Token::Let)?;
+  let (i, p) = pat(i, ts)?;
+  let i = eat(i, ts, Token::Equal)?;
+  let (i, e) = expr(i, ts)?;
+  return Ok((i, Stmt::Let(p, e)));
 }
 
 fn pat(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {

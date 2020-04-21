@@ -130,5 +130,4 @@ pub struct Block {
 #[derive(Debug, PartialEq, Eq)]
 pub enum Stmt {
   Let(Pat, Expr),
-  Do(Expr),
 }
