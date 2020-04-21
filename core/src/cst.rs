@@ -60,7 +60,7 @@ pub struct StructExpr {
   pub fields: Vec<Param<Ident, Type>>,
 }
 
-pub enum IdentPath {
+pub enum QualIdent {
   Ident(Ident),
   More(BigIdent, Ident),
 }
@@ -70,10 +70,10 @@ pub enum Expr {
   Number(u64),
   Tuple(Vec<Expr>),
   Struct(BigIdent, Vec<TypeOrEffect>, Vec<Field<Expr>>),
-  Var(IdentPath),
-  FnCall(IdentPath, Vec<TypeOrEffect>, Vec<Expr>),
-  FieldGet(IdentPath, Ident),
-  MethodCall(IdentPath, Ident, Vec<TypeOrEffect>, Vec<Expr>),
+  Var(QualIdent),
+  FnCall(QualIdent, Vec<TypeOrEffect>, Vec<Expr>),
+  FieldGet(Box<Expr>, Ident),
+  MethodCall(Box<Expr>, Ident, Vec<TypeOrEffect>, Vec<Expr>),
   Return(Box<Expr>),
   Match(Box<Expr>, Vec<Arm>),
   Block(Box<Block>),
@@ -99,7 +99,7 @@ pub enum Pat {
   Number(u64),
   Tuple(Vec<Pat>),
   Struct(BigIdent, Vec<Field<Pat>>),
-  Enum(IdentPath, Box<Pat>),
+  Enum(QualIdent, Box<Pat>),
   Ident(Ident),
   Or(Box<Pat>, Box<Pat>),
   TypeAnnotation(Box<Pat>, Type),
@@ -112,7 +112,7 @@ pub enum Field<T> {
 
 pub struct Block {
   pub stmts: Vec<Stmt>,
-  pub expr: Expr,
+  pub expr: Option<Expr>,
 }
 
 pub enum Stmt {
