@@ -8,7 +8,7 @@ const syntax: Grammar = [
   },
   {
     name: "type-defn",
-    def: [a(t("type"), n("big-ident"), n("big-params"), t("="), n("type"))],
+    def: [a(t("type"), n("big-ident"), n("big-param-list-opt"), t("="), n("type"))],
   },
   {
     name: "struct-defn",
@@ -16,26 +16,18 @@ const syntax: Grammar = [
       a(
         t("struct"),
         n("big-ident"),
-        n("big-params"),
+        n("big-param-list-opt"),
         t("="),
         t("{"),
         n("field-list"),
-        t("}"),
+        t("}")
       ),
     ],
   },
   {
     name: "enum-defn",
     def: [
-      a(
-        t("enum"),
-        n("big-ident"),
-        n("big-params"),
-        t("="),
-        t("{"),
-        n("ctor-list"),
-        t("}"),
-      ),
+      a(t("enum"), n("big-ident"), n("big-param-list-opt"), t("="), t("{"), n("ctor-list"), t("}")),
     ],
   },
   {
@@ -44,25 +36,26 @@ const syntax: Grammar = [
       a(
         t("fn"),
         n("ident"),
-        n("big-params"),
-        n("params"),
+        n("big-param-list-opt"),
+        t("("),
+        n("param-list"),
+        t(")"),
         t(":"),
         n("type"),
         n("requires-clause"),
         n("ensures-clause"),
         t("="),
-        n("expr"),
+        n("expr")
       ),
     ],
   },
-  { name: "big-params", def: [e, a(t("["), n("big-param-list"), t("]"))] },
+  {
+    name: "big-param-list-opt",
+    def: [e, a(t("["), n("big-param-list"), t("]"))],
+  },
   {
     name: "big-param-list",
-    def: [
-      e,
-      n("big-param-one"),
-      a(n("big-param-one"), t(","), n("big-param-list")),
-    ],
+    def: [e, n("big-param-one"), a(n("big-param-one"), t(","), n("big-param-list"))],
   },
   {
     name: "big-param-one",
@@ -70,11 +63,7 @@ const syntax: Grammar = [
   },
   {
     name: "kind",
-    def: [
-      n("big-ident"),
-      a(t("("), n("kind-list"), t(")")),
-      a(n("kind"), t("->"), n("kind")),
-    ],
+    def: [n("big-ident"), a(t("("), n("kind-list"), t(")")), a(n("kind"), t("->"), n("kind"))],
   },
   {
     name: "kind-list",
@@ -117,7 +106,6 @@ const syntax: Grammar = [
     name: "effect-tl",
     def: [e, a(t("+"), n("effect"))],
   },
-  { name: "params", def: [a(t("("), n("param-list"), t(")"))] },
   {
     name: "param-list",
     def: [e, n("pat"), a(n("pat"), t(","), n("param-list"))],
@@ -155,13 +143,7 @@ const syntax: Grammar = [
       n("string"),
       n("number"),
       a(t("("), n("expr-list"), t(")")),
-      a(
-        n("big-ident"),
-        n("type-effect-args-opt"),
-        t("{"),
-        n("field-expr-list"),
-        t("}"),
-      ),
+      a(n("big-ident"), n("type-effect-args-opt"), t("{"), n("field-expr-list"), t("}")),
       a(n("ident-path"), n("call-opt")),
       a(n("expr"), t("."), n("ident"), n("call-opt")),
       a(t("return"), n("expr")),
@@ -183,11 +165,7 @@ const syntax: Grammar = [
   },
   {
     name: "type-effect-list",
-    def: [
-      e,
-      n("type-effect"),
-      a(n("type-effect"), t(","), n("type-effect-list")),
-    ],
+    def: [e, n("type-effect"), a(n("type-effect"), t(","), n("type-effect-list"))],
   },
   {
     // can't tell whether a bare big-ident is a type or effect.

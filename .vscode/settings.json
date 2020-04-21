@@ -30,5 +30,7 @@
     "node_modules": true,
     "**/pkg": true,
     "target": true
-  }
+  },
+  "prettier.printWidth": 100,
+  "editor.rulers": [100]
 }
