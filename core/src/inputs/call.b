@@ -4,10 +4,10 @@ fn call[
   U: Type,
   E: Effect,
 ](
-  f: T -> U affects E,
+  f: T -> U affects {E},
   x: T,
 ):
-  U affects E
+  U affects {E}
   requires true
   ensures true
 = {

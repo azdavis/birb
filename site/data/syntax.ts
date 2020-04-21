@@ -108,7 +108,11 @@ const syntax: Grammar = [
   },
   {
     name: "effect",
-    def: [n("big-ident"), a(n("big-ident"), t("+"), n("effect"))],
+    def: [a(t("{"), n("effect-list"), t("}"))],
+  },
+  {
+    name: "effect-list",
+    def: [e, n("big-ident"), a(n("big-ident"), t(","), n("effect-list"))],
   },
   {
     name: "param-list",
@@ -183,7 +187,6 @@ const syntax: Grammar = [
     def: [e, n("type-effect"), a(n("type-effect"), t(","), n("type-effect-list"))],
   },
   {
-    // can't tell whether a bare big-ident is a type or effect.
     name: "type-effect",
     def: [n("type"), n("effect")],
   },

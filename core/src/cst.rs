@@ -92,11 +92,7 @@ pub enum Expr {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum TypeOrEffect {
-  /// couldn't determine at parse time whether this was a type or effect
-  BigIdent(BigIdent),
-  /// the type inside will not be BigIdent
   Type(Type),
-  /// the vec will have len >= 2
   Effect(Vec<BigIdent>),
 }
 

@@ -200,14 +200,10 @@ fn ctor(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {
 }
 
 fn effect(i: usize, ts: &[Token]) -> Result<(usize, Vec<BigIdent>)> {
-  let (mut i, bi) = big_ident(i, ts)?;
-  let mut ret = vec![bi];
-  while let Ok(j) = eat(i, ts, Token::Plus) {
-    let (j, bi) = big_ident(j, ts)?;
-    ret.push(bi);
-    i = j;
-  }
-  Ok((i, ret))
+  let i = eat(i, ts, Token::LCurly)?;
+  let (i, es) = comma_sep(i, ts, big_ident)?;
+  let i = eat(i, ts, Token::RCurly)?;
+  Ok((i, es))
 }
 
 fn param(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {
@@ -418,9 +414,6 @@ fn type_effect_args_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<TypeOrEffe
 }
 
 fn type_effect(i: usize, ts: &[Token]) -> Result<(usize, TypeOrEffect)> {
-  if let Ok((i, bi)) = big_ident(i, ts) {
-    return Ok((i, TypeOrEffect::BigIdent(bi)));
-  }
   if let Ok((i, t)) = type_(i, ts) {
     return Ok((i, TypeOrEffect::Type(t)));
   }

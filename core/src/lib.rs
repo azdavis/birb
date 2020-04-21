@@ -114,7 +114,7 @@ mod tests {
                   Pat::Wildcard,
                   Expr::Struct(
                     BigIdent::new("Guy"),
-                    vec![TypeOrEffect::BigIdent(BigIdent::new("T"))],
+                    vec![TypeOrEffect::Type(Type::BigIdent(BigIdent::new("T")))],
                     vec![Field::Ident(Ident::new("x"))],
                   )
                 ),
