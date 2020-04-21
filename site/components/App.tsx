@@ -55,7 +55,6 @@ export default function App() {
       <h3>Reserved Words</h3>
       <p>
         The reserved words are below. An identifier may not be a reserved word.
-        Not all reserved words are currently used.
       </p>
       <div className="d-flex flex-wrap jc-center">{reserved.map(monoWord)}</div>
       <h3>Other Tokens</h3>

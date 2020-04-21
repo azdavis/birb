@@ -188,27 +188,7 @@ const syntax: Grammar = [
 ];
 
 const special: string[] = [];
-const reserved: string[] = [
-  "become",
-  "case",
-  "const",
-  "exists",
-  "extern",
-  "final",
-  "for",
-  "forall",
-  "if",
-  "impl",
-  "import",
-  "loop",
-  "mod",
-  "mut",
-  "throw",
-  "throws",
-  "trait",
-  "use",
-  "while",
-];
+const reserved: string[] = [];
 const alpha = /^[a-z]+$/;
 
 terminals(syntax).forEach((t) => {
