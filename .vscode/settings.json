@@ -15,6 +15,7 @@
     "lexed",
     "mapsto",
     "newchan",
+    "println",
     "punct",
     "rightarrow",
     "stmts",
