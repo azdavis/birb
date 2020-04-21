@@ -24,7 +24,7 @@ impl fmt::Display for Found {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match *self {
       Self::EOF => write!(f, "end of file"),
-      Self::Token(ref t) => t.fmt(f),
+      Self::Token(ref t) => write!(f, "`{}`", t),
     }
   }
 }
