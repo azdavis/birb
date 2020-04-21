@@ -460,6 +460,7 @@ where
   let mut ret = Vec::new();
   while let Ok((j, y)) = f(i, ts) {
     ret.push(y);
+    i = j;
     i = match eat(j, ts, Token::Comma) {
       Ok(i) => i,
       Err(_) => break,
