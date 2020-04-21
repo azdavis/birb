@@ -155,7 +155,6 @@ const syntax: Grammar = [
       n("string"),
       n("number"),
       a(t("("), n("expr-list"), t(")")),
-      a(n("path"), n("call-opt")),
       a(
         n("big-ident"),
         n("type-effect-args-opt"),
@@ -163,6 +162,7 @@ const syntax: Grammar = [
         n("field-expr-list"),
         t("}"),
       ),
+      a(n("path"), n("call-opt")),
       a(n("expr"), t("."), n("ident"), n("call-opt")),
       a(t("return"), n("expr")),
       a(t("match"), n("expr"), t("{"), n("arm-list"), t("}")),
