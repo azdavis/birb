@@ -28,7 +28,7 @@ pub struct StructDefn {
 pub struct EnumDefn {
   name: BigIdent,
   params: Vec<Param<BigIdent, Kind>>,
-  cases: Vec<Param<Ident, Type>>,
+  ctors: Vec<Param<Ident, Type>>,
 }
 
 pub struct FnDefn {
