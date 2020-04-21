@@ -152,27 +152,47 @@ const syntax: Grammar = [
   {
     name: "expr",
     def: [
-      n("ident"),
-      a(n("big-ident"), t("::"), n("ident")),
       n("string"),
       n("number"),
       a(t("("), n("expr-list"), t(")")),
-      a(n("big-ident"), t("{"), n("field-expr-list"), t("}")),
-      a(n("ident"), n("type-list"), t("("), n("expr-list"), t(")")),
-      a(n("expr"), t("."), t("ident")),
+      a(n("path"), n("call-opt")),
       a(
-        n("expr"),
-        t("."),
-        n("ident"),
-        n("type-list"),
-        t("("),
-        n("expr-list"),
-        t(")"),
+        n("big-ident"),
+        n("type-effect-args-opt"),
+        t("{"),
+        n("field-expr-list"),
+        t("}"),
       ),
+      a(n("expr"), t("."), n("ident"), n("call-opt")),
       a(t("return"), n("expr")),
       a(t("match"), n("expr"), t("{"), n("arm-list"), t("}")),
       n("block"),
     ],
+  },
+  {
+    name: "path",
+    def: [n("ident"), a(n("big-ident"), t("::"), n("ident"))],
+  },
+  {
+    name: "call-opt",
+    def: [e, a(n("type-effect-args-opt"), t("("), n("expr-list"), t(")"))],
+  },
+  {
+    name: "type-effect-args-opt",
+    def: [e, a(t("["), n("type-effect-list"), t("]"))],
+  },
+  {
+    name: "type-effect-list",
+    def: [
+      e,
+      n("type-effect"),
+      a(n("type-effect"), t(","), n("type-effect-list")),
+    ],
+  },
+  {
+    // can't tell whether a bare big-ident is a type or effect.
+    name: "type-effect",
+    def: [n("type"), n("effect")],
   },
   {
     name: "expr-list",
