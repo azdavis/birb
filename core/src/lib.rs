@@ -1,6 +1,6 @@
-mod cst;
-mod error;
-mod ident;
-mod lex;
-mod parse;
-mod token;
+pub mod cst;
+pub mod error;
+pub mod ident;
+pub mod lex;
+pub mod parse;
+pub mod token;
