@@ -8,37 +8,37 @@ pub enum TopDefn {
 }
 
 pub struct Param<I, T> {
-  ident: I,
+  pub ident: I,
   /// maybe not type, but instead kind.
-  type_: T,
+  pub type_: T,
 }
 
 pub struct TypeDefn {
-  name: BigIdent,
-  params: Vec<Param<BigIdent, Kind>>,
-  def: Type,
+  pub name: BigIdent,
+  pub params: Vec<Param<BigIdent, Kind>>,
+  pub def: Type,
 }
 
 pub struct StructDefn {
-  name: BigIdent,
-  params: Vec<Param<BigIdent, Kind>>,
-  fields: Vec<Param<Ident, Type>>,
+  pub name: BigIdent,
+  pub params: Vec<Param<BigIdent, Kind>>,
+  pub fields: Vec<Param<Ident, Type>>,
 }
 
 pub struct EnumDefn {
-  name: BigIdent,
-  params: Vec<Param<BigIdent, Kind>>,
-  ctors: Vec<Param<Ident, Type>>,
+  pub name: BigIdent,
+  pub params: Vec<Param<BigIdent, Kind>>,
+  pub ctors: Vec<Param<Ident, Type>>,
 }
 
 pub struct FnDefn {
-  name: Ident,
-  big_params: Vec<Param<BigIdent, Kind>>,
-  params: Vec<Param<Ident, Type>>,
-  ret_type: Type,
-  requires: Option<Expr>,
-  ensures: Option<Expr>,
-  body: Expr,
+  pub name: Ident,
+  pub big_params: Vec<Param<BigIdent, Kind>>,
+  pub params: Vec<Param<Ident, Type>>,
+  pub ret_type: Type,
+  pub requires: Option<Expr>,
+  pub ensures: Option<Expr>,
+  pub body: Expr,
 }
 
 pub enum Kind {
@@ -55,9 +55,9 @@ pub enum Type {
 }
 
 pub struct StructExpr {
-  name: BigIdent,
-  params: Option<Vec<Param<BigIdent, Kind>>>,
-  fields: Vec<Param<Ident, Type>>,
+  pub name: BigIdent,
+  pub params: Option<Vec<Param<BigIdent, Kind>>>,
+  pub fields: Vec<Param<Ident, Type>>,
 }
 
 pub enum IdentPath {
@@ -89,8 +89,8 @@ pub enum TypeOrEffect {
 }
 
 pub struct Arm {
-  pat: Pat,
-  block: Block,
+  pub pat: Pat,
+  pub block: Block,
 }
 
 pub enum Pat {
@@ -111,8 +111,8 @@ pub enum FieldPat {
 }
 
 pub struct Block {
-  stmts: Vec<Stmt>,
-  expr: Expr,
+  pub stmts: Vec<Stmt>,
+  pub expr: Expr,
 }
 
 pub enum Stmt {
