@@ -61,9 +61,14 @@ const syntax: Grammar = [
     name: "big-param",
     def: [a(n("big-ident"), t(":"), n("kind"))],
   },
+  { name: "kind", def: [a(n("kind-hd"), n("kind-tl"))] },
   {
-    name: "kind",
-    def: [n("big-ident"), a(t("("), n("kind-list"), t(")")), a(n("kind"), t("->"), n("kind"))],
+    name: "kind-hd",
+    def: [n("big-ident"), a(t("("), n("kind-list"), t(")"))],
+  },
+  {
+    name: "kind-tl",
+    def: [e, a(t("->"), n("kind"))],
   },
   {
     name: "kind-list",
@@ -71,12 +76,15 @@ const syntax: Grammar = [
   },
   {
     name: "type",
-    def: [
-      n("big-ident"),
-      a(t("("), n("type-list"), t(")")),
-      a(n("type"), t("->"), n("type")),
-      a(n("type"), t("affects"), n("effect")),
-    ],
+    def: [a(n("type-hd"), n("type-tl"))],
+  },
+  {
+    name: "type-hd",
+    def: [n("big-ident"), a(t("("), n("type-list"), t(")"))],
+  },
+  {
+    name: "type-tl",
+    def: [e, a(t("->"), n("type")), a(t("affects"), n("effect"))],
   },
   {
     name: "type-list",
@@ -100,11 +108,7 @@ const syntax: Grammar = [
   },
   {
     name: "effect",
-    def: [a(n("big-ident"), n("effect-tl"))],
-  },
-  {
-    name: "effect-tl",
-    def: [e, a(t("+"), n("effect"))],
+    def: [n("big-ident"), a(n("big-ident"), t("+"), n("effect"))],
   },
   {
     name: "param-list",
@@ -120,6 +124,10 @@ const syntax: Grammar = [
   },
   {
     name: "pat",
+    def: [a(n("pat-hd"), n("pat-tl"))],
+  },
+  {
+    name: "pat-hd",
     def: [
       t("_"),
       n("string"),
@@ -128,10 +136,9 @@ const syntax: Grammar = [
       a(n("big-ident"), t("{"), n("field-pat-list"), t("}")),
       a(n("ident-path"), t("("), n("pat"), t(")")),
       n("ident"),
-      a(n("pat"), t("|"), n("pat")),
-      a(n("pat"), t(":"), n("type")),
     ],
   },
+  { name: "pat-tl", def: [e, a(t("|"), n("pat")), a(t(":"), n("type"))] },
   {
     name: "field-pat-list",
     def: [e, n("field-pat"), a(n("field-pat"), t(","), n("field-pat-list"))],
