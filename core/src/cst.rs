@@ -98,16 +98,16 @@ pub enum Pat {
   String_(String),
   Number(u64),
   Tuple(Vec<Pat>),
-  Struct(BigIdent, Vec<FieldPat>),
+  Struct(BigIdent, Vec<Field<Pat>>),
   Enum(IdentPath, Box<Pat>),
   Ident(Ident),
   Or(Box<Pat>, Box<Pat>),
   TypeAnnotation(Box<Pat>, Type),
 }
 
-pub enum FieldPat {
+pub enum Field<T> {
   Ident(Ident),
-  IdentPat(Ident, Pat),
+  IdentAnd(Ident, T),
 }
 
 pub struct Block {
