@@ -70,7 +70,7 @@ pub enum Expr {
   Number(u64),
   Tuple(Vec<Expr>),
   Struct(BigIdent, Vec<TypeOrEffect>, Vec<Field<Expr>>),
-  Var(QualIdent),
+  QualIdent(QualIdent),
   FnCall(QualIdent, Vec<TypeOrEffect>, Vec<Expr>),
   FieldGet(Box<Expr>, Ident),
   MethodCall(Box<Expr>, Ident, Vec<TypeOrEffect>, Vec<Expr>),

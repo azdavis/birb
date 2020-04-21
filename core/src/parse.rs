@@ -363,7 +363,7 @@ fn expr_hd(i: usize, ts: &[Token]) -> Result<(usize, Expr)> {
   if let Ok((i, ip)) = qual_ident(i, ts) {
     let (i, co) = call_opt(i, ts)?;
     return match co {
-      None => Ok((i, Expr::Var(ip))),
+      None => Ok((i, Expr::QualIdent(ip))),
       Some((tes, es)) => Ok((i, Expr::FnCall(ip, tes, es))),
     };
   }
