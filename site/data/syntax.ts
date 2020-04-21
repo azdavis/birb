@@ -112,7 +112,11 @@ const syntax: Grammar = [
   },
   {
     name: "param-list",
-    def: [e, n("pat"), a(n("pat"), t(","), n("param-list"))],
+    def: [e, n("param"), a(n("param"), t(","), n("param-list"))],
+  },
+  {
+    name: "param",
+    def: [a(n("ident"), t(":"), n("type"))],
   },
   { name: "requires-clause", def: [e, a(t("requires"), n("expr"))] },
   { name: "ensures-clause", def: [e, a(t("ensures"), n("expr"))] },
