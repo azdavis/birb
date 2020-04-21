@@ -150,18 +150,22 @@ const syntax: Grammar = [
   { name: "field-pat", def: [n("ident"), a(n("ident"), t(":"), n("pat"))] },
   {
     name: "expr",
+    def: [a(n("expr-hd"), n("expr-tl-list"))],
+  },
+  {
+    name: "expr-hd",
     def: [
       n("string"),
       n("number"),
       a(t("("), n("expr-list"), t(")")),
       a(n("big-ident"), n("type-effect-args-opt"), t("{"), n("field-expr-list"), t("}")),
       a(n("ident-path"), n("call-opt")),
-      a(n("expr"), t("."), n("ident"), n("call-opt")),
       a(t("return"), n("expr")),
       a(t("match"), n("expr"), t("{"), n("arm-list"), t("}")),
       n("block"),
     ],
   },
+  { name: "expr-tl-list", def: [e, a(t("."), n("ident"), n("call-opt"), n("expr-tail-list"))] },
   {
     name: "ident-path",
     def: [n("ident"), a(n("big-ident"), t("::"), n("ident"))],
