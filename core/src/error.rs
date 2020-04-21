@@ -1,3 +1,4 @@
+use crate::parse::Found;
 use std::fmt;
 
 #[derive(Debug)]
@@ -6,6 +7,7 @@ pub enum Error {
   UnclosedString,
   InvalidUTF8(std::str::Utf8Error),
   InvalidNumber(std::num::ParseIntError),
+  Parse(&'static str, Found),
 }
 
 impl fmt::Display for Error {
@@ -15,6 +17,9 @@ impl fmt::Display for Error {
       Self::UnclosedString => write!(f, "unclosed string literal"),
       Self::InvalidUTF8(ref e) => write!(f, "invalid utf-8: {}", e),
       Self::InvalidNumber(ref e) => write!(f, "invalid number: {}", e),
+      Self::Parse(ref expected, ref found) => {
+        write!(f, "parse error: expected {}, found {}", expected, found)
+      }
     }
   }
 }
@@ -24,7 +29,7 @@ impl std::error::Error for Error {
     match *self {
       Self::InvalidUTF8(ref e) => Some(e),
       Self::InvalidNumber(ref e) => Some(e),
-      Self::InvalidByte(_) | Self::UnclosedString => None,
+      Self::InvalidByte(_) | Self::UnclosedString | Self::Parse(..) => None,
     }
   }
 }
