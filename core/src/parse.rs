@@ -57,6 +57,38 @@ fn eat(i: usize, ts: &[Token], t: Token) -> Result<usize> {
   Err(Error::Parse(t.desc(), f))
 }
 
+fn ident(i: usize, ts: &[Token]) -> Result<(usize, Ident)> {
+  let f = found(i, ts);
+  if let Found::Token(Token::Ident(id)) = f {
+    return Ok((i + 1, id));
+  }
+  Err(Error::Parse("an identifier", f))
+}
+
+fn big_ident(i: usize, ts: &[Token]) -> Result<(usize, BigIdent)> {
+  let f = found(i, ts);
+  if let Found::Token(Token::BigIdent(id)) = f {
+    return Ok((i + 1, id));
+  }
+  Err(Error::Parse("a big identifier", f))
+}
+
+fn number(i: usize, ts: &[Token]) -> Result<(usize, u64)> {
+  let f = found(i, ts);
+  if let Found::Token(Token::Number(n)) = f {
+    return Ok((i + 1, n));
+  }
+  Err(Error::Parse("a number", f))
+}
+
+fn string(i: usize, ts: &[Token]) -> Result<(usize, String)> {
+  let f = found(i, ts);
+  if let Found::Token(Token::String_(s)) = f {
+    return Ok((i + 1, s));
+  }
+  Err(Error::Parse("a string", f))
+}
+
 fn found(i: usize, ts: &[Token]) -> Found {
   match ts.get(i) {
     Some(t) => Found::Token(t.clone()),
