@@ -11,7 +11,7 @@ A programming language
 
 ```
 $ cargo install wasm-pack
-$ wasm-pack build core
+$ wasm-pack build wasm
 $ npm install
 $ npm start
 ```

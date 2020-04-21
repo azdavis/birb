@@ -6,7 +6,7 @@ import { special, reserved, syntax } from "../data/syntax";
 import AbsSyntax from "./AbsSyntax";
 import absSyntax from "../data/abs-syntax";
 import { Judgement, typeKind, effKind, valueType, compType, compStep } from "../data/judgements";
-import { mul } from "../../core/pkg/birb_core";
+import { mul } from "../../wasm/pkg/birb_wasm";
 
 function monoWord(x: string) {
   return (
