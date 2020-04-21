@@ -20,7 +20,7 @@ const syntax: Grammar = [
         t("="),
         t("{"),
         n("field-list"),
-        t("}")
+        t("}"),
       ),
     ],
   },
@@ -45,7 +45,7 @@ const syntax: Grammar = [
         n("requires-clause"),
         n("ensures-clause"),
         t("="),
-        n("expr")
+        n("expr"),
       ),
     ],
   },
