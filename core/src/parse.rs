@@ -172,7 +172,7 @@ fn type_hd(i: usize, ts: &[Token]) -> Result<(usize, Type)> {
   err(i, ts, "a type")
 }
 
-fn field(mut i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {
+fn field(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {
   let (i, id) = ident(i, ts)?;
   let i = eat(i, ts, Token::Colon)?;
   let (i, t) = type_(i, ts)?;
@@ -211,9 +211,9 @@ fn effect(i: usize, ts: &[Token]) -> Result<(usize, Vec<BigIdent>)> {
 }
 
 fn param(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {
-  let (j, id) = ident(i, ts)?;
-  let j = eat(j, ts, Token::Colon)?;
-  let (j, t) = type_(j, ts)?;
+  let (i, id) = ident(i, ts)?;
+  let i = eat(i, ts, Token::Colon)?;
+  let (i, t) = type_(i, ts)?;
   Ok((
     i,
     Param {
