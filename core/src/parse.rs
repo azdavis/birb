@@ -45,23 +45,25 @@ fn top_defn(i: usize, ts: &[Token]) -> Result<(usize, TopDefn)> {
   err(i, ts, "a top-level definition")
 }
 
+// helpers
+
 fn eat(i: usize, ts: &[Token], t: Token) -> Result<usize> {
-  match ts.get(i) {
-    Some(got) => {
-      if t == *got {
-        Ok(i + 1)
-      } else {
-        Err(Error::Parse(t.desc(), Found::Token(got.clone())))
-      }
+  let f = found(i, ts);
+  if let Found::Token(ref got) = f {
+    if t == *got {
+      return Ok(i + 1);
     }
-    None => Err(Error::Parse(t.desc(), Found::EOF)),
+  }
+  Err(Error::Parse(t.desc(), f))
+}
+
+fn found(i: usize, ts: &[Token]) -> Found {
+  match ts.get(i) {
+    Some(t) => Found::Token(t.clone()),
+    None => Found::EOF,
   }
 }
 
 fn err<T>(i: usize, ts: &[Token], expected: &'static str) -> Result<T> {
-  let found = match ts.get(i) {
-    Some(t) => Found::Token(t.clone()),
-    None => Found::EOF,
-  };
-  Err(Error::Parse(expected, found))
+  Err(Error::Parse(expected, found(i, ts)))
 }
