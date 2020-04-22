@@ -98,6 +98,7 @@ pub const PUNCT: [(&[u8], Token); 15] = [
   (b"_", Token::Underscore),
   (b",", Token::Comma),
   (b":", Token::Colon),
+  (b".", Token::Dot),
   (b"(", Token::LRound),
   (b")", Token::RRound),
   (b"[", Token::LSquare),
@@ -107,7 +108,6 @@ pub const PUNCT: [(&[u8], Token); 15] = [
   (b"+", Token::Plus),
   (b"=", Token::Equal),
   (b"|", Token::Bar),
-  (b".", Token::Dot),
 ];
 
 pub const WORDS: [(&[u8], Token); 10] = [
