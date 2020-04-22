@@ -41,7 +41,7 @@ mod tests {
           name: Ident::new("main"),
           big_params: Vec::new(),
           params: Vec::new(),
-          ret_type: Type::BigIdent(BigIdent::new("String")),
+          ret_type: Type::BigIdent(BigIdent::new("String"), Vec::new()),
           requires: None,
           ensures: None,
           body: Block {
@@ -66,7 +66,7 @@ mod tests {
           }],
           fields: vec![Param {
             ident: Ident::new("x"),
-            type_: Type::BigIdent(BigIdent::new("T")),
+            type_: Type::BigIdent(BigIdent::new("T"), Vec::new()),
           }]
         }),
         TopDefn::Fn_(FnDefn {
@@ -89,9 +89,9 @@ mod tests {
             Param {
               ident: Ident::new("f"),
               type_: Type::Arrow(
-                Type::BigIdent(BigIdent::new("T")).into(),
+                Type::BigIdent(BigIdent::new("T"), Vec::new()).into(),
                 Type::Effectful(
-                  Type::BigIdent(BigIdent::new("U")).into(),
+                  Type::BigIdent(BigIdent::new("U"), Vec::new()).into(),
                   Effect {
                     idents: vec![BigIdent::new("E")]
                   }
@@ -101,11 +101,11 @@ mod tests {
             },
             Param {
               ident: Ident::new("x"),
-              type_: Type::BigIdent(BigIdent::new("T")),
+              type_: Type::BigIdent(BigIdent::new("T"), Vec::new()),
             }
           ],
           ret_type: Type::Effectful(
-            Type::BigIdent(BigIdent::new("U")).into(),
+            Type::BigIdent(BigIdent::new("U"), Vec::new()).into(),
             Effect {
               idents: vec![BigIdent::new("E")]
             }
@@ -119,7 +119,10 @@ mod tests {
                 None,
                 Expr::Struct(
                   BigIdent::new("Guy"),
-                  vec![TypeOrEffect::Type(Type::BigIdent(BigIdent::new("T")))],
+                  vec![TypeOrEffect::Type(Type::BigIdent(
+                    BigIdent::new("T"),
+                    Vec::new()
+                  ))],
                   vec![Field::Ident(Ident::new("x"))],
                 )
               ),

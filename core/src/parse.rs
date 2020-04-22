@@ -152,7 +152,8 @@ fn type_(i: usize, ts: &[Token]) -> Result<(usize, Type)> {
 
 fn type_hd(i: usize, ts: &[Token]) -> Result<(usize, Type)> {
   if let Ok((i, bi)) = big_ident(i, ts) {
-    return Ok((i, Type::BigIdent(bi)));
+    let (i, tes, _) = type_effect_args_opt(i, ts)?;
+    return Ok((i, Type::BigIdent(bi, tes)));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
     let (i, ks) = comma_sep(i, ts, type_)?;

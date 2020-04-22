@@ -63,7 +63,7 @@ const syntax: Grammar = [
   },
   {
     name: "type-hd",
-    def: [n("big-ident"), a(t("("), n("type-list"), t(")"))],
+    def: [a(n("big-ident"), n("type-effect-args-opt")), a(t("("), n("type-list"), t(")"))],
   },
   {
     name: "type-tl",

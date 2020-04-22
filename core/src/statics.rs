@@ -98,7 +98,8 @@ fn ck_kind(cx: &Cx, k: &Kind) -> Result<()> {
 fn ck_type(cx: &Cx, t: &Type) -> Result<Kind> {
   let tk = type_kind();
   match t {
-    Type::BigIdent(bi) => {
+    Type::BigIdent(bi, tes) => {
+      // TODO
       if let Some(ti) = cx.structs.get(bi) {
         return Ok(mk_arrow_kind(&ti.params));
       }

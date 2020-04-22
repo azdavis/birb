@@ -60,7 +60,7 @@ impl fmt::Display for Kind {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Type {
-  BigIdent(BigIdent),
+  BigIdent(BigIdent, Vec<TypeOrEffect>),
   Tuple(Vec<Type>),
   Arrow(Box<Type>, Box<Type>),
   Effectful(Box<Type>, Effect),
@@ -69,7 +69,13 @@ pub enum Type {
 impl fmt::Display for Type {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
-      Self::BigIdent(bi) => write!(f, "{}", bi),
+      Self::BigIdent(bi, tes) => {
+        write!(f, "{}", bi)?;
+        if !tes.is_empty() {
+          SliceDisplay::new("[", tes, "]").fmt(f)?;
+        }
+        Ok(())
+      }
       Self::Tuple(ts) => SliceDisplay::new("(", ts, ")").fmt(f),
       Self::Arrow(k1, k2) => write!(f, "({}) -> ({})", k1, k2),
       Self::Effectful(t, e) => write!(f, "({}) affects {}", t, e),
@@ -116,10 +122,19 @@ pub enum Expr {
   Block(Box<Block>),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum TypeOrEffect {
   Type(Type),
   Effect(Effect),
+}
+
+impl fmt::Display for TypeOrEffect {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::Type(t) => t.fmt(f),
+      Self::Effect(e) => e.fmt(f),
+    }
+  }
 }
 
 #[derive(Debug, PartialEq, Eq)]
