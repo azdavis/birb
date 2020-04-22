@@ -249,7 +249,7 @@ fn stmt(i: usize, ts: &[Token]) -> Result<(usize, Stmt)> {
   let i = eat(i, ts, Token::Equal)?;
   let (i, e) = expr(i, ts)?;
   let i = eat(i, ts, Token::Semi)?;
-  return Ok((i, Stmt::Let(p, ta, e)));
+  Ok((i, Stmt::Let(p, ta, e)))
 }
 
 fn type_annotation(i: usize, ts: &[Token]) -> Result<(usize, Option<Type>)> {
