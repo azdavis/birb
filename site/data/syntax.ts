@@ -141,7 +141,7 @@ const syntax: Grammar = [
   { name: "field-pat", def: [n("ident"), a(n("ident"), t(":"), n("pat"))] },
   {
     name: "expr",
-    def: [a(n("expr-hd"), n("expr-tl-list"))],
+    def: [a(n("expr-hd"), n("expr-method-call-list"))],
   },
   {
     name: "expr-hd",
@@ -156,7 +156,10 @@ const syntax: Grammar = [
       n("block"),
     ],
   },
-  { name: "expr-tl-list", def: [e, a(t("."), n("ident"), n("call-opt"), n("expr-tail-list"))] },
+  {
+    name: "expr-method-call-list",
+    def: [e, a(t("."), n("ident"), n("call-opt"), n("expr-method-call-list"))],
+  },
   {
     name: "qual-ident",
     def: [n("ident"), a(n("big-ident"), t("::"), n("ident"))],
