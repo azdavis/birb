@@ -1,4 +1,6 @@
 use crate::ident::{BigIdent, Ident};
+use crate::util::SliceDisplay;
+use std::fmt;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum TopDefn {
@@ -54,6 +56,16 @@ pub enum Kind {
   Arrow(Box<Kind>, Box<Kind>),
 }
 
+impl fmt::Display for Kind {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::BigIdent(bi) => write!(f, "{}", bi),
+      Self::Tuple(ts) => SliceDisplay::new("(", ts, ")").fmt(f),
+      Self::Arrow(k1, k2) => write!(f, "({}) -> ({})", k1, k2),
+    }
+  }
+}
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Type {
   BigIdent(BigIdent),
@@ -62,9 +74,26 @@ pub enum Type {
   Effectful(Box<Type>, Effect),
 }
 
+impl fmt::Display for Type {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::BigIdent(bi) => write!(f, "{}", bi),
+      Self::Tuple(ts) => SliceDisplay::new("(", ts, ")").fmt(f),
+      Self::Arrow(k1, k2) => write!(f, "({}) -> ({})", k1, k2),
+      Self::Effectful(t, e) => write!(f, "({}) affects {}", t, e),
+    }
+  }
+}
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Effect {
   pub idents: Vec<BigIdent>,
+}
+
+impl fmt::Display for Effect {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    SliceDisplay::new("{", &self.idents, "}").fmt(f)
+  }
 }
 
 #[derive(Debug, PartialEq, Eq)]

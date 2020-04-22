@@ -5,6 +5,8 @@ pub mod lex;
 pub mod parse;
 pub mod token;
 
+mod util;
+
 pub fn get(bs: &[u8]) -> error::Result<Vec<cst::TopDefn>> {
   let ts = lex::get(bs)?;
   parse::get(&ts)
