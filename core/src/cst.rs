@@ -8,7 +8,7 @@ pub enum TopDefn {
   Fn_(FnDefn),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Param<I, T> {
   pub ident: I,
   /// maybe not type, but instead kind.
@@ -47,14 +47,14 @@ pub struct FnDefn {
   pub body: Expr,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Kind {
   BigIdent(BigIdent),
   Tuple(Vec<Kind>),
   Arrow(Box<Kind>, Box<Kind>),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Type {
   BigIdent(BigIdent),
   Tuple(Vec<Type>),
@@ -62,7 +62,7 @@ pub enum Type {
   Effectful(Box<Type>, Effect),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Effect {
   pub idents: Vec<BigIdent>,
 }
