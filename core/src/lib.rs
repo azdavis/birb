@@ -29,23 +29,23 @@ mod tests {
       vec![
         TopDefn::Struct(StructDefn {
           name: BigIdent::new("Unit"),
-          params: Vec::new(),
-          fields: Vec::new()
+          params: vec![],
+          fields: vec![]
         }),
         TopDefn::Enum(EnumDefn {
           name: BigIdent::new("Void"),
-          params: Vec::new(),
-          ctors: Vec::new(),
+          params: vec![],
+          ctors: vec![],
         }),
         TopDefn::Fn_(FnDefn {
           name: Ident::new("main"),
-          big_params: Vec::new(),
-          params: Vec::new(),
-          ret_type: Type::BigIdent(BigIdent::new("String"), Vec::new()),
+          big_params: vec![],
+          params: vec![],
+          ret_type: Type::BigIdent(BigIdent::new("String"), vec![]),
           requires: None,
           ensures: None,
           body: Block {
-            stmts: Vec::new(),
+            stmts: vec![],
             expr: Some(Expr::String_(String::from("hello")))
           },
         }),
@@ -66,7 +66,7 @@ mod tests {
           }],
           fields: vec![Param {
             ident: Ident::new("x"),
-            type_: Type::BigIdent(BigIdent::new("T"), Vec::new()),
+            type_: Type::BigIdent(BigIdent::new("T"), vec![]),
           }]
         }),
         TopDefn::Fn_(FnDefn {
@@ -89,9 +89,9 @@ mod tests {
             Param {
               ident: Ident::new("f"),
               type_: Type::Arrow(
-                Type::BigIdent(BigIdent::new("T"), Vec::new()).into(),
+                Type::BigIdent(BigIdent::new("T"), vec![]).into(),
                 Type::Effectful(
-                  Type::BigIdent(BigIdent::new("U"), Vec::new()).into(),
+                  Type::BigIdent(BigIdent::new("U"), vec![]).into(),
                   Effect {
                     idents: vec![BigIdent::new("E")]
                   }
@@ -101,11 +101,11 @@ mod tests {
             },
             Param {
               ident: Ident::new("x"),
-              type_: Type::BigIdent(BigIdent::new("T"), Vec::new()),
+              type_: Type::BigIdent(BigIdent::new("T"), vec![]),
             }
           ],
           ret_type: Type::Effectful(
-            Type::BigIdent(BigIdent::new("U"), Vec::new()).into(),
+            Type::BigIdent(BigIdent::new("U"), vec![]).into(),
             Effect {
               idents: vec![BigIdent::new("E")]
             }
@@ -121,7 +121,7 @@ mod tests {
                   BigIdent::new("Guy"),
                   vec![TypeOrEffect::Type(Type::BigIdent(
                     BigIdent::new("T"),
-                    Vec::new()
+                    vec![]
                   ))],
                   vec![Field::Ident(Ident::new("x"))],
                 )
@@ -130,12 +130,12 @@ mod tests {
                 Pat::Wildcard,
                 None,
                 Expr::Match(
-                  Expr::Tuple(Vec::new()).into(),
+                  Expr::Tuple(vec![]).into(),
                   vec![Arm {
-                    pat: Pat::Tuple(Vec::new()),
+                    pat: Pat::Tuple(vec![]),
                     block: Block {
-                      stmts: Vec::new(),
-                      expr: Some(Expr::Tuple(Vec::new()))
+                      stmts: vec![],
+                      expr: Some(Expr::Tuple(vec![]))
                     }
                   }]
                 )
@@ -144,8 +144,8 @@ mod tests {
             expr: Some(Expr::MethodCall(
               Expr::QualIdent(QualIdent::Ident(Ident::new("x"))).into(),
               Ident::new("f"),
-              Vec::new(),
-              Vec::new(),
+              vec![],
+              vec![],
             )),
           }
           .into(),
