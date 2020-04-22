@@ -49,7 +49,10 @@ mod tests {
           ret_type: Type::BigIdent(BigIdent::new("String")),
           requires: None,
           ensures: None,
-          body: Expr::String_(String::from("hello")),
+          body: Block {
+            stmts: Vec::new(),
+            expr: Some(Expr::String_(String::from("hello")))
+          },
         }),
       ]
     );
@@ -114,40 +117,38 @@ mod tests {
           ),
           requires: Some(Expr::QualIdent(QualIdent::Ident(Ident::new("true")))),
           ensures: Some(Expr::QualIdent(QualIdent::Ident(Ident::new("true")))),
-          body: Expr::Block(
-            Block {
-              stmts: vec![
-                Stmt::Let(
-                  Pat::Wildcard,
-                  Expr::Struct(
-                    BigIdent::new("Guy"),
-                    vec![TypeOrEffect::Type(Type::BigIdent(BigIdent::new("T")))],
-                    vec![Field::Ident(Ident::new("x"))],
-                  )
-                ),
-                Stmt::Let(
-                  Pat::Wildcard,
-                  Expr::Match(
-                    Expr::Tuple(Vec::new()).into(),
-                    vec![Arm {
-                      pat: Pat::Tuple(Vec::new()),
-                      block: Block {
-                        stmts: Vec::new(),
-                        expr: Some(Expr::Tuple(Vec::new()))
-                      }
-                    }]
-                  )
+          body: Block {
+            stmts: vec![
+              Stmt::Let(
+                Pat::Wildcard,
+                Expr::Struct(
+                  BigIdent::new("Guy"),
+                  vec![TypeOrEffect::Type(Type::BigIdent(BigIdent::new("T")))],
+                  vec![Field::Ident(Ident::new("x"))],
                 )
-              ],
-              expr: Some(Expr::MethodCall(
-                Expr::QualIdent(QualIdent::Ident(Ident::new("x"))).into(),
-                Ident::new("f"),
-                Vec::new(),
-                Vec::new(),
-              )),
-            }
-            .into()
-          ),
+              ),
+              Stmt::Let(
+                Pat::Wildcard,
+                Expr::Match(
+                  Expr::Tuple(Vec::new()).into(),
+                  vec![Arm {
+                    pat: Pat::Tuple(Vec::new()),
+                    block: Block {
+                      stmts: Vec::new(),
+                      expr: Some(Expr::Tuple(Vec::new()))
+                    }
+                  }]
+                )
+              )
+            ],
+            expr: Some(Expr::MethodCall(
+              Expr::QualIdent(QualIdent::Ident(Ident::new("x"))).into(),
+              Ident::new("f"),
+              Vec::new(),
+              Vec::new(),
+            )),
+          }
+          .into(),
         })
       ]
     );

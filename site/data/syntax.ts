@@ -12,23 +12,11 @@ const syntax: Grammar = [
   },
   {
     name: "struct-defn",
-    def: [
-      a(
-        t("struct"),
-        n("big-ident"),
-        n("big-param-list-opt"),
-        t("="),
-        t("{"),
-        n("field-list"),
-        t("}"),
-      ),
-    ],
+    def: [a(t("struct"), n("big-ident"), n("big-param-list-opt"), t("{"), n("field-list"), t("}"))],
   },
   {
     name: "enum-defn",
-    def: [
-      a(t("enum"), n("big-ident"), n("big-param-list-opt"), t("="), t("{"), n("ctor-list"), t("}")),
-    ],
+    def: [a(t("enum"), n("big-ident"), n("big-param-list-opt"), t("{"), n("ctor-list"), t("}"))],
   },
   {
     name: "fn-defn",
@@ -44,8 +32,7 @@ const syntax: Grammar = [
         n("type"),
         n("requires-clause"),
         n("ensures-clause"),
-        t("="),
-        n("expr"),
+        n("block"),
       ),
     ],
   },

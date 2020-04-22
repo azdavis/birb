@@ -1,4 +1,4 @@
-struct Guy[T: Type] = { x: T }
+struct Guy[T: Type] { x: T }
 fn call[
   T: Type,
   U: Type,
@@ -10,7 +10,7 @@ fn call[
   U affects {E}
   requires true
   ensures true
-= {
+{
   // move semantics?
   let _ = Guy[T] { x }
   // match the empty tuple against the single-arm match

@@ -46,7 +46,7 @@ pub struct FnDefn {
   pub ret_type: Type,
   pub requires: Option<Expr>,
   pub ensures: Option<Expr>,
-  pub body: Expr,
+  pub body: Block,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]

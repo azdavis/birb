@@ -46,7 +46,6 @@ fn top_defn(i: usize, ts: &[Token]) -> Result<(usize, TopDefn)> {
   if let Ok(i) = eat(i, ts, Token::Struct) {
     let (i, name) = big_ident(i, ts)?;
     let (i, params) = big_param_list_opt(i, ts)?;
-    let i = eat(i, ts, Token::Equal)?;
     let i = eat(i, ts, Token::LCurly)?;
     let (i, fields) = comma_sep(i, ts, field)?;
     let i = eat(i, ts, Token::RCurly)?;
@@ -62,7 +61,6 @@ fn top_defn(i: usize, ts: &[Token]) -> Result<(usize, TopDefn)> {
   if let Ok(i) = eat(i, ts, Token::Enum) {
     let (i, name) = big_ident(i, ts)?;
     let (i, params) = big_param_list_opt(i, ts)?;
-    let i = eat(i, ts, Token::Equal)?;
     let i = eat(i, ts, Token::LCurly)?;
     let (i, ctors) = comma_sep(i, ts, ctor)?;
     let i = eat(i, ts, Token::RCurly)?;
@@ -85,8 +83,7 @@ fn top_defn(i: usize, ts: &[Token]) -> Result<(usize, TopDefn)> {
     let (i, ret_type) = type_(i, ts)?;
     let (i, requires) = requires_clause(i, ts)?;
     let (i, ensures) = ensures_clause(i, ts)?;
-    let i = eat(i, ts, Token::Equal)?;
-    let (i, body) = expr(i, ts)?;
+    let (i, body) = block(i, ts)?;
     return Ok((
       i,
       TopDefn::Fn_(FnDefn {
