@@ -44,13 +44,13 @@ const syntax: Grammar = [
     name: "big-param",
     def: [a(n("big-ident"), t(":"), n("kind"))],
   },
-  { name: "kind", def: [a(n("kind-hd"), n("kind-tl"))] },
+  { name: "kind", def: [a(n("kind-hd"), n("kind-arrow"))] },
   {
     name: "kind-hd",
     def: [n("big-ident"), a(t("("), n("kind-list"), t(")"))],
   },
   {
-    name: "kind-tl",
+    name: "kind-arrow",
     def: [e, a(t("->"), n("kind"))],
   },
   {
