@@ -111,7 +111,7 @@ const syntax: Grammar = [
   { name: "block-inner", def: [e, n("expr"), a(n("stmt"), n("block-inner"))] },
   {
     name: "stmt",
-    def: [a(t("let"), n("pat"), t("="), n("expr"))],
+    def: [a(t("let"), n("pat"), t("="), n("expr"), t(";"))],
   },
   {
     name: "pat",

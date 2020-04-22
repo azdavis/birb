@@ -247,6 +247,7 @@ fn stmt(i: usize, ts: &[Token]) -> Result<(usize, Stmt)> {
   let (i, p) = pat(i, ts)?;
   let i = eat(i, ts, Token::Equal)?;
   let (i, e) = expr(i, ts)?;
+  let i = eat(i, ts, Token::Semi)?;
   return Ok((i, Stmt::Let(p, e)));
 }
 

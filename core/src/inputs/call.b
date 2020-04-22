@@ -12,9 +12,9 @@ fn call[
   ensures true
 {
   // move semantics?
-  let _ = Guy[T] { x }
+  let _ = Guy[T] { x };
   // match the empty tuple against the single-arm match
   // and upon match, evaluate to the empty tuple
-  let _ = match () { () { () } }
+  let _ = match () { () { () } };
   x.f()
 }

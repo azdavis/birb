@@ -18,6 +18,7 @@ pub enum Token {
   RCurly,
   RRound,
   RSquare,
+  Semi,
   Underscore,
   // reserved words
   Affects,
@@ -55,6 +56,7 @@ impl Token {
       Self::RCurly => "}",
       Self::RRound => ")",
       Self::RSquare => "]",
+      Self::Semi => ";",
       Self::Underscore => "_",
       // reserved words
       Self::Affects => "affects",
@@ -90,13 +92,14 @@ impl fmt::Display for Token {
 
 // these should be sorted longest first, then alphabetically
 
-pub const PUNCT: [(&[u8], Token); 15] = [
+pub const PUNCT: [(&[u8], Token); 16] = [
   // 2
   (b"->", Token::Arrow),
   (b"::", Token::ColonColon),
   // 1
   (b"_", Token::Underscore),
   (b",", Token::Comma),
+  (b";", Token::Semi),
   (b":", Token::Colon),
   (b".", Token::Dot),
   (b"(", Token::LRound),
