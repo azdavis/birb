@@ -1,5 +1,5 @@
 use crate::cst::{
-  Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Param, Pat, QualIdent, Stmt, StructDefn,
+  Arm, Block, Effect, EnumDefn, Expr, Field, FnDefn, Kind, Param, Pat, QualIdent, Stmt, StructDefn,
   TopDefn, Type, TypeDefn, TypeOrEffect,
 };
 use crate::error::{Error, Result};
@@ -199,11 +199,11 @@ fn ctor(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {
   ))
 }
 
-fn effect(i: usize, ts: &[Token]) -> Result<(usize, Vec<BigIdent>)> {
+fn effect(i: usize, ts: &[Token]) -> Result<(usize, Effect)> {
   let i = eat(i, ts, Token::LCurly)?;
-  let (i, es) = comma_sep(i, ts, big_ident)?;
+  let (i, idents) = comma_sep(i, ts, big_ident)?;
   let i = eat(i, ts, Token::RCurly)?;
-  Ok((i, es))
+  Ok((i, Effect { idents }))
 }
 
 fn param(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {

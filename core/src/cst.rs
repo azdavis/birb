@@ -59,7 +59,12 @@ pub enum Type {
   BigIdent(BigIdent),
   Tuple(Vec<Type>),
   Arrow(Box<Type>, Box<Type>),
-  Effectful(Box<Type>, Vec<BigIdent>),
+  Effectful(Box<Type>, Effect),
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct Effect {
+  pub idents: Vec<BigIdent>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -93,7 +98,7 @@ pub enum Expr {
 #[derive(Debug, PartialEq, Eq)]
 pub enum TypeOrEffect {
   Type(Type),
-  Effect(Vec<BigIdent>),
+  Effect(Effect),
 }
 
 #[derive(Debug, PartialEq, Eq)]

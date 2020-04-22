@@ -13,8 +13,8 @@ pub fn get(bs: &[u8]) -> error::Result<Vec<cst::TopDefn>> {
 #[cfg(test)]
 mod tests {
   use crate::cst::{
-    Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Param, Pat, QualIdent, Stmt, StructDefn,
-    TopDefn, Type, TypeDefn, TypeOrEffect,
+    Arm, Block, Effect, EnumDefn, Expr, Field, FnDefn, Kind, Param, Pat, QualIdent, Stmt,
+    StructDefn, TopDefn, Type, TypeDefn, TypeOrEffect,
   };
   use crate::get;
   use crate::ident::{BigIdent, Ident};
@@ -91,7 +91,9 @@ mod tests {
                 Type::BigIdent(BigIdent::new("T")).into(),
                 Type::Effectful(
                   Type::BigIdent(BigIdent::new("U")).into(),
-                  vec![BigIdent::new("E")]
+                  Effect {
+                    idents: vec![BigIdent::new("E")]
+                  }
                 )
                 .into()
               )
@@ -103,7 +105,9 @@ mod tests {
           ],
           ret_type: Type::Effectful(
             Type::BigIdent(BigIdent::new("U")).into(),
-            vec![BigIdent::new("E")]
+            Effect {
+              idents: vec![BigIdent::new("E")]
+            }
           ),
           requires: Some(Expr::QualIdent(QualIdent::Ident(Ident::new("true")))),
           ensures: Some(Expr::QualIdent(QualIdent::Ident(Ident::new("true")))),
