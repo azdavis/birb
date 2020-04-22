@@ -116,6 +116,7 @@ mod tests {
             stmts: vec![
               Stmt::Let(
                 Pat::Wildcard,
+                None,
                 Expr::Struct(
                   BigIdent::new("Guy"),
                   vec![TypeOrEffect::Type(Type::BigIdent(BigIdent::new("T")))],
@@ -124,6 +125,7 @@ mod tests {
               ),
               Stmt::Let(
                 Pat::Wildcard,
+                None,
                 Expr::Match(
                   Expr::Tuple(Vec::new()).into(),
                   vec![Arm {

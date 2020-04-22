@@ -245,10 +245,20 @@ fn block(i: usize, ts: &[Token]) -> Result<(usize, Block)> {
 fn stmt(i: usize, ts: &[Token]) -> Result<(usize, Stmt)> {
   let i = eat(i, ts, Token::Let)?;
   let (i, p) = pat(i, ts)?;
+  let (i, ta) = type_annotation(i, ts)?;
   let i = eat(i, ts, Token::Equal)?;
   let (i, e) = expr(i, ts)?;
   let i = eat(i, ts, Token::Semi)?;
-  return Ok((i, Stmt::Let(p, e)));
+  return Ok((i, Stmt::Let(p, ta, e)));
+}
+
+fn type_annotation(i: usize, ts: &[Token]) -> Result<(usize, Option<Type>)> {
+  let i = match eat(i, ts, Token::Colon) {
+    Ok(i) => i,
+    Err(_) => return Ok((i, None)),
+  };
+  let (i, t) = type_(i, ts)?;
+  Ok((i, Some(t)))
 }
 
 fn pat(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
@@ -256,10 +266,6 @@ fn pat(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
   if let Ok(i) = eat(i, ts, Token::Bar) {
     let (i, p2) = pat(i, ts)?;
     return Ok((i, Pat::Or(p.into(), p2.into())));
-  }
-  if let Ok(i) = eat(i, ts, Token::Colon) {
-    let (i, t) = type_(i, ts)?;
-    return Ok((i, Pat::TypeAnnotation(p.into(), t)));
   }
   Ok((i, p))
 }

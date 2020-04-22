@@ -111,11 +111,15 @@ const syntax: Grammar = [
   { name: "block-inner", def: [e, n("expr"), a(n("stmt"), n("block-inner"))] },
   {
     name: "stmt",
-    def: [a(t("let"), n("pat"), t("="), n("expr"), t(";"))],
+    def: [a(t("let"), n("pat"), n("type-annotation"), t("="), n("expr"), t(";"))],
+  },
+  {
+    name: "type-annotation",
+    def: [e, a(t(":"), n("type"))],
   },
   {
     name: "pat",
-    def: [a(n("pat-hd"), n("pat-tl"))],
+    def: [a(n("pat-hd"), n("pat-or"))],
   },
   {
     name: "pat-hd",
@@ -129,7 +133,7 @@ const syntax: Grammar = [
       n("ident"),
     ],
   },
-  { name: "pat-tl", def: [e, a(t("|"), n("pat")), a(t(":"), n("type"))] },
+  { name: "pat-or", def: [e, a(t("|"), n("pat"))] },
   {
     name: "field-pat-list",
     def: [e, n("field-pat"), a(n("field-pat"), t(","), n("field-pat-list"))],

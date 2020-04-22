@@ -138,7 +138,6 @@ pub enum Pat {
   Enum(QualIdent, Box<Pat>),
   Ident(Ident),
   Or(Box<Pat>, Box<Pat>),
-  TypeAnnotation(Box<Pat>, Type),
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -155,5 +154,5 @@ pub struct Block {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Stmt {
-  Let(Pat, Expr),
+  Let(Pat, Option<Type>, Expr),
 }
