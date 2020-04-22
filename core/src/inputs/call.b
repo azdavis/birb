@@ -16,5 +16,7 @@ fn call[
   // match the empty tuple against the single-arm match
   // and upon match, evaluate to the empty tuple
   let _ = match () { () { () } };
+  // doesn't typecheck
+  let _: Heh[Nah, {Dude}] = ();
   x.f()
 }

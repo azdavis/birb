@@ -139,6 +139,19 @@ mod tests {
                     }
                   }]
                 )
+              ),
+              Stmt::Let(
+                Pat::Wildcard,
+                Some(Type::BigIdent(
+                  BigIdent::new("Heh"),
+                  vec![
+                    TypeOrEffect::Type(Type::BigIdent(BigIdent::new("Nah"), vec![])),
+                    TypeOrEffect::Effect(Effect {
+                      idents: vec![BigIdent::new("Dude")]
+                    })
+                  ]
+                )),
+                Expr::Tuple(vec![])
               )
             ],
             expr: Some(Expr::MethodCall(
