@@ -1,6 +1,6 @@
 use crate::cst::{
   Arm, Block, Effect, EnumDefn, Expr, Field, FnDefn, Kind, Param, Pat, QualIdent, Stmt, StructDefn,
-  TopDefn, Type, TypeDefn, TypeOrEffect,
+  TopDefn, Type, TypeOrEffect,
 };
 use crate::error::{Error, Result};
 use crate::ident::{BigIdent, Ident};
@@ -36,13 +36,6 @@ impl fmt::Display for Found {
 // grammar items
 
 fn top_defn(i: usize, ts: &[Token]) -> Result<(usize, TopDefn)> {
-  if let Ok(i) = eat(i, ts, Token::Type) {
-    let (i, name) = big_ident(i, ts)?;
-    let (i, params) = big_param_list_opt(i, ts)?;
-    let i = eat(i, ts, Token::Equal)?;
-    let (i, def) = type_(i, ts)?;
-    return Ok((i, TopDefn::Type(TypeDefn { name, params, def })));
-  }
   if let Ok(i) = eat(i, ts, Token::Struct) {
     let (i, name) = big_ident(i, ts)?;
     let (i, params) = big_param_list_opt(i, ts)?;

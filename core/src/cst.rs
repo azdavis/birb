@@ -4,7 +4,6 @@ use std::fmt;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum TopDefn {
-  Type(TypeDefn),
   Struct(StructDefn),
   Enum(EnumDefn),
   Fn_(FnDefn),
@@ -15,13 +14,6 @@ pub struct Param<I, T> {
   pub ident: I,
   /// maybe not type, but instead kind.
   pub type_: T,
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub struct TypeDefn {
-  pub name: BigIdent,
-  pub params: Vec<Param<BigIdent, Kind>>,
-  pub def: Type,
 }
 
 #[derive(Debug, PartialEq, Eq)]

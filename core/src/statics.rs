@@ -15,7 +15,6 @@ pub fn get(top_defns: &[TopDefn]) -> Result<()> {
 
 #[derive(Default)]
 struct Cx {
-  types: HashMap<BigIdent, TypeInfo>,
   structs: HashMap<BigIdent, StructInfo>,
   enums: HashMap<BigIdent, EnumInfo>,
   fns: HashMap<Ident, FnInfo>,
@@ -48,24 +47,6 @@ struct FnInfo {
 
 fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
   match td {
-    TopDefn::Type(type_) => {
-      for p in type_.params.iter() {
-        ck_kind(&cx, &p.type_)?;
-        cx.big_vars.insert(p.ident.clone(), p.type_.clone());
-      }
-      ck_type(&cx, &type_.def)?;
-      for p in type_.params.iter() {
-        cx.big_vars.remove(&p.ident).unwrap();
-      }
-      cx.types.insert(
-        type_.name.clone(),
-        TypeInfo {
-          params: type_.params.clone(),
-          def: type_.def.clone(),
-        },
-      );
-      Ok(cx)
-    }
     TopDefn::Struct(struct_) => {
       for p in struct_.params.iter() {
         ck_kind(&cx, &p.type_)?;
@@ -118,9 +99,6 @@ fn ck_type(cx: &Cx, t: &Type) -> Result<Kind> {
   let tk = type_kind();
   match t {
     Type::BigIdent(bi) => {
-      if let Some(ti) = cx.types.get(bi) {
-        return Ok(mk_arrow_kind(&ti.params));
-      }
       if let Some(ti) = cx.structs.get(bi) {
         return Ok(mk_arrow_kind(&ti.params));
       }

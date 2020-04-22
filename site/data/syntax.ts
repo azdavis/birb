@@ -4,11 +4,7 @@ const syntax: Grammar = [
   { name: "program", def: [e, a(n("top-defn"), n("program"))] },
   {
     name: "top-defn",
-    def: [n("type-defn"), n("struct-defn"), n("enum-defn"), n("fn-defn")],
-  },
-  {
-    name: "type-defn",
-    def: [a(t("type"), n("big-ident"), n("big-param-list-opt"), t("="), n("type"))],
+    def: [n("struct-defn"), n("enum-defn"), n("fn-defn")],
   },
   {
     name: "struct-defn",

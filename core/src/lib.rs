@@ -17,7 +17,7 @@ pub fn get(bs: &[u8]) -> error::Result<Vec<cst::TopDefn>> {
 mod tests {
   use crate::cst::{
     Arm, Block, Effect, EnumDefn, Expr, Field, FnDefn, Kind, Param, Pat, QualIdent, Stmt,
-    StructDefn, TopDefn, Type, TypeDefn, TypeOrEffect,
+    StructDefn, TopDefn, Type, TypeOrEffect,
   };
   use crate::get;
   use crate::ident::{BigIdent, Ident};
@@ -36,11 +36,6 @@ mod tests {
           name: BigIdent::new("Void"),
           params: Vec::new(),
           ctors: Vec::new(),
-        }),
-        TopDefn::Type(TypeDefn {
-          name: BigIdent::new("Never"),
-          params: Vec::new(),
-          def: Type::BigIdent(BigIdent::new("Void")),
         }),
         TopDefn::Fn_(FnDefn {
           name: Ident::new("main"),
