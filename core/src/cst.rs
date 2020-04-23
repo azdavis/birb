@@ -43,7 +43,8 @@ pub struct FnDefn {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Kind {
-  BigIdent(BigIdent),
+  Type,
+  Effect,
   Tuple(Vec<Kind>),
   Arrow(Box<Kind>, Box<Kind>),
 }
@@ -51,7 +52,8 @@ pub enum Kind {
 impl fmt::Display for Kind {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
-      Self::BigIdent(bi) => write!(f, "{}", bi),
+      Self::Type => write!(f, "Type"),
+      Self::Effect => write!(f, "Effect"),
       Self::Tuple(ts) => SliceDisplay::new("(", ts, ")").fmt(f),
       Self::Arrow(k1, k2) => write!(f, "({}) -> ({})", k1, k2),
     }

@@ -62,7 +62,7 @@ mod tests {
           name: BigIdent::new("Guy"),
           params: vec![Param {
             ident: BigIdent::new("T"),
-            type_: Kind::BigIdent(BigIdent::new("Type")),
+            type_: Kind::Type,
           }],
           fields: vec![Param {
             ident: Ident::new("x"),
@@ -74,15 +74,15 @@ mod tests {
           big_params: vec![
             Param {
               ident: BigIdent::new("T"),
-              type_: Kind::BigIdent(BigIdent::new("Type"))
+              type_: Kind::Type,
             },
             Param {
               ident: BigIdent::new("U"),
-              type_: Kind::BigIdent(BigIdent::new("Type"))
+              type_: Kind::Type,
             },
             Param {
               ident: BigIdent::new("E"),
-              type_: Kind::BigIdent(BigIdent::new("Effect"))
+              type_: Kind::Effect,
             },
           ],
           params: vec![

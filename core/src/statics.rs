@@ -7,8 +7,6 @@ use std::collections::{HashMap, HashSet};
 
 pub fn get(top_defns: &[TopDefn]) -> Result<()> {
   let mut cx = Cx::default();
-  cx.kinds.insert(type_ident());
-  cx.kinds.insert(effect_ident());
   cx.effects.insert(BigIdent::new("Stdout"));
   Ok(())
 }
@@ -49,7 +47,6 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
   match td {
     TopDefn::Struct(struct_) => {
       for p in struct_.params.iter() {
-        ck_kind(&cx, &p.type_)?;
         cx.big_vars.insert(p.ident.clone(), p.type_.clone());
       }
       for f in struct_.fields.iter() {
@@ -72,31 +69,8 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
   }
 }
 
-fn ck_kind(cx: &Cx, k: &Kind) -> Result<()> {
-  match k {
-    Kind::BigIdent(bi) => {
-      if cx.kinds.contains(bi) {
-        Ok(())
-      } else {
-        Err(Error::UndefinedKind(bi.clone()))
-      }
-    }
-    Kind::Arrow(k1, k2) => {
-      ck_kind(cx, k1)?;
-      ck_kind(cx, k2)?;
-      Ok(())
-    }
-    Kind::Tuple(ks) => {
-      for k in ks {
-        ck_kind(cx, k)?;
-      }
-      Ok(())
-    }
-  }
-}
-
 fn ck_type(cx: &Cx, t: &Type) -> Result<Kind> {
-  let tk = type_kind();
+  let tk = Kind::Type;
   match t {
     Type::BigIdent(bi, tes) => {
       // TODO
@@ -143,13 +117,12 @@ fn ck_type(cx: &Cx, t: &Type) -> Result<Kind> {
 }
 
 fn ck_effect(cx: &Cx, eff: &Effect) -> Result<()> {
-  let ek = effect_kind();
   for e in eff.idents.iter() {
     let k = match cx.big_vars.get(e) {
       Some(k) => k,
       None => return Err(Error::UndefinedEffect(e.clone())),
     };
-    if *k != ek {
+    if *k != Kind::Effect {
       return Err(Error::MismatchedEffectKinds(e.clone(), k.clone()));
     }
   }
@@ -159,22 +132,8 @@ fn ck_effect(cx: &Cx, eff: &Effect) -> Result<()> {
 fn mk_arrow_kind(params: &[Param<BigIdent, Kind>]) -> Kind {
   Kind::Arrow(
     Kind::Tuple(params.iter().map(|p| p.type_.clone()).collect()).into(),
-    type_kind().into(),
+    Kind::Type.into(),
   )
 }
 
-fn type_kind() -> Kind {
-  Kind::BigIdent(type_ident())
-}
-
-fn type_ident() -> BigIdent {
-  BigIdent::new("Type")
-}
-
-fn effect_kind() -> Kind {
-  Kind::BigIdent(effect_ident())
-}
-
-fn effect_ident() -> BigIdent {
-  BigIdent::new("Effect")
 }

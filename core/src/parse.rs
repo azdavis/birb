@@ -127,7 +127,13 @@ fn kind(i: usize, ts: &[Token]) -> Result<(usize, Kind)> {
 
 fn kind_hd(i: usize, ts: &[Token]) -> Result<(usize, Kind)> {
   if let Ok((i, bi)) = big_ident(i, ts) {
-    return Ok((i, Kind::BigIdent(bi)));
+    if bi == BigIdent::new("Type") {
+      return Ok((i, Kind::Type));
+    }
+    if bi == BigIdent::new("Effect") {
+      return Ok((i, Kind::Effect));
+    }
+    return Err(Error::UndefinedKind(bi));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
     let (i, ks) = comma_sep(i, ts, kind)?;
