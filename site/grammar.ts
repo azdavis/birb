@@ -32,16 +32,6 @@ export function a(...as: Alternative[]): Alternative {
   return { t: "And", as };
 }
 
-function union<T>(xs: Set<T>, ys: Set<T>): Set<T> {
-  const ret = new Set<T>();
-  function add(x: T) {
-    ret.add(x);
-  }
-  xs.forEach(add);
-  ys.forEach(add);
-  return ret;
-}
-
 function altTerminal(ac: Set<string>, a: Alternative): Set<string> {
   switch (a.t) {
     case "Empty":
