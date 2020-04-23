@@ -4,10 +4,10 @@ fn call[
   U: Type,
   E: Effect,
 ](
-  f: T -> U affects {E},
+  f: T -> U affects E,
   x: T,
 ):
-  U affects {E}
+  U affects E
   requires true
   ensures true
 {
@@ -17,6 +17,6 @@ fn call[
   // and upon match, evaluate to the empty tuple
   let _ = match () { () { () } };
   // doesn't typecheck
-  let _: Heh[Nah, {Dude}] = ();
+  let _: Heh[Nah, Dude] = ();
   x.f()
 }
