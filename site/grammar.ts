@@ -10,8 +10,8 @@ export type Production = {
 export type Alternative =
   | { t: "Empty" }
   | { t: "Comment"; msg: string }
-  | { t: "Term"; val: string }
-  | { t: "NonTerm"; val: string }
+  | { t: "Terminal"; val: string }
+  | { t: "NonTerminal"; val: string }
   | { t: "And"; as: Alternative[] };
 
 export const e: Alternative = { t: "Empty" };
@@ -21,11 +21,11 @@ export function c(msg: string): Alternative {
 }
 
 export function t(val: string): Alternative {
-  return { t: "Term", val };
+  return { t: "Terminal", val };
 }
 
 export function n(val: string): Alternative {
-  return { t: "NonTerm", val };
+  return { t: "NonTerminal", val };
 }
 
 export function a(...as: Alternative[]): Alternative {
@@ -36,9 +36,9 @@ function altTerminal(ac: Set<string>, a: Alternative): Set<string> {
   switch (a.t) {
     case "Empty":
     case "Comment":
-    case "NonTerm":
+    case "NonTerminal":
       return ac;
-    case "Term":
+    case "Terminal":
       ac.add(a.val);
       return ac;
     case "And":

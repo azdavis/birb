@@ -26,9 +26,9 @@ function alternative(a: G.Alternative): React.ReactNode {
       return eps;
     case "Comment":
       return a.msg;
-    case "Term":
+    case "Terminal":
       return <code>{a.val}</code>;
-    case "NonTerm":
+    case "NonTerminal":
       return <em>{a.val}</em>;
     case "And":
       return a.as.map(andItem);
