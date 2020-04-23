@@ -1,6 +1,8 @@
-import { Grammar, t, c, n, a, e } from "../grammar";
+import { Grammar, t, c, n, a, e, verify } from "../grammar";
 
-const tokens: Grammar = [
+const exported = new Set(["comment", "big-ident", "ident", "number", "string"]);
+
+const tokens: Grammar = verify(new Set(), exported, [
   { name: "comment", def: [a(t("//"), n("comment-tl"))] },
   { name: "comment-tl", def: [c("any character except newline")] },
   { name: "big-ident", def: [a(n("upper"), n("big-ident-tl"))] },
@@ -11,7 +13,7 @@ const tokens: Grammar = [
   { name: "big-ident-tl-one", def: [n("upper"), n("lower"), n("digit")] },
   { name: "ident", def: [a(n("lower"), n("ident-tl"))] },
   { name: "ident-tl", def: [e, a(n("ident-tl-one"), n("ident-tl"))] },
-  { name: "ident-tl-one", def: [n("lower"), n("number"), t("_")] },
+  { name: "ident-tl-one", def: [n("lower"), n("digit"), t("_")] },
   { name: "string", def: [a(t('"'), n("string-inner"), t('"'))] },
   {
     name: "string-inner",
@@ -45,6 +47,6 @@ const tokens: Grammar = [
     name: "digit",
     def: [t("0"), t("1"), c("..."), t("9")],
   },
-];
+]);
 
 export default tokens;

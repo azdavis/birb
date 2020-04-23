@@ -1,6 +1,9 @@
-import { Grammar, t, n, a, e, terminals } from "../grammar";
+import { Grammar, t, n, a, e, terminals, verify } from "../grammar";
 
-const syntax: Grammar = [
+const imported = new Set(["big-ident", "ident", "string", "number"]);
+const exported = new Set(["program"]);
+
+const syntax: Grammar = verify(imported, exported, [
   { name: "program", def: [e, a(n("top-defn"), n("program"))] },
   {
     name: "top-defn",
@@ -25,7 +28,7 @@ const syntax: Grammar = [
         n("param-list"),
         t(")"),
         t(":"),
-        n("type"),
+        n("kinded"),
         n("requires-clause"),
         n("ensures-clause"),
         n("block"),
@@ -91,7 +94,7 @@ const syntax: Grammar = [
   },
   {
     name: "ctor",
-    def: [a(n("ident"), t("("), n("type"), t(")"))],
+    def: [a(n("ident"), t("("), n("kinded"), t(")"))],
   },
   {
     name: "param-list",
@@ -99,7 +102,7 @@ const syntax: Grammar = [
   },
   {
     name: "param",
-    def: [a(n("ident"), t(":"), n("type"))],
+    def: [a(n("ident"), t(":"), n("kinded"))],
   },
   { name: "requires-clause", def: [e, a(t("requires"), n("expr"))] },
   { name: "ensures-clause", def: [e, a(t("ensures"), n("expr"))] },
@@ -111,7 +114,7 @@ const syntax: Grammar = [
   },
   {
     name: "type-annotation",
-    def: [e, a(t(":"), n("type"))],
+    def: [e, a(t(":"), n("kinded"))],
   },
   {
     name: "pat",
@@ -129,6 +132,7 @@ const syntax: Grammar = [
       n("ident"),
     ],
   },
+  { name: "pat-list", def: [e, n("pat"), a(n("pat"), t(","), n("pat-list"))] },
   { name: "pat-or", def: [e, a(t("|"), n("pat"))] },
   {
     name: "field-pat-list",
@@ -175,7 +179,7 @@ const syntax: Grammar = [
   { name: "field-expr", def: [n("ident"), a(n("ident"), t(":"), n("expr"))] },
   { name: "arm-list", def: [e, a(n("arm"), n("arm-list"))] },
   { name: "arm", def: [a(n("pat"), n("block"))] },
-];
+]);
 
 const special: string[] = [];
 const reserved: string[] = [];
