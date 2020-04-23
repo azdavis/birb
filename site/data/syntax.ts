@@ -58,27 +58,31 @@ const syntax: Grammar = [
     def: [e, n("kind"), a(n("kind"), t(","), n("kind-list"))],
   },
   {
-    name: "type",
-    def: [a(n("type-hd"), n("type-tl"))],
+    name: "kinded",
+    def: [a(n("kinded-hd"), n("kinded-tl"))],
   },
   {
-    name: "type-hd",
-    def: [a(n("big-ident"), n("type-effect-args-opt")), a(t("("), n("type-list"), t(")"))],
+    name: "kinded-hd",
+    def: [a(n("big-ident"), n("kinded-args-opt")), a(t("("), n("kinded-list"), t(")"))],
   },
   {
-    name: "type-tl",
-    def: [e, a(t("->"), n("type")), a(t("affects"), n("effect"))],
+    name: "kinded-tl",
+    def: [e, a(t("->"), n("kinded")), a(t("affects"), n("kinded"))],
   },
   {
-    name: "type-list",
-    def: [e, n("type"), a(n("type"), t(","), n("type-list"))],
+    name: "kinded-args-opt",
+    def: [e, a(t("["), n("kinded-list"), t("]"))],
+  },
+  {
+    name: "kinded-list",
+    def: [e, n("kinded"), a(n("kinded"), t(","), n("kinded-list"))],
   },
   {
     name: "field-list",
     def: [
       e,
-      a(n("ident"), t(":"), n("type")),
-      a(n("ident"), t(":"), n("type"), t(","), n("field-list")),
+      a(n("ident"), t(":"), n("kinded")),
+      a(n("ident"), t(":"), n("kinded"), t(","), n("field-list")),
     ],
   },
   {
@@ -88,14 +92,6 @@ const syntax: Grammar = [
   {
     name: "ctor",
     def: [a(n("ident"), t("("), n("type"), t(")"))],
-  },
-  {
-    name: "effect",
-    def: [a(t("{"), n("effect-list"), t("}"))],
-  },
-  {
-    name: "effect-list",
-    def: [e, n("big-ident"), a(n("big-ident"), t(","), n("effect-list"))],
   },
   {
     name: "param-list",
@@ -149,7 +145,7 @@ const syntax: Grammar = [
       n("string"),
       n("number"),
       a(t("("), n("expr-list"), t(")")),
-      a(n("big-ident"), n("type-effect-args-opt"), t("{"), n("field-expr-list"), t("}")),
+      a(n("big-ident"), n("kinded-args-opt"), t("{"), n("field-expr-list"), t("}")),
       a(n("qual-ident"), n("call-opt")),
       a(t("return"), n("expr")),
       a(t("match"), n("expr"), t("{"), n("arm-list"), t("}")),
@@ -166,19 +162,7 @@ const syntax: Grammar = [
   },
   {
     name: "call-opt",
-    def: [e, a(n("type-effect-args-opt"), t("("), n("expr-list"), t(")"))],
-  },
-  {
-    name: "type-effect-args-opt",
-    def: [e, a(t("["), n("type-effect-list"), t("]"))],
-  },
-  {
-    name: "type-effect-list",
-    def: [e, n("type-effect"), a(n("type-effect"), t(","), n("type-effect-list"))],
-  },
-  {
-    name: "type-effect",
-    def: [n("type"), n("effect")],
+    def: [e, a(n("kinded-args-opt"), t("("), n("expr-list"), t(")"))],
   },
   {
     name: "expr-list",

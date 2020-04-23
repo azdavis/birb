@@ -16,8 +16,8 @@ pub fn get(bs: &[u8]) -> error::Result<Vec<cst::TopDefn>> {
 #[cfg(test)]
 mod tests {
   use crate::cst::{
-    Arm, Block, Effect, EnumDefn, Expr, Field, FnDefn, Kind, Param, Pat, QualIdent, Stmt,
-    StructDefn, TopDefn, Type, TypeOrEffect,
+    Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Kinded, Param, Pat, QualIdent, Stmt,
+    StructDefn, TopDefn,
   };
   use crate::get;
   use crate::ident::{BigIdent, Ident};
@@ -41,7 +41,7 @@ mod tests {
           name: Ident::new("main"),
           big_params: vec![],
           params: vec![],
-          ret_type: Type::BigIdent(BigIdent::new("String"), vec![]),
+          ret_type: Kinded::BigIdent(BigIdent::new("String"), vec![]),
           requires: None,
           ensures: None,
           body: Block {
@@ -66,7 +66,7 @@ mod tests {
           }],
           fields: vec![Param {
             ident: Ident::new("x"),
-            type_: Type::BigIdent(BigIdent::new("T"), vec![]),
+            type_: Kinded::BigIdent(BigIdent::new("T"), vec![]),
           }]
         }),
         TopDefn::Fn_(FnDefn {
@@ -88,27 +88,23 @@ mod tests {
           params: vec![
             Param {
               ident: Ident::new("f"),
-              type_: Type::Arrow(
-                Type::BigIdent(BigIdent::new("T"), vec![]).into(),
-                Type::Effectful(
-                  Type::BigIdent(BigIdent::new("U"), vec![]).into(),
-                  Effect {
-                    idents: vec![BigIdent::new("E")]
-                  }
+              type_: Kinded::Arrow(
+                Kinded::BigIdent(BigIdent::new("T"), vec![]).into(),
+                Kinded::Effectful(
+                  Kinded::BigIdent(BigIdent::new("U"), vec![]).into(),
+                  Kinded::BigIdent(BigIdent::new("E"), vec![]).into(),
                 )
                 .into()
               )
             },
             Param {
               ident: Ident::new("x"),
-              type_: Type::BigIdent(BigIdent::new("T"), vec![]),
+              type_: Kinded::BigIdent(BigIdent::new("T"), vec![]),
             }
           ],
-          ret_type: Type::Effectful(
-            Type::BigIdent(BigIdent::new("U"), vec![]).into(),
-            Effect {
-              idents: vec![BigIdent::new("E")]
-            }
+          ret_type: Kinded::Effectful(
+            Kinded::BigIdent(BigIdent::new("U"), vec![]).into(),
+            Kinded::BigIdent(BigIdent::new("E"), vec![]).into(),
           ),
           requires: Some(Expr::QualIdent(QualIdent::Ident(Ident::new("true")))),
           ensures: Some(Expr::QualIdent(QualIdent::Ident(Ident::new("true")))),
@@ -119,10 +115,7 @@ mod tests {
                 None,
                 Expr::Struct(
                   BigIdent::new("Guy"),
-                  vec![TypeOrEffect::Type(Type::BigIdent(
-                    BigIdent::new("T"),
-                    vec![]
-                  ))],
+                  vec![Kinded::BigIdent(BigIdent::new("T"), vec![])],
                   vec![Field::Ident(Ident::new("x"))],
                 )
               ),
@@ -142,13 +135,11 @@ mod tests {
               ),
               Stmt::Let(
                 Pat::Wildcard,
-                Some(Type::BigIdent(
+                Some(Kinded::BigIdent(
                   BigIdent::new("Heh"),
                   vec![
-                    TypeOrEffect::Type(Type::BigIdent(BigIdent::new("Nah"), vec![])),
-                    TypeOrEffect::Effect(Effect {
-                      idents: vec![BigIdent::new("Dude")]
-                    })
+                    Kinded::BigIdent(BigIdent::new("Nah"), vec![]),
+                    Kinded::BigIdent(BigIdent::new("Dude"), vec![]),
                   ]
                 )),
                 Expr::Tuple(vec![])

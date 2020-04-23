@@ -20,22 +20,22 @@ pub struct Param<I, T> {
 pub struct StructDefn {
   pub name: BigIdent,
   pub params: Vec<Param<BigIdent, Kind>>,
-  pub fields: Vec<Param<Ident, Type>>,
+  pub fields: Vec<Param<Ident, Kinded>>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct EnumDefn {
   pub name: BigIdent,
   pub params: Vec<Param<BigIdent, Kind>>,
-  pub ctors: Vec<Param<Ident, Type>>,
+  pub ctors: Vec<Param<Ident, Kinded>>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct FnDefn {
   pub name: Ident,
   pub big_params: Vec<Param<BigIdent, Kind>>,
-  pub params: Vec<Param<Ident, Type>>,
-  pub ret_type: Type,
+  pub params: Vec<Param<Ident, Kinded>>,
+  pub ret_type: Kinded,
   pub requires: Option<Expr>,
   pub ensures: Option<Expr>,
   pub body: Block,
@@ -61,14 +61,14 @@ impl fmt::Display for Kind {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Type {
-  BigIdent(BigIdent, Vec<TypeOrEffect>),
-  Tuple(Vec<Type>),
-  Arrow(Box<Type>, Box<Type>),
-  Effectful(Box<Type>, Effect),
+pub enum Kinded {
+  BigIdent(BigIdent, Vec<Kinded>),
+  Tuple(Vec<Kinded>),
+  Arrow(Box<Kinded>, Box<Kinded>),
+  Effectful(Box<Kinded>, Box<Kinded>),
 }
 
-impl fmt::Display for Type {
+impl fmt::Display for Kinded {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::BigIdent(bi, tes) => {
@@ -80,19 +80,8 @@ impl fmt::Display for Type {
       }
       Self::Tuple(ts) => SliceDisplay::new("(", ts, ")").fmt(f),
       Self::Arrow(k1, k2) => write!(f, "({}) -> ({})", k1, k2),
-      Self::Effectful(t, e) => write!(f, "({}) affects {}", t, e),
+      Self::Effectful(t, e) => write!(f, "({}) affects ({})", t, e),
     }
-  }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Effect {
-  pub idents: Vec<BigIdent>,
-}
-
-impl fmt::Display for Effect {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    SliceDisplay::new("{", &self.idents, "}").fmt(f)
   }
 }
 
@@ -100,7 +89,7 @@ impl fmt::Display for Effect {
 pub struct StructExpr {
   pub name: BigIdent,
   pub params: Vec<Param<BigIdent, Kind>>,
-  pub fields: Vec<Param<Ident, Type>>,
+  pub fields: Vec<Param<Ident, Kinded>>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -114,29 +103,14 @@ pub enum Expr {
   String_(String),
   Number(u64),
   Tuple(Vec<Expr>),
-  Struct(BigIdent, Vec<TypeOrEffect>, Vec<Field<Expr>>),
+  Struct(BigIdent, Vec<Kinded>, Vec<Field<Expr>>),
   QualIdent(QualIdent),
-  FnCall(QualIdent, Vec<TypeOrEffect>, Vec<Expr>),
+  FnCall(QualIdent, Vec<Kinded>, Vec<Expr>),
   FieldGet(Box<Expr>, Ident),
-  MethodCall(Box<Expr>, Ident, Vec<TypeOrEffect>, Vec<Expr>),
+  MethodCall(Box<Expr>, Ident, Vec<Kinded>, Vec<Expr>),
   Return(Box<Expr>),
   Match(Box<Expr>, Vec<Arm>),
   Block(Box<Block>),
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum TypeOrEffect {
-  Type(Type),
-  Effect(Effect),
-}
-
-impl fmt::Display for TypeOrEffect {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    match self {
-      Self::Type(t) => t.fmt(f),
-      Self::Effect(e) => e.fmt(f),
-    }
-  }
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -171,5 +145,5 @@ pub struct Block {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Stmt {
-  Let(Pat, Option<Type>, Expr),
+  Let(Pat, Option<Kinded>, Expr),
 }

@@ -1,5 +1,5 @@
-use crate::cst::{Kind, Type};
-use crate::ident::{BigIdent, Ident};
+use crate::cst::{Kind, Kinded};
+use crate::ident::BigIdent;
 use crate::parse::Found;
 use std::fmt;
 
@@ -13,8 +13,8 @@ pub enum Error {
   UndefinedKind(BigIdent),
   UndefinedType(BigIdent),
   UndefinedEffect(BigIdent),
-  MismatchedTypeKinds(Type, Kind),
-  MismatchedEffectKinds(BigIdent, Kind),
+  MismatchedKinds(Kinded, Kind, Kind),
+  WrongNumKindedArgs(BigIdent, usize, usize),
 }
 
 impl fmt::Display for Error {
@@ -30,15 +30,15 @@ impl fmt::Display for Error {
       Self::UndefinedKind(bi) => write!(f, "undefined kind: {}", bi),
       Self::UndefinedType(bi) => write!(f, "undefined type: {}", bi),
       Self::UndefinedEffect(bi) => write!(f, "undefined effect: {}", bi),
-      Self::MismatchedTypeKinds(t, found) => write!(
+      Self::MismatchedKinds(te, expected, found) => write!(
         f,
-        "mismatched kinds for {}: expected Type, found {}",
-        t, found
+        "mismatched kinds for {}: expected {}, found {}",
+        te, expected, found
       ),
-      Self::MismatchedEffectKinds(bi, found) => write!(
+      Self::WrongNumKindedArgs(te, expected, found) => write!(
         f,
-        "mismatched kinds for {}: expected Effect, found {}",
-        bi, found
+        "wrong number of arguments for {}: expected {}, found {}",
+        te, expected, found
       ),
     }
   }
@@ -55,8 +55,8 @@ impl std::error::Error for Error {
       | Self::UndefinedKind(..)
       | Self::UndefinedType(..)
       | Self::UndefinedEffect(..)
-      | Self::MismatchedTypeKinds(..)
-      | Self::MismatchedEffectKinds(..) => None,
+      | Self::MismatchedKinds(..)
+      | Self::WrongNumKindedArgs(..) => None,
     }
   }
 }

@@ -1,6 +1,6 @@
 use crate::cst::{
-  Arm, Block, Effect, EnumDefn, Expr, Field, FnDefn, Kind, Param, Pat, QualIdent, Stmt, StructDefn,
-  TopDefn, Type, TypeOrEffect,
+  Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Kinded, Param, Pat, QualIdent, Stmt, StructDefn,
+  TopDefn,
 };
 use crate::error::{Error, Result};
 use crate::ident::{BigIdent, Ident};
@@ -73,7 +73,7 @@ fn top_defn(i: usize, ts: &[Token]) -> Result<(usize, TopDefn)> {
     let (i, params) = comma_sep(i, ts, param)?;
     let i = eat(i, ts, Token::RRound)?;
     let i = eat(i, ts, Token::Colon)?;
-    let (i, ret_type) = type_(i, ts)?;
+    let (i, ret_type) = kinded(i, ts)?;
     let (i, requires) = requires_clause(i, ts)?;
     let (i, ensures) = ensures_clause(i, ts)?;
     let (i, body) = block(i, ts)?;
@@ -93,6 +93,16 @@ fn top_defn(i: usize, ts: &[Token]) -> Result<(usize, TopDefn)> {
   err(i, ts, "a top-level definition")
 }
 
+fn big_param_list_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<Param<BigIdent, Kind>>)> {
+  let i = match eat(i, ts, Token::LSquare) {
+    Ok(i) => i,
+    Err(_) => return Ok((i, Vec::new())),
+  };
+  let (i, ret) = comma_sep(i, ts, big_param)?;
+  let i = eat(i, ts, Token::RSquare)?;
+  Ok((i, ret))
+}
+
 fn big_param(i: usize, ts: &[Token]) -> Result<(usize, Param<BigIdent, Kind>)> {
   let (i, bi) = big_ident(i, ts)?;
   let i = eat(i, ts, Token::Colon)?;
@@ -104,16 +114,6 @@ fn big_param(i: usize, ts: &[Token]) -> Result<(usize, Param<BigIdent, Kind>)> {
       type_: k,
     },
   ))
-}
-
-fn big_param_list_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<Param<BigIdent, Kind>>)> {
-  let i = match eat(i, ts, Token::LSquare) {
-    Ok(i) => i,
-    Err(_) => return Ok((i, Vec::new())),
-  };
-  let (i, ret) = comma_sep(i, ts, big_param)?;
-  let i = eat(i, ts, Token::RSquare)?;
-  Ok((i, ret))
 }
 
 fn kind(i: usize, ts: &[Token]) -> Result<(usize, Kind)> {
@@ -136,7 +136,7 @@ fn kind_hd(i: usize, ts: &[Token]) -> Result<(usize, Kind)> {
     return Err(Error::UndefinedKind(bi));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
-    let (i, kinds) = comma_sep(i, ts, kind)?;
+    let (i, mut kinds) = comma_sep(i, ts, kind)?;
     let i = eat(i, ts, Token::RRound)?;
     let k = if kinds.len() == 1 {
       kinds.pop().unwrap()
@@ -148,41 +148,51 @@ fn kind_hd(i: usize, ts: &[Token]) -> Result<(usize, Kind)> {
   err(i, ts, "a kind")
 }
 
-fn type_(i: usize, ts: &[Token]) -> Result<(usize, Type)> {
-  let (i, t) = type_hd(i, ts)?;
+fn kinded(i: usize, ts: &[Token]) -> Result<(usize, Kinded)> {
+  let (i, t) = kinded_hd(i, ts)?;
   if let Ok(i) = eat(i, ts, Token::Arrow) {
-    let (i, t2) = type_(i, ts)?;
-    return Ok((i, Type::Arrow(t.into(), t2.into())));
+    let (i, t2) = kinded(i, ts)?;
+    return Ok((i, Kinded::Arrow(t.into(), t2.into())));
   }
   if let Ok(i) = eat(i, ts, Token::Affects) {
-    let (i, e) = effect(i, ts)?;
-    return Ok((i, Type::Effectful(t.into(), e)));
+    let (i, e) = kinded(i, ts)?;
+    return Ok((i, Kinded::Effectful(t.into(), e.into())));
   }
   Ok((i, t))
 }
 
-fn type_hd(i: usize, ts: &[Token]) -> Result<(usize, Type)> {
+fn kinded_hd(i: usize, ts: &[Token]) -> Result<(usize, Kinded)> {
   if let Ok((i, bi)) = big_ident(i, ts) {
-    let (i, tes, _) = type_effect_args_opt(i, ts)?;
-    return Ok((i, Type::BigIdent(bi, tes)));
+    let (i, tes, _) = kinded_args_opt(i, ts)?;
+    return Ok((i, Kinded::BigIdent(bi, tes)));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
-    let (i, types) = comma_sep(i, ts, type_)?;
+    let (i, mut types) = comma_sep(i, ts, kinded)?;
     let i = eat(i, ts, Token::RRound)?;
     let t = if types.len() == 1 {
       types.pop().unwrap()
     } else {
-      Type::Tuple(types)
+      Kinded::Tuple(types)
     };
     return Ok((i, t));
   }
-  err(i, ts, "a type")
+  err(i, ts, "a type or effect")
 }
 
-fn field(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {
+fn kinded_args_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<Kinded>, bool)> {
+  let i = match eat(i, ts, Token::LSquare) {
+    Ok(i) => i,
+    Err(_) => return Ok((i, Vec::new(), false)),
+  };
+  let (i, tes) = comma_sep(i, ts, kinded)?;
+  let i = eat(i, ts, Token::RSquare)?;
+  Ok((i, tes, true))
+}
+
+fn field(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Kinded>)> {
   let (i, id) = ident(i, ts)?;
   let i = eat(i, ts, Token::Colon)?;
-  let (i, t) = type_(i, ts)?;
+  let (i, t) = kinded(i, ts)?;
   Ok((
     i,
     Param {
@@ -192,10 +202,10 @@ fn field(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {
   ))
 }
 
-fn ctor(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {
+fn ctor(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Kinded>)> {
   let (i, id) = ident(i, ts)?;
   let i = eat(i, ts, Token::LRound)?;
-  let (i, t) = type_(i, ts)?;
+  let (i, t) = kinded(i, ts)?;
   let i = eat(i, ts, Token::RRound)?;
   Ok((
     i,
@@ -206,17 +216,10 @@ fn ctor(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {
   ))
 }
 
-fn effect(i: usize, ts: &[Token]) -> Result<(usize, Effect)> {
-  let i = eat(i, ts, Token::LCurly)?;
-  let (i, idents) = comma_sep(i, ts, big_ident)?;
-  let i = eat(i, ts, Token::RCurly)?;
-  Ok((i, Effect { idents }))
-}
-
-fn param(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Type>)> {
+fn param(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Kinded>)> {
   let (i, id) = ident(i, ts)?;
   let i = eat(i, ts, Token::Colon)?;
-  let (i, t) = type_(i, ts)?;
+  let (i, t) = kinded(i, ts)?;
   Ok((
     i,
     Param {
@@ -269,12 +272,12 @@ fn stmt(i: usize, ts: &[Token]) -> Result<(usize, Stmt)> {
   Ok((i, Stmt::Let(p, ta, e)))
 }
 
-fn type_annotation(i: usize, ts: &[Token]) -> Result<(usize, Option<Type>)> {
+fn type_annotation(i: usize, ts: &[Token]) -> Result<(usize, Option<Kinded>)> {
   let i = match eat(i, ts, Token::Colon) {
     Ok(i) => i,
     Err(_) => return Ok((i, None)),
   };
-  let (i, t) = type_(i, ts)?;
+  let (i, t) = kinded(i, ts)?;
   Ok((i, Some(t)))
 }
 
@@ -298,7 +301,7 @@ fn pat_hd(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
     return Ok((i, Pat::Number(n)));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
-    let (i, pats) = comma_sep(i, ts, pat)?;
+    let (i, mut pats) = comma_sep(i, ts, pat)?;
     let i = eat(i, ts, Token::RRound)?;
     let p = if pats.len() == 1 {
       pats.pop().unwrap()
@@ -358,7 +361,7 @@ fn expr_hd(i: usize, ts: &[Token]) -> Result<(usize, Expr)> {
     return Ok((i, Expr::Number(n)));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
-    let (i, exprs) = comma_sep(i, ts, expr)?;
+    let (i, mut exprs) = comma_sep(i, ts, expr)?;
     let i = eat(i, ts, Token::RRound)?;
     let e = if exprs.len() == 1 {
       exprs.pop().unwrap()
@@ -368,7 +371,7 @@ fn expr_hd(i: usize, ts: &[Token]) -> Result<(usize, Expr)> {
     return Ok((i, e));
   }
   if let Ok((i, bi)) = big_ident(i, ts) {
-    let (i, tes, _) = type_effect_args_opt(i, ts)?;
+    let (i, tes, _) = kinded_args_opt(i, ts)?;
     let i = eat(i, ts, Token::LCurly)?;
     let (i, fes) = comma_sep(i, ts, field_expr)?;
     let i = eat(i, ts, Token::RCurly)?;
@@ -410,8 +413,8 @@ fn qual_ident(i: usize, ts: &[Token]) -> Result<(usize, QualIdent)> {
   err(i, ts, "a qualified identifier")
 }
 
-fn call_opt(i: usize, ts: &[Token]) -> Result<(usize, Option<(Vec<TypeOrEffect>, Vec<Expr>)>)> {
-  let (i, tes, got) = type_effect_args_opt(i, ts)?;
+fn call_opt(i: usize, ts: &[Token]) -> Result<(usize, Option<(Vec<Kinded>, Vec<Expr>)>)> {
+  let (i, tes, got) = kinded_args_opt(i, ts)?;
   let i = match eat(i, ts, Token::LRound) {
     Ok(i) => i,
     Err(e) => return if got { Err(e) } else { Ok((i, None)) },
@@ -419,26 +422,6 @@ fn call_opt(i: usize, ts: &[Token]) -> Result<(usize, Option<(Vec<TypeOrEffect>,
   let (i, es) = comma_sep(i, ts, expr)?;
   let i = eat(i, ts, Token::RRound)?;
   Ok((i, Some((tes, es))))
-}
-
-fn type_effect_args_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<TypeOrEffect>, bool)> {
-  let i = match eat(i, ts, Token::LSquare) {
-    Ok(i) => i,
-    Err(_) => return Ok((i, Vec::new(), false)),
-  };
-  let (i, tes) = comma_sep(i, ts, type_effect)?;
-  let i = eat(i, ts, Token::RSquare)?;
-  Ok((i, tes, true))
-}
-
-fn type_effect(i: usize, ts: &[Token]) -> Result<(usize, TypeOrEffect)> {
-  if let Ok((i, t)) = type_(i, ts) {
-    return Ok((i, TypeOrEffect::Type(t)));
-  }
-  if let Ok((i, e)) = effect(i, ts) {
-    return Ok((i, TypeOrEffect::Effect(e)));
-  }
-  err(i, ts, "a type or effect")
 }
 
 fn field_expr(i: usize, ts: &[Token]) -> Result<(usize, Field<Expr>)> {
