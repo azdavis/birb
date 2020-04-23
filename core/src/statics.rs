@@ -69,51 +69,36 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
   }
 }
 
-fn ck_type(cx: &Cx, t: &Type) -> Result<Kind> {
-  let tk = Kind::Type;
+fn ck_type(cx: &Cx, t: &Type) -> Result<()> {
   match t {
     Type::BigIdent(bi, tes) => {
       // TODO
-      if let Some(ti) = cx.structs.get(bi) {
-        return Ok(mk_arrow_kind(&ti.params));
-      }
-      if let Some(ti) = cx.enums.get(bi) {
-        return Ok(mk_arrow_kind(&ti.params));
-      }
-      if let Some(k) = cx.big_vars.get(bi) {
-        return Ok(k.clone());
-      }
-      Err(Error::UndefinedType(bi.clone()))
+      let k = if let Some(ti) = cx.structs.get(bi) {
+        mk_params_kind(&ti.params)
+      } else if let Some(ti) = cx.enums.get(bi) {
+        mk_params_kind(&ti.params)
+      } else if let Some(k) = cx.big_vars.get(bi) {
+        k.clone()
+      } else {
+        return Err(Error::UndefinedType(bi.clone()));
+      };
+      todo!()
     }
     Type::Tuple(ts) => {
       for t in ts {
-        let k = ck_type(cx, t)?;
-        if k != tk {
-          return Err(Error::MismatchedTypeKinds(t.clone(), k));
-        }
+        ck_type(cx, t)?;
       }
-      Ok(tk)
     }
     Type::Arrow(t1, t2) => {
-      let k1 = ck_type(cx, t1)?;
-      if k1 != tk {
-        return Err(Error::MismatchedTypeKinds((**t1).clone(), k1));
-      }
-      let k2 = ck_type(cx, t2)?;
-      if k2 != tk {
-        return Err(Error::MismatchedTypeKinds((**t2).clone(), k2));
-      }
-      Ok(tk)
+      ck_type(cx, t1)?;
+      ck_type(cx, t2)?;
     }
     Type::Effectful(t, e) => {
-      let kt = ck_type(cx, t)?;
-      if kt != tk {
-        return Err(Error::MismatchedTypeKinds((**t).clone(), kt));
-      }
+      ck_type(cx, t)?;
       ck_effect(cx, e)?;
-      Ok(tk)
     }
   }
+  Ok(())
 }
 
 fn ck_effect(cx: &Cx, eff: &Effect) -> Result<()> {
@@ -129,11 +114,15 @@ fn ck_effect(cx: &Cx, eff: &Effect) -> Result<()> {
   Ok(())
 }
 
-fn mk_arrow_kind(params: &[Param<BigIdent, Kind>]) -> Kind {
-  Kind::Arrow(
-    Kind::Tuple(params.iter().map(|p| p.type_.clone()).collect()).into(),
-    Kind::Type.into(),
-  )
-}
-
+fn mk_params_kind(params: &[Param<BigIdent, Kind>]) -> Kind {
+  if params.is_empty() {
+    Kind::Type
+  } else if params.len() == 1 {
+    Kind::Arrow(params[0].type_.clone().into(), Kind::Type.into())
+  } else {
+    Kind::Arrow(
+      Kind::Tuple(params.iter().map(|p| p.type_.clone()).collect()).into(),
+      Kind::Type.into(),
+    )
+  }
 }
