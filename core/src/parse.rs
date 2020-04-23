@@ -136,9 +136,14 @@ fn kind_hd(i: usize, ts: &[Token]) -> Result<(usize, Kind)> {
     return Err(Error::UndefinedKind(bi));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
-    let (i, ks) = comma_sep(i, ts, kind)?;
+    let (i, kinds) = comma_sep(i, ts, kind)?;
     let i = eat(i, ts, Token::RRound)?;
-    return Ok((i, Kind::Tuple(ks)));
+    let k = if kinds.len() == 1 {
+      kinds.pop().unwrap()
+    } else {
+      Kind::Tuple(kinds)
+    };
+    return Ok((i, k));
   }
   err(i, ts, "a kind")
 }
@@ -162,9 +167,14 @@ fn type_hd(i: usize, ts: &[Token]) -> Result<(usize, Type)> {
     return Ok((i, Type::BigIdent(bi, tes)));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
-    let (i, ks) = comma_sep(i, ts, type_)?;
+    let (i, types) = comma_sep(i, ts, type_)?;
     let i = eat(i, ts, Token::RRound)?;
-    return Ok((i, Type::Tuple(ks)));
+    let t = if types.len() == 1 {
+      types.pop().unwrap()
+    } else {
+      Type::Tuple(types)
+    };
+    return Ok((i, t));
   }
   err(i, ts, "a type")
 }
@@ -288,9 +298,14 @@ fn pat_hd(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
     return Ok((i, Pat::Number(n)));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
-    let (i, ps) = comma_sep(i, ts, pat)?;
+    let (i, pats) = comma_sep(i, ts, pat)?;
     let i = eat(i, ts, Token::RRound)?;
-    return Ok((i, Pat::Tuple(ps)));
+    let p = if pats.len() == 1 {
+      pats.pop().unwrap()
+    } else {
+      Pat::Tuple(pats)
+    };
+    return Ok((i, p));
   }
   if let Ok((i, bi)) = big_ident(i, ts) {
     let i = eat(i, ts, Token::LCurly)?;
@@ -343,9 +358,14 @@ fn expr_hd(i: usize, ts: &[Token]) -> Result<(usize, Expr)> {
     return Ok((i, Expr::Number(n)));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
-    let (i, es) = comma_sep(i, ts, expr)?;
+    let (i, exprs) = comma_sep(i, ts, expr)?;
     let i = eat(i, ts, Token::RRound)?;
-    return Ok((i, Expr::Tuple(es)));
+    let e = if exprs.len() == 1 {
+      exprs.pop().unwrap()
+    } else {
+      Expr::Tuple(exprs)
+    };
+    return Ok((i, e));
   }
   if let Ok((i, bi)) = big_ident(i, ts) {
     let (i, tes, _) = type_effect_args_opt(i, ts)?;
