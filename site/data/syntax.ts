@@ -123,7 +123,7 @@ const syntax: Grammar = verify(imported, exported, [
   { name: "field-pat", def: [n("ident"), a(n("ident"), t(":"), n("pat"))] },
   {
     name: "expr",
-    def: [a(n("expr-hd"), n("expr-method-call-list"))],
+    def: [a(n("expr-hd"), n("expr-tl-list"))],
   },
   {
     name: "expr-hd",
@@ -139,8 +139,8 @@ const syntax: Grammar = verify(imported, exported, [
     ],
   },
   {
-    name: "expr-method-call-list",
-    def: [e, a(t("."), n("ident"), n("call-opt"), n("expr-method-call-list"))],
+    name: "expr-tl-list",
+    def: [e, a(t("."), n("ident"), n("call-opt"), n("expr-tl-list"))],
   },
   {
     name: "qual-ident",
