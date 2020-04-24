@@ -81,8 +81,21 @@ fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
       } else {
         return Err(Error::InvalidKindApp(bi.clone(), k));
       };
-      // let arg = if args.len() == 1 { args[0].clone()}
-      todo!()
+      let mut arg_kinds = Vec::with_capacity(args.len());
+      for arg in args {
+        arg_kinds.push(get_kind(cx, arg)?);
+      }
+      let arg_kind = if arg_kinds.len() == 1 {
+        arg_kinds.pop().unwrap()
+      } else {
+        Kind::Tuple(arg_kinds)
+      };
+      if param == arg_kind {
+        Ok(res)
+      } else {
+        // not the best error message. whatever.
+        Err(Error::MismatchedKinds(kinded.clone(), param, arg_kind))
+      }
     }
     Kinded::Tuple(ts) => {
       for t in ts {
