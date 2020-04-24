@@ -16,7 +16,6 @@ struct Cx {
   fns: HashMap<Ident, FnInfo>,
   big_vars: HashMap<BigIdent, Kind>,
   vars: HashMap<Ident, Kinded>,
-  kinds: HashSet<BigIdent>,
   effects: HashSet<BigIdent>,
 }
 
