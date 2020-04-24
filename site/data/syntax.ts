@@ -7,19 +7,9 @@ const syntax: Grammar = verify(imported, exported, [
   { name: "program", def: [e, a(n("top-defn"), n("program"))] },
   {
     name: "top-defn",
-    def: [n("struct-defn"), n("enum-defn"), n("fn-defn")],
-  },
-  {
-    name: "struct-defn",
-    def: [a(t("struct"), n("big-ident"), n("big-param-list-opt"), t("{"), n("field-list"), t("}"))],
-  },
-  {
-    name: "enum-defn",
-    def: [a(t("enum"), n("big-ident"), n("big-param-list-opt"), t("{"), n("ctor-list"), t("}"))],
-  },
-  {
-    name: "fn-defn",
     def: [
+      a(t("struct"), n("big-ident"), n("big-param-list-opt"), t("{"), n("param-list"), t("}")),
+      a(t("enum"), n("big-ident"), n("big-param-list-opt"), t("{"), n("ctor-list"), t("}")),
       a(
         t("fn"),
         n("ident"),
