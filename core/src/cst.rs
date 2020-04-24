@@ -64,6 +64,7 @@ impl fmt::Display for Kind {
 pub enum Kinded {
   BigIdent(BigIdent, Vec<Kinded>),
   Tuple(Vec<Kinded>),
+  Set(Vec<Kinded>),
   Arrow(Box<Kinded>, Box<Kinded>),
   Effectful(Box<Kinded>, Box<Kinded>),
 }
@@ -79,6 +80,7 @@ impl fmt::Display for Kinded {
         Ok(())
       }
       Self::Tuple(ts) => SliceDisplay::new("(", ts, ")").fmt(f),
+      Self::Set(ts) => SliceDisplay::new("{", ts, "}").fmt(f),
       Self::Arrow(k1, k2) => write!(f, "({}) -> ({})", k1, k2),
       Self::Effectful(t, e) => write!(f, "({}) affects ({})", t, e),
     }

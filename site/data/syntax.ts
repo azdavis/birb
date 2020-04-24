@@ -56,7 +56,11 @@ const syntax: Grammar = verify(imported, exported, [
   },
   {
     name: "kinded-hd",
-    def: [a(n("big-ident"), n("kinded-args-opt")), a(t("("), n("kinded-list"), t(")"))],
+    def: [
+      a(n("big-ident"), n("kinded-args-opt")),
+      a(t("("), n("kinded-list"), t(")")),
+      a(t("{"), n("kinded-list"), t("}")),
+    ],
   },
   {
     name: "kinded-tl",

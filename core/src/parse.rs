@@ -176,6 +176,16 @@ fn kinded_hd(i: usize, ts: &[Token]) -> Result<(usize, Kinded)> {
     };
     return Ok((i, t));
   }
+  if let Ok(i) = eat(i, ts, Token::LCurly) {
+    let (i, mut effects) = comma_sep(i, ts, kinded)?;
+    let i = eat(i, ts, Token::RCurly)?;
+    let t = if effects.len() == 1 {
+      effects.pop().unwrap()
+    } else {
+      Kinded::Set(effects)
+    };
+    return Ok((i, t));
+  }
   err(i, ts, "a type or effect")
 }
 
