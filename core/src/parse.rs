@@ -40,7 +40,7 @@ fn top_defn(i: usize, ts: &[Token]) -> Result<(usize, TopDefn)> {
     let (i, name) = big_ident(i, ts)?;
     let (i, params) = big_param_list_opt(i, ts)?;
     let i = eat(i, ts, Token::LCurly)?;
-    let (i, fields) = comma_sep(i, ts, field)?;
+    let (i, fields) = comma_sep(i, ts, param)?;
     let i = eat(i, ts, Token::RCurly)?;
     return Ok((
       i,
@@ -187,19 +187,6 @@ fn kinded_args_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<Kinded>, bool)>
   let (i, tes) = comma_sep(i, ts, kinded)?;
   let i = eat(i, ts, Token::RSquare)?;
   Ok((i, tes, true))
-}
-
-fn field(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Kinded>)> {
-  let (i, id) = ident(i, ts)?;
-  let i = eat(i, ts, Token::Colon)?;
-  let (i, t) = kinded(i, ts)?;
-  Ok((
-    i,
-    Param {
-      ident: id,
-      type_: t,
-    },
-  ))
 }
 
 fn ctor(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Kinded>)> {

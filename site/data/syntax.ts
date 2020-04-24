@@ -71,14 +71,6 @@ const syntax: Grammar = verify(imported, exported, [
     def: [e, n("kinded"), a(n("kinded"), t(","), n("kinded-list"))],
   },
   {
-    name: "field-list",
-    def: [
-      e,
-      a(n("ident"), t(":"), n("kinded")),
-      a(n("ident"), t(":"), n("kinded"), t(","), n("field-list")),
-    ],
-  },
-  {
     name: "ctor-list",
     def: [e, n("ctor"), a(n("ctor"), t(","), n("ctor-list"))],
   },
