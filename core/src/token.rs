@@ -1,7 +1,11 @@
+//! Tokens.
+
 use crate::ident::{BigIdent, Ident};
 use std::fmt;
 
+/// A token.
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[allow(missing_docs)]
 pub enum Token {
   // punctuation
   Arrow,
@@ -39,6 +43,7 @@ pub enum Token {
 }
 
 impl Token {
+  /// A description of a token.
   pub fn desc(&self) -> &'static str {
     match self {
       // punctuation
@@ -92,6 +97,7 @@ impl fmt::Display for Token {
 
 // these should be sorted longest first, then alphabetically
 
+/// Tokens composed of punctuation.
 pub const PUNCT: [(&[u8], Token); 16] = [
   // 2
   (b"->", Token::Arrow),
@@ -113,6 +119,7 @@ pub const PUNCT: [(&[u8], Token); 16] = [
   (b"|", Token::Bar),
 ];
 
+/// Reserved words.
 pub const WORDS: [(&[u8], Token); 10] = [
   // 8
   (b"requires", Token::Requires),

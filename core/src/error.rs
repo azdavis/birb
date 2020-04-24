@@ -1,23 +1,40 @@
+//! Errors.
+
 use crate::cst::{Kind, Kinded};
 use crate::ident::BigIdent;
 use crate::parse::Found;
 use std::fmt;
 
+/// An error.
 #[derive(Debug)]
 pub enum Error {
+  /// An invalid byte was found.
   InvalidByte(u8),
+  /// An unclosed string literal was found.
   UnclosedString,
+  /// Invalid UTF-8 was found in a string literal.
   InvalidUTF8(std::str::Utf8Error),
+  /// A number literal was invalid.
   InvalidNumber(std::num::ParseIntError),
+  /// A parse error occurred, where we expected one thing but found another thing.
   Parse(&'static str, Found),
+  /// There were empty kinded params, like `struct Foo[] { x: Int }`.
   EmptyKindedParams,
+  /// There were empty kinded arguments, like `Foo[] { x: 3 }`.
   EmptyKindedArgs,
+  /// There was an undefined kind.
   UndefinedKind(BigIdent),
+  /// There was an undefined type.
   UndefinedType(BigIdent),
+  /// There was an undefined effect.
   UndefinedEffect(BigIdent),
+  /// There was a kind mismatch, where we expected the Kinded to have the left Kind but it had the
+  /// right Kind instead.
   MismatchedKinds(Kinded, Kind, Kind),
+  /// There was an incorrect number of Kinded arguments.
   WrongNumKindedArgs(BigIdent, usize, usize),
-  InvalidKindApp(BigIdent, Kind),
+  /// There was a application of a Kinded where the Kinded did not have Arrow kind.
+  InvalidKindedApp(BigIdent, Kind),
 }
 
 impl fmt::Display for Error {
@@ -45,7 +62,7 @@ impl fmt::Display for Error {
         "wrong number of arguments for {}: expected {}, found {}",
         te, expected, found
       ),
-      Self::InvalidKindApp(bi, found) => write!(
+      Self::InvalidKindedApp(bi, found) => write!(
         f,
         "invalid kind for {}: expected an arrow kind, found {}",
         bi, found
@@ -69,9 +86,10 @@ impl std::error::Error for Error {
       | Self::UndefinedEffect(..)
       | Self::MismatchedKinds(..)
       | Self::WrongNumKindedArgs(..)
-      | Self::InvalidKindApp(..) => None,
+      | Self::InvalidKindedApp(..) => None,
     }
   }
 }
 
+/// A shorthand for a Result where the error is our Error.
 pub type Result<T> = std::result::Result<T, Error>;

@@ -1,8 +1,11 @@
+//! Static verification.
+
 use crate::cst::{Arm, Block, Expr, Field, Kind, Kinded, Param, Pat, QualIdent, Stmt, TopDefn};
 use crate::error::{Error, Result};
 use crate::ident::{BigIdent, Ident};
 use std::collections::{HashMap, HashSet};
 
+/// Checks whether the sequence of top-level definitions is statically well-formed.
 pub fn get(top_defns: &[TopDefn]) -> Result<()> {
   let mut cx = Cx::default();
   cx.effects.insert(BigIdent::new("Stdout"));
@@ -79,7 +82,7 @@ fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
       let (param, res) = if let Kind::Arrow(param, res) = k {
         (*param, *res)
       } else {
-        return Err(Error::InvalidKindApp(bi.clone(), k));
+        return Err(Error::InvalidKindedApp(bi.clone(), k));
       };
       let mut arg_kinds = Vec::with_capacity(args.len());
       for arg in args {

@@ -1,3 +1,7 @@
+//! An implementation of Birb.
+
+#![deny(missing_docs)]
+
 pub mod cst;
 pub mod error;
 pub mod ident;
@@ -8,9 +12,12 @@ pub mod token;
 
 mod util;
 
+/// Turn a sequence of bytes into a statically-checked sequence of top-level definitions.
 pub fn get(bs: &[u8]) -> error::Result<Vec<cst::TopDefn>> {
   let ts = lex::get(bs)?;
-  parse::get(&ts)
+  let ret = parse::get(&ts)?;
+  statics::get(&ret)?;
+  Ok(ret)
 }
 
 #[cfg(test)]

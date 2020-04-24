@@ -1,10 +1,13 @@
+//! Lexing.
+
 use crate::error::{Error, Result};
 use crate::ident::{BigIdent, Ident};
 use crate::token::{Token, PUNCT, WORDS};
 
-// a guess
+/// A guess.
 const BYTES_PER_TOKEN: usize = 10;
 
+/// Turn a sequence of bytes into a sequence of tokens.
 pub fn get(bs: &[u8]) -> Result<Vec<Token>> {
   let mut i = 0;
   let n = bs.len();

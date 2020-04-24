@@ -1,3 +1,5 @@
+//! Parsing.
+
 use crate::cst::{
   Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Kinded, Param, Pat, QualIdent, Stmt, StructDefn,
   TopDefn,
@@ -7,6 +9,7 @@ use crate::ident::{BigIdent, Ident};
 use crate::token::Token;
 use std::fmt;
 
+/// Turn a sequence of tokens into a sequence of top-level definitions.
 pub fn get(ts: &[Token]) -> Result<Vec<TopDefn>> {
   let mut i = 0;
   let mut ds = Vec::new();
@@ -18,9 +21,12 @@ pub fn get(ts: &[Token]) -> Result<Vec<TopDefn>> {
   Ok(ds)
 }
 
+/// Something unexpected that was found while parsing.
 #[derive(Debug)]
 pub enum Found {
+  /// The end of the file.
   EOF,
+  /// An unexpected token.
   Token(Token),
 }
 
@@ -325,7 +331,7 @@ fn pat_hd(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
     let i = eat(i, ts, Token::LRound)?;
     let (i, p) = pat(i, ts)?;
     let i = eat(i, ts, Token::RRound)?;
-    return Ok((i, Pat::Enum(ip, p.into())));
+    return Ok((i, Pat::Ctor(ip, p.into())));
   }
   if let Ok((i, id)) = ident(i, ts) {
     return Ok((i, Pat::Ident(id.into())));
