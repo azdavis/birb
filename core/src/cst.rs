@@ -19,6 +19,7 @@ pub struct Param<I, T> {
 #[derive(Debug, PartialEq, Eq)]
 pub struct StructDefn {
   pub name: BigIdent,
+  /// will be empty iff no params were written in the source
   pub params: Vec<Param<BigIdent, Kind>>,
   pub fields: Vec<Param<Ident, Kinded>>,
 }
@@ -26,6 +27,7 @@ pub struct StructDefn {
 #[derive(Debug, PartialEq, Eq)]
 pub struct EnumDefn {
   pub name: BigIdent,
+  /// will be empty iff no params were written in the source
   pub params: Vec<Param<BigIdent, Kind>>,
   pub ctors: Vec<Param<Ident, Kinded>>,
 }
@@ -33,6 +35,7 @@ pub struct EnumDefn {
 #[derive(Debug, PartialEq, Eq)]
 pub struct FnDefn {
   pub name: Ident,
+  /// will be empty iff no params were written in the source
   pub big_params: Vec<Param<BigIdent, Kind>>,
   pub params: Vec<Param<Ident, Kinded>>,
   pub ret_type: Kinded,
@@ -62,6 +65,7 @@ impl fmt::Display for Kind {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Kinded {
+  /// the Vec<Kinded> will be empty iff no args were written in the source
   BigIdent(BigIdent, Vec<Kinded>),
   Tuple(Vec<Kinded>),
   Set(Vec<Kinded>),

@@ -100,7 +100,11 @@ fn big_param_list_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<Param<BigIde
   };
   let (i, ret) = comma_sep(i, ts, big_param)?;
   let i = eat(i, ts, Token::RSquare)?;
-  Ok((i, ret))
+  if ret.is_empty() {
+    Err(Error::EmptyKindedParams)
+  } else {
+    Ok((i, ret))
+  }
 }
 
 fn big_param(i: usize, ts: &[Token]) -> Result<(usize, Param<BigIdent, Kind>)> {
@@ -196,7 +200,11 @@ fn kinded_args_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<Kinded>, bool)>
   };
   let (i, tes) = comma_sep(i, ts, kinded)?;
   let i = eat(i, ts, Token::RSquare)?;
-  Ok((i, tes, true))
+  if tes.is_empty() {
+    Err(Error::EmptyKindedArgs)
+  } else {
+    Ok((i, tes, true))
+  }
 }
 
 fn ctor(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Kinded>)> {

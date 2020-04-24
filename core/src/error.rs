@@ -10,6 +10,8 @@ pub enum Error {
   InvalidUTF8(std::str::Utf8Error),
   InvalidNumber(std::num::ParseIntError),
   Parse(&'static str, Found),
+  EmptyKindedParams,
+  EmptyKindedArgs,
   UndefinedKind(BigIdent),
   UndefinedType(BigIdent),
   UndefinedEffect(BigIdent),
@@ -28,6 +30,8 @@ impl fmt::Display for Error {
       Self::Parse(expected, found) => {
         write!(f, "parse error: expected {}, found {}", expected, found)
       }
+      Self::EmptyKindedParams => write!(f, "empty type/effect params"),
+      Self::EmptyKindedArgs => write!(f, "empty type/effect args"),
       Self::UndefinedKind(bi) => write!(f, "undefined kind: {}", bi),
       Self::UndefinedType(bi) => write!(f, "undefined type: {}", bi),
       Self::UndefinedEffect(bi) => write!(f, "undefined effect: {}", bi),
@@ -58,6 +62,8 @@ impl std::error::Error for Error {
       Self::InvalidByte(..)
       | Self::UnclosedString
       | Self::Parse(..)
+      | Self::EmptyKindedParams
+      | Self::EmptyKindedArgs
       | Self::UndefinedKind(..)
       | Self::UndefinedType(..)
       | Self::UndefinedEffect(..)
