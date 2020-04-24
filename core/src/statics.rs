@@ -42,7 +42,7 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
         cx.big_vars.insert(p.ident.clone(), p.type_.clone());
       }
       for f in struct_.fields.iter() {
-        ck_kinded(&cx, &f.type_)?;
+        ck_has_kind(&cx, &f.type_, Kind::Type)?;
       }
       for p in struct_.params.iter() {
         cx.big_vars.remove(&p.ident).unwrap();
@@ -61,24 +61,61 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
   }
 }
 
-fn ck_kinded(cx: &Cx, t: &Kinded) -> Result<Kind> {
-  match t {
-    Kinded::BigIdent(bi, tes) => todo!(),
+fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
+  match kinded {
+    Kinded::BigIdent(bi, tes) => {
+      let k = if let Some(si) = cx.structs.get(bi) {
+        mk_params_kind(&si.params)
+      } else if let Some(ei) = cx.enums.get(bi) {
+        mk_params_kind(&ei.params)
+      } else if let Some(k) = cx.big_vars.get(bi) {
+        k.clone()
+      } else {
+        return Err(Error::UndefinedKind(bi.clone()));
+      };
+      if tes.is_empty() {
+        return Ok(k);
+      }
+      let (param, res) = if let Kind::Arrow(param, res) = k {
+        (*param, *res)
+      } else {
+        return Err(Error::InvalidKindApp(bi.clone(), k));
+      };
+      // let arg = if tes.len() == 1 { tes[0].clone()}
+      todo!()
+    }
     Kinded::Tuple(ts) => {
       for t in ts {
-        ck_kinded(cx, t)?;
+        ck_has_kind(cx, t, Kind::Type)?;
       }
+      Ok(Kind::Type)
+    }
+    Kinded::Set(es) => {
+      for e in es {
+        ck_has_kind(cx, e, Kind::Effect)?;
+      }
+      Ok(Kind::Effect)
     }
     Kinded::Arrow(t1, t2) => {
-      ck_kinded(cx, t1)?;
-      ck_kinded(cx, t2)?;
+      ck_has_kind(cx, t1, Kind::Type)?;
+      ck_has_kind(cx, t2, Kind::Type)?;
+      Ok(Kind::Type)
     }
     Kinded::Effectful(t, e) => {
-      ck_kinded(cx, t)?;
-      ck_kinded(cx, e)?;
+      ck_has_kind(cx, t, Kind::Type)?;
+      ck_has_kind(cx, e, Kind::Effect)?;
+      Ok(Kind::Type)
     }
   }
-  todo!()
+}
+
+fn ck_has_kind(cx: &Cx, t: &Kinded, want: Kind) -> Result<()> {
+  let got = get_kind(cx, t)?;
+  if want == got {
+    Ok(())
+  } else {
+    Err(Error::MismatchedKinds(t.clone(), want, got))
+  }
 }
 
 fn mk_params_kind(params: &[Param<BigIdent, Kind>]) -> Kind {

@@ -15,6 +15,7 @@ pub enum Error {
   UndefinedEffect(BigIdent),
   MismatchedKinds(Kinded, Kind, Kind),
   WrongNumKindedArgs(BigIdent, usize, usize),
+  InvalidKindApp(BigIdent, Kind),
 }
 
 impl fmt::Display for Error {
@@ -40,6 +41,11 @@ impl fmt::Display for Error {
         "wrong number of arguments for {}: expected {}, found {}",
         te, expected, found
       ),
+      Self::InvalidKindApp(bi, found) => write!(
+        f,
+        "invalid kind for {}: expected an arrow kind, found {}",
+        bi, found
+      ),
     }
   }
 }
@@ -49,14 +55,15 @@ impl std::error::Error for Error {
     match self {
       Self::InvalidUTF8(e) => Some(e),
       Self::InvalidNumber(e) => Some(e),
-      Self::InvalidByte(_)
+      Self::InvalidByte(..)
       | Self::UnclosedString
       | Self::Parse(..)
       | Self::UndefinedKind(..)
       | Self::UndefinedType(..)
       | Self::UndefinedEffect(..)
       | Self::MismatchedKinds(..)
-      | Self::WrongNumKindedArgs(..) => None,
+      | Self::WrongNumKindedArgs(..)
+      | Self::InvalidKindApp(..) => None,
     }
   }
 }
