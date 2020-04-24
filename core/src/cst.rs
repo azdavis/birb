@@ -76,10 +76,10 @@ pub enum Kinded {
 impl fmt::Display for Kinded {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
-      Self::BigIdent(bi, tes) => {
+      Self::BigIdent(bi, args) => {
         write!(f, "{}", bi)?;
-        if !tes.is_empty() {
-          SliceDisplay::new("[", tes, "]").fmt(f)?;
+        if !args.is_empty() {
+          SliceDisplay::new("[", args, "]").fmt(f)?;
         }
         Ok(())
       }

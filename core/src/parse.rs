@@ -167,8 +167,8 @@ fn kinded(i: usize, ts: &[Token]) -> Result<(usize, Kinded)> {
 
 fn kinded_hd(i: usize, ts: &[Token]) -> Result<(usize, Kinded)> {
   if let Ok((i, bi)) = big_ident(i, ts) {
-    let (i, tes, _) = kinded_args_opt(i, ts)?;
-    return Ok((i, Kinded::BigIdent(bi, tes)));
+    let (i, args, _) = kinded_args_opt(i, ts)?;
+    return Ok((i, Kinded::BigIdent(bi, args)));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
     let (i, mut types) = comma_sep(i, ts, kinded)?;
@@ -198,12 +198,12 @@ fn kinded_args_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<Kinded>, bool)>
     Ok(i) => i,
     Err(_) => return Ok((i, Vec::new(), false)),
   };
-  let (i, tes) = comma_sep(i, ts, kinded)?;
+  let (i, args) = comma_sep(i, ts, kinded)?;
   let i = eat(i, ts, Token::RSquare)?;
-  if tes.is_empty() {
+  if args.is_empty() {
     Err(Error::EmptyKindedArgs)
   } else {
-    Ok((i, tes, true))
+    Ok((i, args, true))
   }
 }
 
@@ -351,7 +351,7 @@ fn expr(i: usize, ts: &[Token]) -> Result<(usize, Expr)> {
     let (j, co) = call_opt(j, ts)?;
     e = match co {
       None => Expr::FieldGet(e.into(), id),
-      Some((tes, es)) => Expr::MethodCall(e.into(), id, tes, es),
+      Some((args, es)) => Expr::MethodCall(e.into(), id, args, es),
     };
     i = j;
   }
@@ -376,17 +376,17 @@ fn expr_hd(i: usize, ts: &[Token]) -> Result<(usize, Expr)> {
     return Ok((i, e));
   }
   if let Ok((i, bi)) = big_ident(i, ts) {
-    let (i, tes, _) = kinded_args_opt(i, ts)?;
+    let (i, args, _) = kinded_args_opt(i, ts)?;
     let i = eat(i, ts, Token::LCurly)?;
     let (i, fes) = comma_sep(i, ts, field_expr)?;
     let i = eat(i, ts, Token::RCurly)?;
-    return Ok((i, Expr::Struct(bi, tes, fes)));
+    return Ok((i, Expr::Struct(bi, args, fes)));
   }
   if let Ok((i, ip)) = qual_ident(i, ts) {
     let (i, co) = call_opt(i, ts)?;
     return match co {
       None => Ok((i, Expr::QualIdent(ip))),
-      Some((tes, es)) => Ok((i, Expr::FnCall(ip, tes, es))),
+      Some((args, es)) => Ok((i, Expr::FnCall(ip, args, es))),
     };
   }
   if let Ok(i) = eat(i, ts, Token::Return) {
@@ -419,14 +419,14 @@ fn qual_ident(i: usize, ts: &[Token]) -> Result<(usize, QualIdent)> {
 }
 
 fn call_opt(i: usize, ts: &[Token]) -> Result<(usize, Option<(Vec<Kinded>, Vec<Expr>)>)> {
-  let (i, tes, got) = kinded_args_opt(i, ts)?;
+  let (i, args, got) = kinded_args_opt(i, ts)?;
   let i = match eat(i, ts, Token::LRound) {
     Ok(i) => i,
     Err(e) => return if got { Err(e) } else { Ok((i, None)) },
   };
   let (i, es) = comma_sep(i, ts, expr)?;
   let i = eat(i, ts, Token::RRound)?;
-  Ok((i, Some((tes, es))))
+  Ok((i, Some((args, es))))
 }
 
 fn field_expr(i: usize, ts: &[Token]) -> Result<(usize, Field<Expr>)> {

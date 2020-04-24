@@ -63,7 +63,7 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
 
 fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
   match kinded {
-    Kinded::BigIdent(bi, tes) => {
+    Kinded::BigIdent(bi, args) => {
       let k = if let Some(si) = cx.structs.get(bi) {
         mk_params_kind(&si.params)
       } else if let Some(ei) = cx.enums.get(bi) {
@@ -73,7 +73,7 @@ fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
       } else {
         return Err(Error::UndefinedKind(bi.clone()));
       };
-      if tes.is_empty() {
+      if args.is_empty() {
         return Ok(k);
       }
       let (param, res) = if let Kind::Arrow(param, res) = k {
@@ -81,7 +81,7 @@ fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
       } else {
         return Err(Error::InvalidKindApp(bi.clone(), k));
       };
-      // let arg = if tes.len() == 1 { tes[0].clone()}
+      // let arg = if args.len() == 1 { args[0].clone()}
       todo!()
     }
     Kinded::Tuple(ts) => {
