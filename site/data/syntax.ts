@@ -114,7 +114,7 @@ const syntax: Grammar = verify(imported, exported, [
       n("number"),
       a(t("("), n("pat-list"), t(")")),
       a(n("big-ident"), t("{"), n("field-pat-list"), t("}")),
-      a(n("qual-ident"), t("("), n("pat"), t(")")),
+      a(n("ident"), t("("), n("pat"), t(")")),
       n("ident"),
     ],
   },
@@ -136,7 +136,7 @@ const syntax: Grammar = verify(imported, exported, [
       n("number"),
       a(t("("), n("expr-list"), t(")")),
       a(n("big-ident"), n("kinded-args-opt"), t("{"), n("field-expr-list"), t("}")),
-      a(n("qual-ident"), n("call-opt")),
+      a(n("ident"), n("call-opt")),
       a(t("return"), n("expr")),
       a(t("match"), n("expr"), t("{"), n("arm-list"), t("}")),
       n("block"),
@@ -145,10 +145,6 @@ const syntax: Grammar = verify(imported, exported, [
   {
     name: "expr-tl-list",
     def: [e, a(t("."), n("ident"), n("call-opt"), n("expr-tl-list"))],
-  },
-  {
-    name: "qual-ident",
-    def: [n("ident"), a(n("big-ident"), t("::"), n("ident"))],
   },
   {
     name: "call-opt",

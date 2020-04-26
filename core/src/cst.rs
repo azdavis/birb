@@ -123,15 +123,6 @@ impl fmt::Display for Kinded {
   }
 }
 
-/// A qualified identifier.
-#[derive(Debug, PartialEq, Eq)]
-pub enum QualIdent {
-  /// Just a regular identifier.
-  Ident(Ident),
-  /// A big identifier and an identifier. Used to refer to a constructor of an enum.
-  More(BigIdent, Ident),
-}
-
 /// An expression.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Expr {
@@ -143,10 +134,10 @@ pub enum Expr {
   Tuple(Vec<Expr>),
   /// A struct expression, like `Foo { x: 3 }`.
   Struct(BigIdent, Vec<Kinded>, Vec<Field<Expr>>),
-  /// A qualified identifier, like `a` or `Bar::b`.
-  QualIdent(QualIdent),
+  /// An identifier, like `a`.
+  Ident(Ident),
   /// A function call, like `f(x)`.
-  FnCall(QualIdent, Vec<Kinded>, Vec<Expr>),
+  FnCall(Ident, Vec<Kinded>, Vec<Expr>),
   /// A field get, like `x.bar`.
   FieldGet(Box<Expr>, Ident),
   /// A function call written like a method call, like `x.f()`. Semantically equivalent to `f(x)`.
@@ -181,8 +172,8 @@ pub enum Pat {
   Tuple(Vec<Pat>),
   /// A struct pattern, like `Foo { x, y: 3 }`.
   Struct(BigIdent, Vec<Field<Pat>>),
-  /// A constructor pattern, like `Bar::b(x)`.
-  Ctor(QualIdent, Box<Pat>),
+  /// A constructor pattern, like `some(x)`.
+  Ctor(Ident, Box<Pat>),
   /// An identifier pattern, like `x`.
   Ident(Ident),
   /// An or pattern, like `3 | 4`.

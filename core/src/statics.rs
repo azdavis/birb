@@ -1,6 +1,6 @@
 //! Static verification.
 
-use crate::cst::{Arm, Block, Expr, Field, Kind, Kinded, Param, Pat, QualIdent, Stmt, TopDefn};
+use crate::cst::{Arm, Block, Expr, Field, Kind, Kinded, Param, Pat, Stmt, TopDefn};
 use crate::error::{Error, Result};
 use crate::ident::{BigIdent, Ident};
 use std::collections::{HashMap, HashSet};

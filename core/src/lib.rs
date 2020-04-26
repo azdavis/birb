@@ -24,8 +24,7 @@ pub fn get(bs: &[u8]) -> error::Result<Vec<cst::TopDefn>> {
 #[cfg(test)]
 mod tests {
   use crate::cst::{
-    Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Kinded, Param, Pat, QualIdent, Stmt,
-    StructDefn, TopDefn,
+    Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Kinded, Param, Pat, Stmt, StructDefn, TopDefn,
   };
   use crate::get;
   use crate::ident::{BigIdent, Ident};
@@ -114,8 +113,8 @@ mod tests {
             Kinded::BigIdent(BigIdent::new("U"), vec![]).into(),
             Kinded::BigIdent(BigIdent::new("E"), vec![]).into(),
           ),
-          requires: Some(Expr::QualIdent(QualIdent::Ident(Ident::new("true")))),
-          ensures: Some(Expr::QualIdent(QualIdent::Ident(Ident::new("true")))),
+          requires: Some(Expr::Ident(Ident::new("true"))),
+          ensures: Some(Expr::Ident(Ident::new("true"))),
           body: Block {
             stmts: vec![
               Stmt::Let(
@@ -154,7 +153,7 @@ mod tests {
               )
             ],
             expr: Some(Expr::MethodCall(
-              Expr::QualIdent(QualIdent::Ident(Ident::new("x"))).into(),
+              Expr::Ident(Ident::new("x")).into(),
               Ident::new("f"),
               vec![],
               vec![],

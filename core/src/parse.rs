@@ -1,8 +1,7 @@
 //! Parsing.
 
 use crate::cst::{
-  Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Kinded, Param, Pat, QualIdent, Stmt, StructDefn,
-  TopDefn,
+  Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Kinded, Param, Pat, Stmt, StructDefn, TopDefn,
 };
 use crate::error::{Error, Result};
 use crate::ident::{BigIdent, Ident};
@@ -327,11 +326,11 @@ fn pat_hd(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
     let i = eat(i, ts, Token::RCurly)?;
     return Ok((i, Pat::Struct(bi, fps)));
   }
-  if let Ok((i, ip)) = qual_ident(i, ts) {
+  if let Ok((i, id)) = ident(i, ts) {
     let i = eat(i, ts, Token::LRound)?;
     let (i, p) = pat(i, ts)?;
     let i = eat(i, ts, Token::RRound)?;
-    return Ok((i, Pat::Ctor(ip, p.into())));
+    return Ok((i, Pat::Ctor(id, p.into())));
   }
   if let Ok((i, id)) = ident(i, ts) {
     return Ok((i, Pat::Ident(id.into())));
@@ -388,11 +387,11 @@ fn expr_hd(i: usize, ts: &[Token]) -> Result<(usize, Expr)> {
     let i = eat(i, ts, Token::RCurly)?;
     return Ok((i, Expr::Struct(bi, args, fes)));
   }
-  if let Ok((i, ip)) = qual_ident(i, ts) {
+  if let Ok((i, id)) = ident(i, ts) {
     let (i, co) = call_opt(i, ts)?;
     return match co {
-      None => Ok((i, Expr::QualIdent(ip))),
-      Some((args, es)) => Ok((i, Expr::FnCall(ip, args, es))),
+      None => Ok((i, Expr::Ident(id))),
+      Some((args, es)) => Ok((i, Expr::FnCall(id, args, es))),
     };
   }
   if let Ok(i) = eat(i, ts, Token::Return) {
@@ -410,18 +409,6 @@ fn expr_hd(i: usize, ts: &[Token]) -> Result<(usize, Expr)> {
     return Ok((i, Expr::Block(b.into())));
   }
   err(i, ts, "an expression")
-}
-
-fn qual_ident(i: usize, ts: &[Token]) -> Result<(usize, QualIdent)> {
-  if let Ok((i, id)) = ident(i, ts) {
-    return Ok((i, QualIdent::Ident(id)));
-  }
-  if let Ok((i, bi)) = big_ident(i, ts) {
-    let i = eat(i, ts, Token::ColonColon)?;
-    let (i, id) = ident(i, ts)?;
-    return Ok((i, QualIdent::More(bi, id)));
-  }
-  err(i, ts, "a qualified identifier")
 }
 
 fn call_opt(i: usize, ts: &[Token]) -> Result<(usize, Option<(Vec<Kinded>, Vec<Expr>)>)> {
