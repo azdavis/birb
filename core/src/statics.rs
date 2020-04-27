@@ -9,7 +9,13 @@ use std::collections::{HashMap, HashSet};
 /// Checks whether the sequence of top-level definitions is statically well-formed.
 pub fn get(top_defns: &[TopDefn]) -> Result<()> {
   let mut cx = Cx::default();
+  let mut var_cx = VarCx::default();
   cx.effects = effects();
+  for td in top_defns {
+    ck_top_defn(&mut cx, &mut var_cx, td)?;
+    assert!(var_cx.big_vars.is_empty());
+    assert!(var_cx.vars.is_empty());
+  }
   Ok(())
 }
 
@@ -18,9 +24,13 @@ struct Cx {
   structs: HashMap<Ident, StructInfo>,
   enums: HashMap<Ident, EnumInfo>,
   fns: HashMap<Ident, FnInfo>,
+  effects: HashSet<Ident>,
+}
+
+#[derive(Default)]
+struct VarCx {
   big_vars: HashMap<Ident, Kind>,
   vars: HashMap<Ident, Kinded>,
-  effects: HashSet<Ident>,
 }
 
 #[derive(Clone)]
@@ -42,45 +52,43 @@ struct FnInfo {
 }
 
 fn ck_ident(cx: &Cx, id: &Ident) -> Result<()> {
-  if cx.fns.contains_key(id)
-    || cx.vars.contains_key(id)
-    || cx.enums.iter().any(|(_, info)| info.ctors.contains_key(id))
-  {
-    Err(Error::DuplicateIdentifier(id.clone().into()))
+  if cx.fns.contains_key(id) || cx.enums.iter().any(|(_, info)| info.ctors.contains_key(id)) {
+    Err(Error::DuplicateIdentifier(id.clone()))
   } else {
     Ok(())
   }
 }
 
 fn ck_big_ident(cx: &Cx, bi: &Ident) -> Result<()> {
-  if cx.big_vars.contains_key(bi)
-    || cx.structs.contains_key(bi)
-    || cx.enums.contains_key(bi)
-    || cx.effects.contains(bi)
-  {
-    Err(Error::DuplicateIdentifier(bi.clone().into()))
+  if cx.structs.contains_key(bi) || cx.enums.contains_key(bi) || cx.effects.contains(bi) {
+    Err(Error::DuplicateIdentifier(bi.clone()))
   } else {
     Ok(())
   }
 }
 
-fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
+fn ck_top_defn(cx: &mut Cx, var_cx: &mut VarCx, td: &TopDefn) -> Result<()> {
   match td {
     TopDefn::Struct(struct_) => {
       ck_big_ident(&cx, &struct_.name)?;
       for p in struct_.params.iter() {
-        ck_big_ident(&cx, &p.ident)?;
-        cx.big_vars.insert(p.ident.clone(), p.type_.clone());
+        if var_cx
+          .big_vars
+          .insert(p.ident.clone(), p.type_.clone())
+          .is_some()
+        {
+          return Err(Error::DuplicateIdentifier(p.ident.clone()));
+        }
       }
       let mut fields = HashMap::with_capacity(struct_.fields.len());
       for p in struct_.fields.iter() {
-        ck_has_kind(&cx, &p.type_, Kind::Type)?;
+        ck_has_kind(&cx, &var_cx, &p.type_, Kind::Type)?;
         if fields.insert(p.ident.clone(), p.type_.clone()).is_some() {
           return Err(Error::DuplicateField(struct_.name.clone(), p.ident.clone()));
         }
       }
       for p in struct_.params.iter() {
-        cx.big_vars.remove(&p.ident).unwrap();
+        var_cx.big_vars.remove(&p.ident).unwrap();
       }
       cx.structs.insert(
         struct_.name.clone(),
@@ -93,17 +101,22 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
     TopDefn::Enum(enum_) => {
       ck_big_ident(&cx, &enum_.name)?;
       for p in enum_.params.iter() {
-        ck_big_ident(&cx, &p.ident)?;
-        cx.big_vars.insert(p.ident.clone(), p.type_.clone());
+        if var_cx
+          .big_vars
+          .insert(p.ident.clone(), p.type_.clone())
+          .is_some()
+        {
+          return Err(Error::DuplicateIdentifier(p.ident.clone()));
+        }
       }
       let mut ctors = HashMap::with_capacity(enum_.ctors.len());
       for p in enum_.ctors.iter() {
         ck_ident(&cx, &p.ident)?;
-        ck_has_kind(&cx, &p.type_, Kind::Type)?;
+        ck_has_kind(&cx, &var_cx, &p.type_, Kind::Type)?;
         ctors.insert(p.ident.clone(), p.type_.clone());
       }
       for p in enum_.params.iter() {
-        cx.big_vars.remove(&p.ident).unwrap();
+        var_cx.big_vars.remove(&p.ident).unwrap();
       }
       cx.enums.insert(
         enum_.name.clone(),
@@ -116,21 +129,31 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
     TopDefn::Fn_(fn_) => {
       ck_ident(&cx, &fn_.name)?;
       for p in fn_.big_params.iter() {
-        ck_big_ident(&cx, &p.ident)?;
-        cx.big_vars.insert(p.ident.clone(), p.type_.clone());
+        if var_cx
+          .big_vars
+          .insert(p.ident.clone(), p.type_.clone())
+          .is_some()
+        {
+          return Err(Error::DuplicateIdentifier(p.ident.clone()));
+        }
       }
       for p in fn_.params.iter() {
-        ck_ident(&cx, &p.ident)?;
-        ck_has_kind(&cx, &p.type_, Kind::Type)?;
-        cx.vars.insert(p.ident.clone(), p.type_.clone());
+        ck_has_kind(&cx, &var_cx, &p.type_, Kind::Type)?;
+        if var_cx
+          .vars
+          .insert(p.ident.clone(), p.type_.clone())
+          .is_some()
+        {
+          return Err(Error::DuplicateIdentifier(p.ident.clone()));
+        }
       }
-      ck_has_kind(&cx, &fn_.ret_type, Kind::Type)?;
+      ck_has_kind(&cx, &var_cx, &fn_.ret_type, Kind::Type)?;
       // TODO check the requires, ensures, and body
       for p in fn_.big_params.iter() {
-        cx.big_vars.remove(&p.ident).unwrap();
+        var_cx.big_vars.remove(&p.ident).unwrap();
       }
       for p in fn_.params.iter() {
-        cx.vars.remove(&p.ident).unwrap();
+        var_cx.vars.remove(&p.ident).unwrap();
       }
       cx.fns.insert(
         fn_.name.clone(),
@@ -142,20 +165,20 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
       );
     }
   }
-  Ok(cx)
+  Ok(())
 }
 
-fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
+fn get_kind(cx: &Cx, var_cx: &VarCx, kinded: &Kinded) -> Result<Kind> {
   match kinded {
     Kinded::Ident(bi, args) => {
       let k = if let Some(si) = cx.structs.get(bi) {
         mk_params_kind(&si.params)
       } else if let Some(ei) = cx.enums.get(bi) {
         mk_params_kind(&ei.params)
-      } else if let Some(k) = cx.big_vars.get(bi) {
+      } else if let Some(k) = var_cx.big_vars.get(bi) {
         k.clone()
       } else {
-        return Err(Error::UndefinedIdentifier(bi.clone().into()));
+        return Err(Error::UndefinedIdentifier(bi.clone()));
       };
       if args.is_empty() {
         return Ok(k);
@@ -167,7 +190,7 @@ fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
       };
       let mut arg_kinds = Vec::with_capacity(args.len());
       for arg in args {
-        arg_kinds.push(get_kind(cx, arg)?);
+        arg_kinds.push(get_kind(cx, var_cx, arg)?);
       }
       let arg_kind = if arg_kinds.len() == 1 {
         arg_kinds.pop().unwrap()
@@ -183,31 +206,31 @@ fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
     }
     Kinded::Tuple(ts) => {
       for t in ts {
-        ck_has_kind(cx, t, Kind::Type)?;
+        ck_has_kind(cx, var_cx, t, Kind::Type)?;
       }
       Ok(Kind::Type)
     }
     Kinded::Set(es) => {
       for e in es {
-        ck_has_kind(cx, e, Kind::Effect)?;
+        ck_has_kind(cx, var_cx, e, Kind::Effect)?;
       }
       Ok(Kind::Effect)
     }
     Kinded::Arrow(t1, t2) => {
-      ck_has_kind(cx, t1, Kind::Type)?;
-      ck_has_kind(cx, t2, Kind::Type)?;
+      ck_has_kind(cx, var_cx, t1, Kind::Type)?;
+      ck_has_kind(cx, var_cx, t2, Kind::Type)?;
       Ok(Kind::Type)
     }
     Kinded::Effectful(t, e) => {
-      ck_has_kind(cx, t, Kind::Type)?;
-      ck_has_kind(cx, e, Kind::Effect)?;
+      ck_has_kind(cx, var_cx, t, Kind::Type)?;
+      ck_has_kind(cx, var_cx, e, Kind::Effect)?;
       Ok(Kind::Type)
     }
   }
 }
 
-fn ck_has_kind(cx: &Cx, kinded: &Kinded, want: Kind) -> Result<()> {
-  let got = get_kind(cx, kinded)?;
+fn ck_has_kind(cx: &Cx, var_cx: &VarCx, kinded: &Kinded, want: Kind) -> Result<()> {
+  let got = get_kind(cx, var_cx, kinded)?;
   if want == got {
     Ok(())
   } else {
@@ -228,61 +251,57 @@ fn mk_params_kind(params: &[Param<Ident, Kind>]) -> Kind {
   }
 }
 
-fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
+fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
   match expr {
-    Expr::String_(_) => Ok((cx, Kinded::Ident(Ident::new(STR), vec![]))),
-    Expr::Number(_) => Ok((cx, Kinded::Ident(Ident::new(INT), vec![]))),
+    Expr::String_(_) => Ok(Kinded::Ident(Ident::new(STR), vec![])),
+    Expr::Number(_) => Ok(Kinded::Ident(Ident::new(INT), vec![])),
     Expr::Tuple(es) => {
       let mut ts = Vec::with_capacity(es.len());
       for e in es {
-        let ans = get_expr_type(cx, e)?;
-        cx = ans.0;
-        ts.push(ans.1);
+        ts.push(get_expr_type(cx, var_cx, e)?);
       }
-      Ok((cx, Kinded::Tuple(ts)))
+      Ok(Kinded::Tuple(ts))
     }
     Expr::Struct(name, args, fields) => {
       let info = match cx.structs.get(name) {
         Some(x) => x.clone(),
-        None => return Err(Error::UndefinedIdentifier(name.clone().into())),
+        None => return Err(Error::UndefinedIdentifier(name.clone())),
       };
       if info.params.len() != args.len() {
         return Err(Error::WrongNumArgs(
-          name.clone().into(),
+          name.clone(),
           info.params.len(),
           args.len(),
         ));
       }
       for (p, a) in info.params.iter().zip(args) {
-        ck_has_kind(&cx, a, p.type_.clone())?;
+        ck_has_kind(&cx, &var_cx, a, p.type_.clone())?;
       }
       let mut fields_seen = HashSet::with_capacity(info.fields.len());
       for f in fields {
-        let (x, ans) = match f {
-          Field::Ident(x) => (x, get_expr_type(cx, &Expr::Ident(x.clone()))?),
-          Field::IdentAnd(x, e) => (x, get_expr_type(cx, e)?),
+        let (x, got) = match f {
+          Field::Ident(x) => (x, get_expr_type(cx, var_cx, &Expr::Ident(x.clone()))?),
+          Field::IdentAnd(x, e) => (x, get_expr_type(cx, var_cx, e)?),
         };
-        cx = ans.0;
         let want = match info.fields.get(x) {
           None => return Err(Error::NoSuchField(name.clone(), x.clone())),
           Some(t) => t,
         };
-        if *want != ans.1 {
-          return Err(Error::MismatchedTypes(want.clone(), ans.1));
+        if *want != got {
+          return Err(Error::MismatchedTypes(want.clone(), got));
         }
         if !fields_seen.insert(x) {
           return Err(Error::DuplicateField(name.clone(), x.clone()));
         }
       }
-      Ok((cx, Kinded::Ident(name.clone(), args.clone())))
+      Ok(Kinded::Ident(name.clone(), args.clone()))
     }
     Expr::Ident(name) => {
-      if let Some(t) = cx.vars.get(name) {
-        let t = t.clone();
-        return Ok((cx, t));
+      if let Some(t) = var_cx.vars.get(name) {
+        return Ok(t.clone());
       }
       // TODO we currently forbid bare function and constructor names
-      Err(Error::UndefinedIdentifier(name.clone().into()))
+      Err(Error::UndefinedIdentifier(name.clone()))
     }
     Expr::FnCall(name, big_args, args) => {
       let info = if let Some(info) = cx.fns.get(name) {
@@ -299,25 +318,34 @@ fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
       }) {
         info
       } else {
-        return Err(Error::UndefinedIdentifier(name.clone().into()));
+        return Err(Error::UndefinedIdentifier(name.clone()));
       };
       if info.big_params.len() != big_args.len() {
         return Err(Error::WrongNumArgs(
-          name.clone().into(),
+          name.clone(),
           info.big_params.len(),
           big_args.len(),
         ));
       }
+      let mut big_vars = HashMap::with_capacity(big_args.len());
       for (p, a) in info.big_params.iter().zip(big_args) {
-        ck_has_kind(&cx, a, p.type_.clone())?;
+        ck_has_kind(&cx, var_cx, a, p.type_.clone())?;
         ck_big_ident(&cx, &p.ident)?;
+        big_vars.insert(p.ident.clone(), a.clone());
+      }
+      if info.params.len() != args.len() {
+        return Err(Error::WrongNumArgs(
+          name.clone(),
+          info.params.len(),
+          args.len(),
+        ));
       }
       // TODO handle generics
       assert!(info.big_params.is_empty());
       todo!()
     }
     Expr::FieldGet(struct_, name) => {
-      let (cx, type_) = get_expr_type(cx, struct_)?;
+      let type_ = get_expr_type(cx, var_cx, struct_)?;
       let (bi, ks) = if let Kinded::Ident(bi, ks) = type_ {
         (bi, ks)
       } else {
@@ -329,14 +357,5 @@ fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
     Expr::Return(expr) => todo!(),
     Expr::Match(expr, arms) => todo!(),
     Expr::Block(block) => todo!(),
-  }
-}
-
-fn ck_expr_has_type(cx: Cx, e: &Expr, want: Kinded) -> Result<Cx> {
-  let (cx, got) = get_expr_type(cx, e)?;
-  if want == got {
-    Ok(cx)
-  } else {
-    Err(Error::MismatchedTypes(want, got))
   }
 }
