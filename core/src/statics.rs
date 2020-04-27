@@ -24,12 +24,12 @@ struct Cx {
 
 struct StructInfo {
   params: Vec<Param<BigIdent, Kind>>,
-  fields: Vec<Param<Ident, Kinded>>,
+  fields: HashMap<Ident, Kinded>,
 }
 
 struct EnumInfo {
   params: Vec<Param<BigIdent, Kind>>,
-  ctors: Vec<Param<Ident, Kinded>>,
+  ctors: HashMap<Ident, Kinded>,
 }
 
 struct FnInfo {
@@ -44,8 +44,12 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
       for p in struct_.params.iter() {
         cx.big_vars.insert(p.ident.clone(), p.type_.clone());
       }
-      for f in struct_.fields.iter() {
-        ck_has_kind(&cx, &f.type_, Kind::Type)?;
+      let mut fields = HashMap::with_capacity(struct_.fields.len());
+      for p in struct_.fields.iter() {
+        ck_has_kind(&cx, &p.type_, Kind::Type)?;
+        if fields.insert(p.ident.clone(), p.type_.clone()).is_some() {
+          return Err(Error::DuplicateField(p.ident.clone()));
+        }
       }
       for p in struct_.params.iter() {
         cx.big_vars.remove(&p.ident).unwrap();
@@ -54,7 +58,7 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
         struct_.name.clone(),
         StructInfo {
           params: struct_.params.clone(),
-          fields: struct_.fields.clone(),
+          fields,
         },
       );
     }
@@ -62,8 +66,18 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
       for p in enum_.params.iter() {
         cx.big_vars.insert(p.ident.clone(), p.type_.clone());
       }
-      for f in enum_.ctors.iter() {
-        ck_has_kind(&cx, &f.type_, Kind::Type)?;
+      let mut ctors = HashMap::with_capacity(enum_.ctors.len());
+      for p in enum_.ctors.iter() {
+        ck_has_kind(&cx, &p.type_, Kind::Type)?;
+        if ctors.insert(p.ident.clone(), p.type_.clone()).is_some()
+          || cx.fns.contains_key(&p.ident)
+          || cx
+            .enums
+            .iter()
+            .any(|(_, info)| info.ctors.contains_key(&p.ident))
+        {
+          return Err(Error::DuplicateFnOrCtor(p.ident.clone()));
+        }
       }
       for p in enum_.params.iter() {
         cx.big_vars.remove(&p.ident).unwrap();
@@ -72,7 +86,7 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
         enum_.name.clone(),
         EnumInfo {
           params: enum_.params.clone(),
-          ctors: enum_.ctors.clone(),
+          ctors,
         },
       );
     }

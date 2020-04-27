@@ -4,7 +4,7 @@ use crate::cst::{Field, Kinded, TopDefn};
 use crate::ident::{BigIdent, Ident};
 
 /// Steps the expression `main()` in the given context to a value. Requires that the context be
-/// statically checked and have a main function
+/// statically checked and have a main function.
 pub fn get(cx: &[TopDefn]) -> Value {
   todo!()
 }

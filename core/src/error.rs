@@ -1,7 +1,7 @@
 //! Errors.
 
 use crate::cst::{Kind, Kinded};
-use crate::ident::BigIdent;
+use crate::ident::{BigIdent, Ident};
 use crate::parse::Found;
 use std::fmt;
 
@@ -35,6 +35,10 @@ pub enum Error {
   WrongNumKindedArgs(BigIdent, usize, usize),
   /// There was a application of a Kinded where the Kinded did not have Arrow kind.
   InvalidKindedApp(BigIdent, Kind),
+  /// There was a duplicated field in a struct.
+  DuplicateField(Ident),
+  /// There was a duplicated function name or constructor.
+  DuplicateFnOrCtor(Ident),
 }
 
 impl fmt::Display for Error {
@@ -67,6 +71,8 @@ impl fmt::Display for Error {
         "invalid kind for {}: expected an arrow kind, found {}",
         bi, found
       ),
+      Self::DuplicateField(id) => write!(f, "duplicate field {}", id),
+      Self::DuplicateFnOrCtor(id) => write!(f, "duplicate function or constructor {}", id),
     }
   }
 }
@@ -86,7 +92,9 @@ impl std::error::Error for Error {
       | Self::UndefinedEffect(..)
       | Self::MismatchedKinds(..)
       | Self::WrongNumKindedArgs(..)
-      | Self::InvalidKindedApp(..) => None,
+      | Self::InvalidKindedApp(..)
+      | Self::DuplicateField(..)
+      | Self::DuplicateFnOrCtor(..) => None,
     }
   }
 }
