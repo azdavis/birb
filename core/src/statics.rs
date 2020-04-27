@@ -3,6 +3,7 @@
 use crate::cst::{Arm, Block, Expr, Field, Kind, Kinded, Param, Pat, Stmt, TopDefn};
 use crate::error::{Error, Result};
 use crate::ident::{BigIdent, Ident};
+use crate::std_lib::{BOOL, INT, STR};
 use std::collections::{HashMap, HashSet};
 
 /// Checks whether the sequence of top-level definitions is statically well-formed.
@@ -22,6 +23,7 @@ struct Cx {
   effects: HashSet<BigIdent>,
 }
 
+#[derive(Clone)]
 struct StructInfo {
   params: Vec<Param<BigIdent, Kind>>,
   fields: HashMap<Ident, Kinded>,
@@ -48,7 +50,7 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
       for p in struct_.fields.iter() {
         ck_has_kind(&cx, &p.type_, Kind::Type)?;
         if fields.insert(p.ident.clone(), p.type_.clone()).is_some() {
-          return Err(Error::DuplicateField(p.ident.clone()));
+          return Err(Error::DuplicateField(struct_.name.clone(), p.ident.clone()));
         }
       }
       for p in struct_.params.iter() {
@@ -151,7 +153,7 @@ fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
         Ok(res)
       } else {
         // not the best error message. whatever.
-        Err(Error::MismatchedKinds(kinded.clone(), param, arg_kind))
+        Err(Error::MismatchedKinds(param, arg_kind))
       }
     }
     Kinded::Tuple(ts) => {
@@ -179,12 +181,12 @@ fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
   }
 }
 
-fn ck_has_kind(cx: &Cx, t: &Kinded, want: Kind) -> Result<()> {
-  let got = get_kind(cx, t)?;
+fn ck_has_kind(cx: &Cx, kinded: &Kinded, want: Kind) -> Result<()> {
+  let got = get_kind(cx, kinded)?;
   if want == got {
     Ok(())
   } else {
-    Err(Error::MismatchedKinds(t.clone(), want, got))
+    Err(Error::MismatchedKinds(want, got))
   }
 }
 
@@ -198,5 +200,65 @@ fn mk_params_kind(params: &[Param<BigIdent, Kind>]) -> Kind {
       Kind::Tuple(params.iter().map(|p| p.type_.clone()).collect()).into(),
       Kind::Type.into(),
     )
+  }
+}
+
+fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
+  match expr {
+    Expr::String_(_) => Ok((cx, Kinded::BigIdent(BigIdent::new(STR), vec![]))),
+    Expr::Number(_) => Ok((cx, Kinded::BigIdent(BigIdent::new(INT), vec![]))),
+    Expr::Tuple(es) => {
+      let mut ts = Vec::with_capacity(es.len());
+      for e in es {
+        let ans = get_expr_type(cx, e)?;
+        cx = ans.0;
+        ts.push(ans.1);
+      }
+      Ok((cx, Kinded::Tuple(ts)))
+    }
+    Expr::Struct(name, args, fields) => {
+      let info = match cx.structs.get(name) {
+        Some(x) => x.clone(),
+        None => return Err(Error::UndefinedType(name.clone())),
+      };
+      if info.params.len() != args.len() {
+        return Err(Error::WrongNumKindedArgs(
+          name.clone(),
+          info.params.len(),
+          args.len(),
+        ));
+      }
+      for (p, a) in info.params.iter().zip(args) {
+        ck_has_kind(&cx, a, p.type_.clone())?;
+      }
+      for f in fields {
+        let (x, ans) = match f {
+          Field::Ident(x) => (x, get_expr_type(cx, &Expr::Ident(x.clone()))?),
+          Field::IdentAnd(x, e) => (x, get_expr_type(cx, e)?),
+        };
+        cx = ans.0;
+        match info.fields.get(x) {
+          None => return Err(Error::UndefinedField(name.clone(), x.clone())),
+          Some(t) => todo!(),
+        }
+      }
+      todo!()
+    }
+    Expr::Ident(name) => todo!(),
+    Expr::FnCall(name, big_args, args) => todo!(),
+    Expr::FieldGet(struct_, name) => todo!(),
+    Expr::MethodCall(receiver, name, big_args, args) => todo!(),
+    Expr::Return(expr) => todo!(),
+    Expr::Match(expr, arms) => todo!(),
+    Expr::Block(block) => todo!(),
+  }
+}
+
+fn ck_expr_has_type(cx: Cx, e: &Expr, want: Kinded) -> Result<Cx> {
+  let (cx, got) = get_expr_type(cx, e)?;
+  if want == got {
+    Ok(cx)
+  } else {
+    Err(Error::MismatchedTypes(want, got))
   }
 }

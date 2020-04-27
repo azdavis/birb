@@ -28,17 +28,22 @@ pub enum Error {
   UndefinedType(BigIdent),
   /// There was an undefined effect.
   UndefinedEffect(BigIdent),
-  /// There was a kind mismatch, where we expected the Kinded to have the left Kind but it had the
+  /// There was a kind mismatch, where we expected something to have the left Kind but it had the
   /// right Kind instead.
-  MismatchedKinds(Kinded, Kind, Kind),
+  MismatchedKinds(Kind, Kind),
   /// There was an incorrect number of Kinded arguments.
   WrongNumKindedArgs(BigIdent, usize, usize),
   /// There was a application of a Kinded where the Kinded did not have Arrow kind.
   InvalidKindedApp(BigIdent, Kind),
   /// There was a duplicated field in a struct.
-  DuplicateField(Ident),
+  DuplicateField(BigIdent, Ident),
   /// There was a duplicated function name or constructor.
   DuplicateFnOrCtor(Ident),
+  /// There was an undefined field in an struct expression or field get.
+  UndefinedField(BigIdent, Ident),
+  /// There was a type mismatch, where we expected something to have the left Kinded but it had the
+  /// right Kinded instead.
+  MismatchedTypes(Kinded, Kinded),
 }
 
 impl fmt::Display for Error {
@@ -56,23 +61,30 @@ impl fmt::Display for Error {
       Self::UndefinedKind(bi) => write!(f, "undefined kind: {}", bi),
       Self::UndefinedType(bi) => write!(f, "undefined type: {}", bi),
       Self::UndefinedEffect(bi) => write!(f, "undefined effect: {}", bi),
-      Self::MismatchedKinds(te, expected, found) => write!(
+      Self::MismatchedKinds(expected, found) => write!(
         f,
-        "mismatched kinds for {}: expected {}, found {}",
-        te, expected, found
+        "mismatched kinds: expected {}, found {}",
+        expected, found
       ),
-      Self::WrongNumKindedArgs(te, expected, found) => write!(
+      Self::WrongNumKindedArgs(kinded, expected, found) => write!(
         f,
         "wrong number of arguments for {}: expected {}, found {}",
-        te, expected, found
+        kinded, expected, found
       ),
       Self::InvalidKindedApp(bi, found) => write!(
         f,
         "invalid kind for {}: expected an arrow kind, found {}",
         bi, found
       ),
-      Self::DuplicateField(id) => write!(f, "duplicate field {}", id),
+      Self::DuplicateField(struct_, field) => {
+        write!(f, "duplicate field for {}: {}", struct_, field)
+      }
       Self::DuplicateFnOrCtor(id) => write!(f, "duplicate function or constructor {}", id),
+      Self::MismatchedTypes(expected, found) => write!(
+        f,
+        "mismatched types: expected {}, found {}",
+        expected, found
+      ),
     }
   }
 }
