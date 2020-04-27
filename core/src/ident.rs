@@ -37,3 +37,33 @@ impl fmt::Display for BigIdent {
     write!(f, "{}", self)
   }
 }
+
+/// An identifier, big or non-big.
+#[derive(Debug)]
+pub enum Identifier {
+  /// A regular (small) identifier.
+  Ident(Ident),
+  /// A big identifier.
+  BigIdent(BigIdent),
+}
+
+impl fmt::Display for Identifier {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::Ident(id) => id.fmt(f),
+      Self::BigIdent(bi) => bi.fmt(f),
+    }
+  }
+}
+
+impl From<Ident> for Identifier {
+  fn from(val: Ident) -> Self {
+    Self::Ident(val)
+  }
+}
+
+impl From<BigIdent> for Identifier {
+  fn from(val: BigIdent) -> Self {
+    Self::BigIdent(val)
+  }
+}

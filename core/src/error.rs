@@ -1,7 +1,7 @@
 //! Errors.
 
 use crate::cst::{Kind, Kinded};
-use crate::ident::{BigIdent, Ident};
+use crate::ident::{BigIdent, Ident, Identifier};
 use crate::parse::Found;
 use std::fmt;
 
@@ -22,25 +22,21 @@ pub enum Error {
   EmptyKindedParams,
   /// There were empty kinded arguments, like `Foo[] { x: 3 }`.
   EmptyKindedArgs,
-  /// There was an undefined kind.
-  UndefinedKind(BigIdent),
-  /// There was an undefined type.
-  UndefinedType(BigIdent),
-  /// There was an undefined effect.
-  UndefinedEffect(BigIdent),
+  /// There was an undefined identifier.
+  UndefinedIdentifier(Identifier),
   /// There was a kind mismatch, where we expected something to have the left Kind but it had the
   /// right Kind instead.
   MismatchedKinds(Kind, Kind),
   /// There was an incorrect number of Kinded arguments.
-  WrongNumKindedArgs(BigIdent, usize, usize),
+  WrongNumKindedArgs(Identifier, usize, usize),
   /// There was a application of a Kinded where the Kinded did not have Arrow kind.
   InvalidKindedApp(BigIdent, Kind),
   /// There was a duplicated field in a struct.
   DuplicateField(BigIdent, Ident),
-  /// There was a duplicated function name or constructor.
-  DuplicateFnOrCtor(Ident),
+  /// There was a duplicated identifier.
+  DuplicateIdentifier(Identifier),
   /// There was an undefined field in an struct expression or field get.
-  UndefinedField(BigIdent, Ident),
+  NoSuchField(BigIdent, Ident),
   /// There was a type mismatch, where we expected something to have the left Kinded but it had the
   /// right Kinded instead.
   MismatchedTypes(Kinded, Kinded),
@@ -58,9 +54,7 @@ impl fmt::Display for Error {
       }
       Self::EmptyKindedParams => write!(f, "empty type/effect params"),
       Self::EmptyKindedArgs => write!(f, "empty type/effect args"),
-      Self::UndefinedKind(bi) => write!(f, "undefined kind: {}", bi),
-      Self::UndefinedType(bi) => write!(f, "undefined type: {}", bi),
-      Self::UndefinedEffect(bi) => write!(f, "undefined effect: {}", bi),
+      Self::UndefinedIdentifier(id) => write!(f, "undefined identifier: {}", id),
       Self::MismatchedKinds(expected, found) => write!(
         f,
         "mismatched kinds: expected {}, found {}",
@@ -79,7 +73,8 @@ impl fmt::Display for Error {
       Self::DuplicateField(struct_, field) => {
         write!(f, "duplicate field for {}: {}", struct_, field)
       }
-      Self::DuplicateFnOrCtor(id) => write!(f, "duplicate function or constructor {}", id),
+      Self::DuplicateIdentifier(id) => write!(f, "duplicate identifier: {}", id),
+      Self::NoSuchField(struct_, field) => write!(f, "no such field for {}: {}", struct_, field),
       Self::MismatchedTypes(expected, found) => write!(
         f,
         "mismatched types: expected {}, found {}",
@@ -99,14 +94,14 @@ impl std::error::Error for Error {
       | Self::Parse(..)
       | Self::EmptyKindedParams
       | Self::EmptyKindedArgs
-      | Self::UndefinedKind(..)
-      | Self::UndefinedType(..)
-      | Self::UndefinedEffect(..)
+      | Self::UndefinedIdentifier(..)
       | Self::MismatchedKinds(..)
       | Self::WrongNumKindedArgs(..)
       | Self::InvalidKindedApp(..)
       | Self::DuplicateField(..)
-      | Self::DuplicateFnOrCtor(..) => None,
+      | Self::DuplicateIdentifier(..)
+      | Self::NoSuchField(..)
+      | Self::MismatchedTypes(..) => None,
     }
   }
 }

@@ -142,7 +142,7 @@ fn kind_hd(i: usize, ts: &[Token]) -> Result<(usize, Kind)> {
     if bi == BigIdent::new("Effect") {
       return Ok((i, Kind::Effect));
     }
-    return Err(Error::UndefinedKind(bi));
+    return Err(Error::UndefinedIdentifier(bi.into()));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
     let (i, mut kinds) = comma_sep(i, ts, kind)?;

@@ -34,16 +34,41 @@ struct EnumInfo {
   ctors: HashMap<Ident, Kinded>,
 }
 
+#[derive(Clone)]
 struct FnInfo {
   big_params: Vec<Param<BigIdent, Kind>>,
   params: Vec<Param<Ident, Kinded>>,
   ret_type: Kinded,
 }
 
+fn ck_ident(cx: &Cx, id: &Ident) -> Result<()> {
+  if cx.fns.contains_key(id)
+    || cx.vars.contains_key(id)
+    || cx.enums.iter().any(|(_, info)| info.ctors.contains_key(id))
+  {
+    Err(Error::DuplicateIdentifier(id.clone().into()))
+  } else {
+    Ok(())
+  }
+}
+
+fn ck_big_ident(cx: &Cx, bi: &BigIdent) -> Result<()> {
+  if cx.big_vars.contains_key(bi)
+    || cx.structs.contains_key(bi)
+    || cx.enums.contains_key(bi)
+    || cx.effects.contains(bi)
+  {
+    Err(Error::DuplicateIdentifier(bi.clone().into()))
+  } else {
+    Ok(())
+  }
+}
+
 fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
   match td {
     TopDefn::Struct(struct_) => {
       for p in struct_.params.iter() {
+        ck_big_ident(&cx, &p.ident)?;
         cx.big_vars.insert(p.ident.clone(), p.type_.clone());
       }
       let mut fields = HashMap::with_capacity(struct_.fields.len());
@@ -56,6 +81,7 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
       for p in struct_.params.iter() {
         cx.big_vars.remove(&p.ident).unwrap();
       }
+      ck_big_ident(&cx, &struct_.name)?;
       cx.structs.insert(
         struct_.name.clone(),
         StructInfo {
@@ -66,24 +92,19 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
     }
     TopDefn::Enum(enum_) => {
       for p in enum_.params.iter() {
+        ck_big_ident(&cx, &p.ident)?;
         cx.big_vars.insert(p.ident.clone(), p.type_.clone());
       }
       let mut ctors = HashMap::with_capacity(enum_.ctors.len());
       for p in enum_.ctors.iter() {
+        ck_ident(&cx, &p.ident)?;
         ck_has_kind(&cx, &p.type_, Kind::Type)?;
-        if ctors.insert(p.ident.clone(), p.type_.clone()).is_some()
-          || cx.fns.contains_key(&p.ident)
-          || cx
-            .enums
-            .iter()
-            .any(|(_, info)| info.ctors.contains_key(&p.ident))
-        {
-          return Err(Error::DuplicateFnOrCtor(p.ident.clone()));
-        }
+        ctors.insert(p.ident.clone(), p.type_.clone());
       }
       for p in enum_.params.iter() {
         cx.big_vars.remove(&p.ident).unwrap();
       }
+      ck_big_ident(&cx, &enum_.name)?;
       cx.enums.insert(
         enum_.name.clone(),
         EnumInfo {
@@ -94,9 +115,11 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
     }
     TopDefn::Fn_(fn_) => {
       for p in fn_.big_params.iter() {
+        ck_big_ident(&cx, &p.ident)?;
         cx.big_vars.insert(p.ident.clone(), p.type_.clone());
       }
       for p in fn_.params.iter() {
+        ck_ident(&cx, &p.ident)?;
         ck_has_kind(&cx, &p.type_, Kind::Type)?;
         cx.vars.insert(p.ident.clone(), p.type_.clone());
       }
@@ -107,6 +130,7 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
       for p in fn_.params.iter() {
         cx.vars.remove(&p.ident).unwrap();
       }
+      ck_ident(&cx, &fn_.name)?;
       cx.fns.insert(
         fn_.name.clone(),
         FnInfo {
@@ -130,7 +154,7 @@ fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
       } else if let Some(k) = cx.big_vars.get(bi) {
         k.clone()
       } else {
-        return Err(Error::UndefinedKind(bi.clone()));
+        return Err(Error::UndefinedIdentifier(bi.clone().into()));
       };
       if args.is_empty() {
         return Ok(k);
@@ -219,11 +243,11 @@ fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
     Expr::Struct(name, args, fields) => {
       let info = match cx.structs.get(name) {
         Some(x) => x.clone(),
-        None => return Err(Error::UndefinedType(name.clone())),
+        None => return Err(Error::UndefinedIdentifier(name.clone().into())),
       };
       if info.params.len() != args.len() {
         return Err(Error::WrongNumKindedArgs(
-          name.clone(),
+          name.clone().into(),
           info.params.len(),
           args.len(),
         ));
@@ -231,21 +255,63 @@ fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
       for (p, a) in info.params.iter().zip(args) {
         ck_has_kind(&cx, a, p.type_.clone())?;
       }
+      let mut fields_seen = HashSet::with_capacity(info.fields.len());
       for f in fields {
         let (x, ans) = match f {
           Field::Ident(x) => (x, get_expr_type(cx, &Expr::Ident(x.clone()))?),
           Field::IdentAnd(x, e) => (x, get_expr_type(cx, e)?),
         };
         cx = ans.0;
-        match info.fields.get(x) {
-          None => return Err(Error::UndefinedField(name.clone(), x.clone())),
-          Some(t) => todo!(),
+        let want = match info.fields.get(x) {
+          None => return Err(Error::NoSuchField(name.clone(), x.clone())),
+          Some(t) => t,
+        };
+        if *want != ans.1 {
+          return Err(Error::MismatchedTypes(want.clone(), ans.1));
         }
+        if !fields_seen.insert(x) {
+          return Err(Error::DuplicateField(name.clone(), x.clone()));
+        }
+      }
+      Ok((cx, Kinded::BigIdent(name.clone(), args.clone())))
+    }
+    Expr::Ident(name) => {
+      if let Some(t) = cx.vars.get(name) {
+        let t = t.clone();
+        return Ok((cx, t));
+      }
+      // TODO we currently forbid bare function and constructor names
+      Err(Error::UndefinedIdentifier(name.clone().into()))
+    }
+    Expr::FnCall(name, big_args, args) => {
+      let info = if let Some(info) = cx.fns.get(name) {
+        info.clone()
+      } else if let Some(info) = cx.enums.iter().find_map(|(enum_name, enum_info)| {
+        enum_info.ctors.get(name).map(|type_| FnInfo {
+          big_params: enum_info.params.clone(),
+          params: vec![Param {
+            ident: Ident::new("_"),
+            type_: type_.clone(),
+          }],
+          ret_type: Kinded::BigIdent(enum_name.clone(), vec![]),
+        })
+      }) {
+        info
+      } else {
+        return Err(Error::UndefinedIdentifier(name.clone().into()));
+      };
+      if info.big_params.len() != big_args.len() {
+        return Err(Error::WrongNumKindedArgs(
+          name.clone().into(),
+          info.big_params.len(),
+          big_args.len(),
+        ));
+      }
+      for (p, a) in info.big_params.iter().zip(big_args) {
+        ck_has_kind(&cx, a, p.type_.clone())?;
       }
       todo!()
     }
-    Expr::Ident(name) => todo!(),
-    Expr::FnCall(name, big_args, args) => todo!(),
     Expr::FieldGet(struct_, name) => todo!(),
     Expr::MethodCall(receiver, name, big_args, args) => todo!(),
     Expr::Return(expr) => todo!(),
