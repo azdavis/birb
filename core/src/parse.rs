@@ -4,7 +4,7 @@ use crate::cst::{
   Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Kinded, Param, Pat, Stmt, StructDefn, TopDefn,
 };
 use crate::error::{Error, Result};
-use crate::ident::{BigIdent, Ident};
+use crate::ident::Ident;
 use crate::token::Token;
 use std::fmt;
 
@@ -98,7 +98,7 @@ fn top_defn(i: usize, ts: &[Token]) -> Result<(usize, TopDefn)> {
   err(i, ts, "a top-level definition")
 }
 
-fn big_param_list_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<Param<BigIdent, Kind>>)> {
+fn big_param_list_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<Param<Ident, Kind>>)> {
   let i = match eat(i, ts, Token::LSquare) {
     Ok(i) => i,
     Err(_) => return Ok((i, Vec::new())),
@@ -112,7 +112,7 @@ fn big_param_list_opt(i: usize, ts: &[Token]) -> Result<(usize, Vec<Param<BigIde
   }
 }
 
-fn big_param(i: usize, ts: &[Token]) -> Result<(usize, Param<BigIdent, Kind>)> {
+fn big_param(i: usize, ts: &[Token]) -> Result<(usize, Param<Ident, Kind>)> {
   let (i, bi) = big_ident(i, ts)?;
   let i = eat(i, ts, Token::Colon)?;
   let (i, k) = kind(i, ts)?;
@@ -136,10 +136,10 @@ fn kind(i: usize, ts: &[Token]) -> Result<(usize, Kind)> {
 
 fn kind_hd(i: usize, ts: &[Token]) -> Result<(usize, Kind)> {
   if let Ok((i, bi)) = big_ident(i, ts) {
-    if bi == BigIdent::new("Type") {
+    if bi == Ident::new("Type") {
       return Ok((i, Kind::Type));
     }
-    if bi == BigIdent::new("Effect") {
+    if bi == Ident::new("Effect") {
       return Ok((i, Kind::Effect));
     }
     return Err(Error::UndefinedIdentifier(bi.into()));
@@ -173,7 +173,7 @@ fn kinded(i: usize, ts: &[Token]) -> Result<(usize, Kinded)> {
 fn kinded_hd(i: usize, ts: &[Token]) -> Result<(usize, Kinded)> {
   if let Ok((i, bi)) = big_ident(i, ts) {
     let (i, args, _) = kinded_args_opt(i, ts)?;
-    return Ok((i, Kinded::BigIdent(bi, args)));
+    return Ok((i, Kinded::Ident(bi, args)));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
     let (i, mut types) = comma_sep(i, ts, kinded)?;
@@ -479,9 +479,9 @@ fn ident(i: usize, ts: &[Token]) -> Result<(usize, Ident)> {
   Err(Error::Parse("an identifier", f))
 }
 
-fn big_ident(i: usize, ts: &[Token]) -> Result<(usize, BigIdent)> {
+fn big_ident(i: usize, ts: &[Token]) -> Result<(usize, Ident)> {
   let f = found(i, ts);
-  if let Found::Token(Token::BigIdent(id)) = f {
+  if let Found::Token(Token::Ident(id)) = f {
     return Ok((i + 1, id));
   }
   Err(Error::Parse("a big identifier", f))

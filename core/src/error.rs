@@ -1,7 +1,7 @@
 //! Errors.
 
 use crate::cst::{Kind, Kinded};
-use crate::ident::{BigIdent, Ident, Identifier};
+use crate::ident::Ident;
 use crate::parse::Found;
 use std::fmt;
 
@@ -23,20 +23,20 @@ pub enum Error {
   /// There were empty kinded arguments, like `Foo[] { x: 3 }`.
   EmptyKindedArgs,
   /// There was an undefined identifier.
-  UndefinedIdentifier(Identifier),
+  UndefinedIdentifier(Ident),
   /// There was a kind mismatch, where we expected something to have the left Kind but it had the
   /// right Kind instead.
   MismatchedKinds(Kind, Kind),
   /// There was an incorrect number of Kinded arguments.
-  WrongNumArgs(Identifier, usize, usize),
+  WrongNumArgs(Ident, usize, usize),
   /// There was a application of a Kinded where the Kinded did not have Arrow kind.
-  InvalidKindedApp(BigIdent, Kind),
+  InvalidKindedApp(Ident, Kind),
   /// There was a duplicated field in a struct.
-  DuplicateField(BigIdent, Ident),
+  DuplicateField(Ident, Ident),
   /// There was a duplicated identifier.
-  DuplicateIdentifier(Identifier),
+  DuplicateIdentifier(Ident),
   /// There was an undefined field in an struct expression or field get.
-  NoSuchField(BigIdent, Ident),
+  NoSuchField(Ident, Ident),
   /// There was a type mismatch, where we expected something to have the left Kinded but it had the
   /// right Kinded instead.
   MismatchedTypes(Kinded, Kinded),

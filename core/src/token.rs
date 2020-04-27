@@ -1,6 +1,6 @@
 //! Tokens.
 
-use crate::ident::{BigIdent, Ident};
+use crate::ident::Ident;
 use std::fmt;
 
 /// A token.
@@ -36,7 +36,7 @@ pub enum Token {
   Struct,
   Type,
   // other
-  BigIdent(BigIdent),
+  BigIdent(Ident),
   Ident(Ident),
   Number(u64),
   String_(String),

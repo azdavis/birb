@@ -2,41 +2,41 @@
 
 use crate::cst::{Arm, Block, Expr, Field, Kind, Kinded, Param, Pat, Stmt, TopDefn};
 use crate::error::{Error, Result};
-use crate::ident::{BigIdent, Ident};
+use crate::ident::Ident;
 use crate::std_lib::{BOOL, INT, STR};
 use std::collections::{HashMap, HashSet};
 
 /// Checks whether the sequence of top-level definitions is statically well-formed.
 pub fn get(top_defns: &[TopDefn]) -> Result<()> {
   let mut cx = Cx::default();
-  cx.effects.insert(BigIdent::new("Stdout"));
+  cx.effects.insert(Ident::new("Stdout"));
   Ok(())
 }
 
 #[derive(Default)]
 struct Cx {
-  structs: HashMap<BigIdent, StructInfo>,
-  enums: HashMap<BigIdent, EnumInfo>,
+  structs: HashMap<Ident, StructInfo>,
+  enums: HashMap<Ident, EnumInfo>,
   fns: HashMap<Ident, FnInfo>,
-  big_vars: HashMap<BigIdent, Kind>,
+  big_vars: HashMap<Ident, Kind>,
   vars: HashMap<Ident, Kinded>,
-  effects: HashSet<BigIdent>,
+  effects: HashSet<Ident>,
 }
 
 #[derive(Clone)]
 struct StructInfo {
-  params: Vec<Param<BigIdent, Kind>>,
+  params: Vec<Param<Ident, Kind>>,
   fields: HashMap<Ident, Kinded>,
 }
 
 struct EnumInfo {
-  params: Vec<Param<BigIdent, Kind>>,
+  params: Vec<Param<Ident, Kind>>,
   ctors: HashMap<Ident, Kinded>,
 }
 
 #[derive(Clone)]
 struct FnInfo {
-  big_params: Vec<Param<BigIdent, Kind>>,
+  big_params: Vec<Param<Ident, Kind>>,
   params: Vec<Param<Ident, Kinded>>,
   ret_type: Kinded,
 }
@@ -52,7 +52,7 @@ fn ck_ident(cx: &Cx, id: &Ident) -> Result<()> {
   }
 }
 
-fn ck_big_ident(cx: &Cx, bi: &BigIdent) -> Result<()> {
+fn ck_big_ident(cx: &Cx, bi: &Ident) -> Result<()> {
   if cx.big_vars.contains_key(bi)
     || cx.structs.contains_key(bi)
     || cx.enums.contains_key(bi)
@@ -147,7 +147,7 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
 
 fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
   match kinded {
-    Kinded::BigIdent(bi, args) => {
+    Kinded::Ident(bi, args) => {
       let k = if let Some(si) = cx.structs.get(bi) {
         mk_params_kind(&si.params)
       } else if let Some(ei) = cx.enums.get(bi) {
@@ -215,7 +215,7 @@ fn ck_has_kind(cx: &Cx, kinded: &Kinded, want: Kind) -> Result<()> {
   }
 }
 
-fn mk_params_kind(params: &[Param<BigIdent, Kind>]) -> Kind {
+fn mk_params_kind(params: &[Param<Ident, Kind>]) -> Kind {
   if params.is_empty() {
     Kind::Type
   } else if params.len() == 1 {
@@ -230,8 +230,8 @@ fn mk_params_kind(params: &[Param<BigIdent, Kind>]) -> Kind {
 
 fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
   match expr {
-    Expr::String_(_) => Ok((cx, Kinded::BigIdent(BigIdent::new(STR), vec![]))),
-    Expr::Number(_) => Ok((cx, Kinded::BigIdent(BigIdent::new(INT), vec![]))),
+    Expr::String_(_) => Ok((cx, Kinded::Ident(Ident::new(STR), vec![]))),
+    Expr::Number(_) => Ok((cx, Kinded::Ident(Ident::new(INT), vec![]))),
     Expr::Tuple(es) => {
       let mut ts = Vec::with_capacity(es.len());
       for e in es {
@@ -274,7 +274,7 @@ fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
           return Err(Error::DuplicateField(name.clone(), x.clone()));
         }
       }
-      Ok((cx, Kinded::BigIdent(name.clone(), args.clone())))
+      Ok((cx, Kinded::Ident(name.clone(), args.clone())))
     }
     Expr::Ident(name) => {
       if let Some(t) = cx.vars.get(name) {
@@ -294,7 +294,7 @@ fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
             ident: Ident::new("_"),
             type_: type_.clone(),
           }],
-          ret_type: Kinded::BigIdent(enum_name.clone(), vec![]),
+          ret_type: Kinded::Ident(enum_name.clone(), vec![]),
         })
       }) {
         info
@@ -318,7 +318,7 @@ fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
     }
     Expr::FieldGet(struct_, name) => {
       let (cx, type_) = get_expr_type(cx, struct_)?;
-      let (bi, ks) = if let Kinded::BigIdent(bi, ks) = type_ {
+      let (bi, ks) = if let Kinded::Ident(bi, ks) = type_ {
         (bi, ks)
       } else {
         return Err(Error::NotStruct(name.clone()));

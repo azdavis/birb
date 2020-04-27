@@ -1,7 +1,7 @@
 //! Lexing.
 
 use crate::error::{Error, Result};
-use crate::ident::{BigIdent, Ident};
+use crate::ident::Ident;
 use crate::token::{Token, PUNCT, WORDS};
 
 /// A guess.
@@ -69,7 +69,7 @@ pub fn get(bs: &[u8]) -> Result<Vec<Token>> {
         i += 1;
       }
       let tok_utf8 = std::str::from_utf8(&bs[s..i]).unwrap();
-      ret.push(Token::BigIdent(BigIdent::new(tok_utf8)));
+      ret.push(Token::BigIdent(Ident::new(tok_utf8)));
       continue 'outer;
     }
     // number
@@ -127,7 +127,7 @@ fn is_ident_tl(b: u8) -> bool {
 
 #[cfg(test)]
 mod tests {
-  use super::{get, BigIdent, Ident, Token as T};
+  use super::{get, Ident, Token as T};
 
   #[test]
   fn empty() {
@@ -174,7 +174,7 @@ mod tests {
         T::LCurly,
         T::Ident(Ident::new("foo")),
         T::RCurly,
-        T::BigIdent(BigIdent::new("Bar")),
+        T::BigIdent(Ident::new("Bar")),
         T::LSquare,
         T::Number(123),
         T::RSquare

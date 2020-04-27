@@ -29,7 +29,7 @@ mod tests {
     Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Kinded, Param, Pat, Stmt, StructDefn, TopDefn,
   };
   use crate::get;
-  use crate::ident::{BigIdent, Ident};
+  use crate::ident::Ident;
 
   #[test]
   fn simple() {
@@ -37,12 +37,12 @@ mod tests {
       get(include_bytes!("inputs/simple.b")).unwrap(),
       vec![
         TopDefn::Struct(StructDefn {
-          name: BigIdent::new("Unit"),
+          name: Ident::new("Unit"),
           params: vec![],
           fields: vec![]
         }),
         TopDefn::Enum(EnumDefn {
-          name: BigIdent::new("Void"),
+          name: Ident::new("Void"),
           params: vec![],
           ctors: vec![],
         }),
@@ -50,7 +50,7 @@ mod tests {
           name: Ident::new("main"),
           big_params: vec![],
           params: vec![],
-          ret_type: Kinded::BigIdent(BigIdent::new("String"), vec![]),
+          ret_type: Kinded::Ident(Ident::new("String"), vec![]),
           requires: None,
           ensures: None,
           body: Block {
@@ -68,29 +68,29 @@ mod tests {
       get(include_bytes!("inputs/call.b")).unwrap(),
       vec![
         TopDefn::Struct(StructDefn {
-          name: BigIdent::new("Guy"),
+          name: Ident::new("Guy"),
           params: vec![Param {
-            ident: BigIdent::new("T"),
+            ident: Ident::new("T"),
             type_: Kind::Type,
           }],
           fields: vec![Param {
             ident: Ident::new("x"),
-            type_: Kinded::BigIdent(BigIdent::new("T"), vec![]),
+            type_: Kinded::Ident(Ident::new("T"), vec![]),
           }]
         }),
         TopDefn::Fn_(FnDefn {
           name: Ident::new("call"),
           big_params: vec![
             Param {
-              ident: BigIdent::new("T"),
+              ident: Ident::new("T"),
               type_: Kind::Type,
             },
             Param {
-              ident: BigIdent::new("U"),
+              ident: Ident::new("U"),
               type_: Kind::Type,
             },
             Param {
-              ident: BigIdent::new("E"),
+              ident: Ident::new("E"),
               type_: Kind::Effect,
             },
           ],
@@ -98,22 +98,22 @@ mod tests {
             Param {
               ident: Ident::new("f"),
               type_: Kinded::Arrow(
-                Kinded::BigIdent(BigIdent::new("T"), vec![]).into(),
+                Kinded::Ident(Ident::new("T"), vec![]).into(),
                 Kinded::Effectful(
-                  Kinded::BigIdent(BigIdent::new("U"), vec![]).into(),
-                  Kinded::BigIdent(BigIdent::new("E"), vec![]).into(),
+                  Kinded::Ident(Ident::new("U"), vec![]).into(),
+                  Kinded::Ident(Ident::new("E"), vec![]).into(),
                 )
                 .into()
               )
             },
             Param {
               ident: Ident::new("x"),
-              type_: Kinded::BigIdent(BigIdent::new("T"), vec![]),
+              type_: Kinded::Ident(Ident::new("T"), vec![]),
             }
           ],
           ret_type: Kinded::Effectful(
-            Kinded::BigIdent(BigIdent::new("U"), vec![]).into(),
-            Kinded::BigIdent(BigIdent::new("E"), vec![]).into(),
+            Kinded::Ident(Ident::new("U"), vec![]).into(),
+            Kinded::Ident(Ident::new("E"), vec![]).into(),
           ),
           requires: Some(Expr::Ident(Ident::new("true"))),
           ensures: Some(Expr::Ident(Ident::new("true"))),
@@ -123,8 +123,8 @@ mod tests {
                 Pat::Wildcard,
                 None,
                 Expr::Struct(
-                  BigIdent::new("Guy"),
-                  vec![Kinded::BigIdent(BigIdent::new("T"), vec![])],
+                  Ident::new("Guy"),
+                  vec![Kinded::Ident(Ident::new("T"), vec![])],
                   vec![Field::Ident(Ident::new("x"))],
                 )
               ),
@@ -144,11 +144,11 @@ mod tests {
               ),
               Stmt::Let(
                 Pat::Wildcard,
-                Some(Kinded::BigIdent(
-                  BigIdent::new("Heh"),
+                Some(Kinded::Ident(
+                  Ident::new("Heh"),
                   vec![
-                    Kinded::BigIdent(BigIdent::new("Nah"), vec![]),
-                    Kinded::BigIdent(BigIdent::new("Dude"), vec![]),
+                    Kinded::Ident(Ident::new("Nah"), vec![]),
+                    Kinded::Ident(Ident::new("Dude"), vec![]),
                   ]
                 )),
                 Expr::Tuple(vec![])

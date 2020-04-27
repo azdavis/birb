@@ -1,6 +1,6 @@
 //! Concrete syntax trees.
 
-use crate::ident::{BigIdent, Ident};
+use crate::ident::Ident;
 use crate::util::SliceDisplay;
 use std::fmt;
 
@@ -29,9 +29,9 @@ pub struct Param<I, T> {
 #[derive(Debug, PartialEq, Eq)]
 pub struct StructDefn {
   /// The name.
-  pub name: BigIdent,
+  pub name: Ident,
   /// The generic type/effect parameters. Will be empty iff no params were written in the source.
-  pub params: Vec<Param<BigIdent, Kind>>,
+  pub params: Vec<Param<Ident, Kind>>,
   /// The fields.
   pub fields: Vec<Param<Ident, Kinded>>,
 }
@@ -40,9 +40,9 @@ pub struct StructDefn {
 #[derive(Debug, PartialEq, Eq)]
 pub struct EnumDefn {
   /// The name.
-  pub name: BigIdent,
+  pub name: Ident,
   /// The generic type/effect parameters. Will be empty iff no params were written in the source.
-  pub params: Vec<Param<BigIdent, Kind>>,
+  pub params: Vec<Param<Ident, Kind>>,
   /// The constructors (also called variants) of the enum.
   pub ctors: Vec<Param<Ident, Kinded>>,
 }
@@ -53,7 +53,7 @@ pub struct FnDefn {
   /// The name.
   pub name: Ident,
   /// The generic type/effect parameters. Will be empty iff no params were written in the source.
-  pub big_params: Vec<Param<BigIdent, Kind>>,
+  pub big_params: Vec<Param<Ident, Kind>>,
   /// The value parameters.
   pub params: Vec<Param<Ident, Kinded>>,
   /// The return type. Even functions which 'return nothing' have one.
@@ -95,7 +95,7 @@ impl fmt::Display for Kind {
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Kinded {
   /// The Vec<Kinded> will be empty iff no args were written in the source.
-  BigIdent(BigIdent, Vec<Kinded>),
+  Ident(Ident, Vec<Kinded>),
   /// A tuple. The Kinded inside must each have kind Type.
   Tuple(Vec<Kinded>),
   /// A set. The Kinded inside must each have kind Effect.
@@ -109,7 +109,7 @@ pub enum Kinded {
 impl fmt::Display for Kinded {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
-      Self::BigIdent(bi, args) => {
+      Self::Ident(bi, args) => {
         write!(f, "{}", bi)?;
         if !args.is_empty() {
           SliceDisplay::new("[", args, "]").fmt(f)?;
@@ -134,7 +134,7 @@ pub enum Expr {
   /// A tuple, like `(1, "e")`.
   Tuple(Vec<Expr>),
   /// A struct expression, like `Foo { x: 3 }`.
-  Struct(BigIdent, Vec<Kinded>, Vec<Field<Expr>>),
+  Struct(Ident, Vec<Kinded>, Vec<Field<Expr>>),
   /// An identifier, like `a`.
   Ident(Ident),
   /// A function call, like `f(x)`.
@@ -172,7 +172,7 @@ pub enum Pat {
   /// A tuple, like `(4, x)`.
   Tuple(Vec<Pat>),
   /// A struct pattern, like `Foo { x, y: 3 }`.
-  Struct(BigIdent, Vec<Field<Pat>>),
+  Struct(Ident, Vec<Field<Pat>>),
   /// A constructor pattern, like `some(x)`.
   Ctor(Ident, Box<Pat>),
   /// An identifier pattern, like `x`.

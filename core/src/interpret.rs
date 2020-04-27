@@ -1,7 +1,7 @@
 //! Interpretation.
 
 use crate::cst::{Field, Kinded, TopDefn};
-use crate::ident::{BigIdent, Ident};
+use crate::ident::Ident;
 
 /// Steps the expression `main()` in the given context to a value. Requires that the context be
 /// statically checked and have a main function.
@@ -19,7 +19,7 @@ pub enum Value {
   /// A tuple, like `(1, "e")`.
   Tuple(Vec<Value>),
   /// A struct expression, like `Foo { x: 3 }`.
-  Struct(BigIdent, Vec<Kinded>, Vec<Field<Value>>),
+  Struct(Ident, Vec<Kinded>, Vec<Field<Value>>),
   /// A constructor, like `some(3)`.
   Ctor(Ident, Vec<Kinded>, Box<Value>),
   /// An identifier, like `a`.

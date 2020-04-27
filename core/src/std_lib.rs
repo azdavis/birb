@@ -1,13 +1,13 @@
 //! The Birb standard library.
 
 use crate::cst::{EnumDefn, Kinded, Param, TopDefn};
-use crate::ident::{BigIdent, Ident};
+use crate::ident::Ident;
 
 /// The prelude of pre-defined types and such.
 pub fn prelude() -> Vec<TopDefn> {
   vec![
     TopDefn::Enum(EnumDefn {
-      name: BigIdent::new(BOOL),
+      name: Ident::new(BOOL),
       params: vec![],
       ctors: vec![
         Param {
@@ -22,13 +22,13 @@ pub fn prelude() -> Vec<TopDefn> {
     }),
     // intrinsic
     TopDefn::Enum(EnumDefn {
-      name: BigIdent::new(INT),
+      name: Ident::new(INT),
       params: vec![],
       ctors: vec![],
     }),
     // intrinsic
     TopDefn::Enum(EnumDefn {
-      name: BigIdent::new(STR),
+      name: Ident::new(STR),
       params: vec![],
       ctors: vec![],
     }),
