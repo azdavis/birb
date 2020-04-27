@@ -57,11 +57,51 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
           fields: struct_.fields.clone(),
         },
       );
-      Ok(cx)
     }
-    TopDefn::Enum(enum_) => todo!(),
-    TopDefn::Fn_(fn_) => todo!(),
+    TopDefn::Enum(enum_) => {
+      for p in enum_.params.iter() {
+        cx.big_vars.insert(p.ident.clone(), p.type_.clone());
+      }
+      for f in enum_.ctors.iter() {
+        ck_has_kind(&cx, &f.type_, Kind::Type)?;
+      }
+      for p in enum_.params.iter() {
+        cx.big_vars.remove(&p.ident).unwrap();
+      }
+      cx.enums.insert(
+        enum_.name.clone(),
+        EnumInfo {
+          params: enum_.params.clone(),
+          ctors: enum_.ctors.clone(),
+        },
+      );
+    }
+    TopDefn::Fn_(fn_) => {
+      for p in fn_.big_params.iter() {
+        cx.big_vars.insert(p.ident.clone(), p.type_.clone());
+      }
+      for p in fn_.params.iter() {
+        ck_has_kind(&cx, &p.type_, Kind::Type)?;
+        cx.vars.insert(p.ident.clone(), p.type_.clone());
+      }
+      // TODO check the requires, ensures, and body
+      for p in fn_.big_params.iter() {
+        cx.big_vars.remove(&p.ident).unwrap();
+      }
+      for p in fn_.params.iter() {
+        cx.vars.remove(&p.ident).unwrap();
+      }
+      cx.fns.insert(
+        fn_.name.clone(),
+        FnInfo {
+          big_params: fn_.big_params.clone(),
+          params: fn_.params.clone(),
+          ret_type: fn_.ret_type.clone(),
+        },
+      );
+    }
   }
+  Ok(cx)
 }
 
 fn get_kind(cx: &Cx, kinded: &Kinded) -> Result<Kind> {
