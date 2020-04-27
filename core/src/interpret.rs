@@ -5,7 +5,7 @@ use crate::ident::{BigIdent, Ident};
 
 /// Steps the expression `main()` in the given context to a value. Requires that the context be
 /// statically checked and have a main function.
-pub fn get(cx: &[TopDefn]) -> Value {
+pub fn get(cx: Vec<TopDefn>) -> Value {
   todo!()
 }
 
