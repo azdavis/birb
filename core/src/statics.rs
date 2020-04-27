@@ -67,6 +67,7 @@ fn ck_big_ident(cx: &Cx, bi: &BigIdent) -> Result<()> {
 fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
   match td {
     TopDefn::Struct(struct_) => {
+      ck_big_ident(&cx, &struct_.name)?;
       for p in struct_.params.iter() {
         ck_big_ident(&cx, &p.ident)?;
         cx.big_vars.insert(p.ident.clone(), p.type_.clone());
@@ -81,7 +82,6 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
       for p in struct_.params.iter() {
         cx.big_vars.remove(&p.ident).unwrap();
       }
-      ck_big_ident(&cx, &struct_.name)?;
       cx.structs.insert(
         struct_.name.clone(),
         StructInfo {
@@ -91,6 +91,7 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
       );
     }
     TopDefn::Enum(enum_) => {
+      ck_big_ident(&cx, &enum_.name)?;
       for p in enum_.params.iter() {
         ck_big_ident(&cx, &p.ident)?;
         cx.big_vars.insert(p.ident.clone(), p.type_.clone());
@@ -104,7 +105,6 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
       for p in enum_.params.iter() {
         cx.big_vars.remove(&p.ident).unwrap();
       }
-      ck_big_ident(&cx, &enum_.name)?;
       cx.enums.insert(
         enum_.name.clone(),
         EnumInfo {
@@ -114,6 +114,7 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
       );
     }
     TopDefn::Fn_(fn_) => {
+      ck_ident(&cx, &fn_.name)?;
       for p in fn_.big_params.iter() {
         ck_big_ident(&cx, &p.ident)?;
         cx.big_vars.insert(p.ident.clone(), p.type_.clone());
@@ -123,6 +124,7 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
         ck_has_kind(&cx, &p.type_, Kind::Type)?;
         cx.vars.insert(p.ident.clone(), p.type_.clone());
       }
+      ck_has_kind(&cx, &fn_.ret_type, Kind::Type)?;
       // TODO check the requires, ensures, and body
       for p in fn_.big_params.iter() {
         cx.big_vars.remove(&p.ident).unwrap();
@@ -130,7 +132,6 @@ fn ck_top_defn(mut cx: Cx, td: &TopDefn) -> Result<Cx> {
       for p in fn_.params.iter() {
         cx.vars.remove(&p.ident).unwrap();
       }
-      ck_ident(&cx, &fn_.name)?;
       cx.fns.insert(
         fn_.name.clone(),
         FnInfo {
@@ -246,7 +247,7 @@ fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
         None => return Err(Error::UndefinedIdentifier(name.clone().into())),
       };
       if info.params.len() != args.len() {
-        return Err(Error::WrongNumKindedArgs(
+        return Err(Error::WrongNumArgs(
           name.clone().into(),
           info.params.len(),
           args.len(),
@@ -301,7 +302,7 @@ fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
         return Err(Error::UndefinedIdentifier(name.clone().into()));
       };
       if info.big_params.len() != big_args.len() {
-        return Err(Error::WrongNumKindedArgs(
+        return Err(Error::WrongNumArgs(
           name.clone().into(),
           info.big_params.len(),
           big_args.len(),
@@ -309,10 +310,21 @@ fn get_expr_type(mut cx: Cx, expr: &Expr) -> Result<(Cx, Kinded)> {
       }
       for (p, a) in info.big_params.iter().zip(big_args) {
         ck_has_kind(&cx, a, p.type_.clone())?;
+        ck_big_ident(&cx, &p.ident)?;
       }
+      // TODO handle generics
+      assert!(info.big_params.is_empty());
       todo!()
     }
-    Expr::FieldGet(struct_, name) => todo!(),
+    Expr::FieldGet(struct_, name) => {
+      let (cx, type_) = get_expr_type(cx, struct_)?;
+      let (bi, ks) = if let Kinded::BigIdent(bi, ks) = type_ {
+        (bi, ks)
+      } else {
+        return Err(Error::NotStruct(name.clone()));
+      };
+      todo!()
+    }
     Expr::MethodCall(receiver, name, big_args, args) => todo!(),
     Expr::Return(expr) => todo!(),
     Expr::Match(expr, arms) => todo!(),

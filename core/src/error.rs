@@ -28,7 +28,7 @@ pub enum Error {
   /// right Kind instead.
   MismatchedKinds(Kind, Kind),
   /// There was an incorrect number of Kinded arguments.
-  WrongNumKindedArgs(Identifier, usize, usize),
+  WrongNumArgs(Identifier, usize, usize),
   /// There was a application of a Kinded where the Kinded did not have Arrow kind.
   InvalidKindedApp(BigIdent, Kind),
   /// There was a duplicated field in a struct.
@@ -40,6 +40,8 @@ pub enum Error {
   /// There was a type mismatch, where we expected something to have the left Kinded but it had the
   /// right Kinded instead.
   MismatchedTypes(Kinded, Kinded),
+  /// There was a field get on something not of struct type.
+  NotStruct(Ident),
 }
 
 impl fmt::Display for Error {
@@ -60,10 +62,10 @@ impl fmt::Display for Error {
         "mismatched kinds: expected {}, found {}",
         expected, found
       ),
-      Self::WrongNumKindedArgs(kinded, expected, found) => write!(
+      Self::WrongNumArgs(id, expected, found) => write!(
         f,
         "wrong number of arguments for {}: expected {}, found {}",
-        kinded, expected, found
+        id, expected, found
       ),
       Self::InvalidKindedApp(bi, found) => write!(
         f,
@@ -80,6 +82,7 @@ impl fmt::Display for Error {
         "mismatched types: expected {}, found {}",
         expected, found
       ),
+      Self::NotStruct(field) => write!(f, "cannot get field {} of non-struct type", field),
     }
   }
 }
@@ -96,12 +99,13 @@ impl std::error::Error for Error {
       | Self::EmptyKindedArgs
       | Self::UndefinedIdentifier(..)
       | Self::MismatchedKinds(..)
-      | Self::WrongNumKindedArgs(..)
+      | Self::WrongNumArgs(..)
       | Self::InvalidKindedApp(..)
       | Self::DuplicateField(..)
       | Self::DuplicateIdentifier(..)
       | Self::NoSuchField(..)
-      | Self::MismatchedTypes(..) => None,
+      | Self::MismatchedTypes(..)
+      | Self::NotStruct(..) => None,
     }
   }
 }
