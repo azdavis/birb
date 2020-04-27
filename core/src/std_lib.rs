@@ -11,11 +11,11 @@ pub fn prelude() -> Vec<TopDefn> {
       params: vec![],
       ctors: vec![
         Param {
-          ident: Ident::new(TRUE),
+          ident: Ident::new("true"),
           type_: Kinded::Tuple(vec![]),
         },
         Param {
-          ident: Ident::new(FALSE),
+          ident: Ident::new("false"),
           type_: Kinded::Tuple(vec![]),
         },
       ],
@@ -43,9 +43,3 @@ pub const INT: &str = "Int";
 
 /// The name of the built-in string type.
 pub const STR: &str = "Str";
-
-/// The name of the built-in true value, one of the boolean values.
-pub const TRUE: &str = "true";
-
-/// The name of the built-in false value, the other boolean value.
-pub const FALSE: &str = "false";
