@@ -17,7 +17,7 @@ mod util;
 /// Turn a sequence of bytes into a statically-checked sequence of top-level definitions.
 pub fn get(bs: &[u8]) -> error::Result<Vec<cst::TopDefn>> {
   let ts = lex::get(bs)?;
-  let mut top_defns = std_lib::prelude();
+  let mut top_defns = std_lib::top_defns();
   top_defns.append(&mut parse::get(&ts)?);
   statics::get(&top_defns)?;
   Ok(top_defns)
