@@ -15,7 +15,8 @@ pub enum TopDefn {
   Fn_(FnDefn),
 }
 
-/// A parameter (also reused as a struct field). A pair of identifier and type.
+/// A pair of identifier and type. Sometimes used for function parameters, but also re-used for
+/// struct fields and enum constructors.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Param<I, T> {
   /// The identifier.
