@@ -2,6 +2,7 @@
 
 use crate::cst::{EnumDefn, Kinded, Param, TopDefn};
 use crate::ident::Ident;
+use std::collections::HashSet;
 
 /// The prelude of pre-defined types and such.
 pub fn prelude() -> Vec<TopDefn> {
@@ -43,3 +44,10 @@ pub const INT: &str = "Int";
 
 /// The name of the built-in string type.
 pub const STR: &str = "Str";
+
+/// The effects.
+pub fn effects() -> HashSet<Ident> {
+  let mut ret = HashSet::new();
+  ret.insert(Ident::new("Stdout"));
+  ret
+}

@@ -3,13 +3,13 @@
 use crate::cst::{Arm, Block, Expr, Field, Kind, Kinded, Param, Pat, Stmt, TopDefn};
 use crate::error::{Error, Result};
 use crate::ident::Ident;
-use crate::std_lib::{BOOL, INT, STR};
+use crate::std_lib::{effects, BOOL, INT, STR};
 use std::collections::{HashMap, HashSet};
 
 /// Checks whether the sequence of top-level definitions is statically well-formed.
 pub fn get(top_defns: &[TopDefn]) -> Result<()> {
   let mut cx = Cx::default();
-  cx.effects.insert(Ident::new("Stdout"));
+  cx.effects = effects();
   Ok(())
 }
 
