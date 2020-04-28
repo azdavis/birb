@@ -1,0 +1,1 @@
+error: wrong number of arguments for right: expected 2, found 0

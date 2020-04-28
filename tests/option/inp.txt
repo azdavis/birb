@@ -10,4 +10,12 @@ fn replace[T: Type, U: Type](opt: Option[T], y: U): Option[U] {
   }
 }
 
+fn default[T: Type](e: Option[T], d: T): T {
+  match e {
+    some(x) { x }
+    none(()) { d }
+  }
+}
+
+
 fn main(): () { () }

@@ -1,0 +1,14 @@
+enum Either[L: Type, R: Type] {
+  left(L),
+  right(R),
+}
+
+fn swap[L: Type, R: Type](e: Either[L, R]): Either[R, L] {
+  // with a bit of inference, we could make this work.
+  match e {
+    left(x) { right(x) }
+    right(x) { left(x) }
+  }
+}
+
+fn main(): () { () }

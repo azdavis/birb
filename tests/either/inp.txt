@@ -10,4 +10,18 @@ fn swap[L: Type, R: Type](e: Either[L, R]): Either[R, L] {
   }
 }
 
+fn unwrap[T: Type](e: Either[T, T]): T {
+  match e {
+    left(x) { x }
+    right(x) { x }
+  }
+}
+
+fn default[T: Type, U: Type](e: Either[T, U], d: T): T {
+  match e {
+    left(x) { x }
+    right(_) { d }
+  }
+}
+
 fn main(): () { () }
