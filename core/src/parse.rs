@@ -481,7 +481,7 @@ fn ident(i: usize, ts: &[Token]) -> Result<(usize, Ident)> {
 
 fn big_ident(i: usize, ts: &[Token]) -> Result<(usize, Ident)> {
   let f = found(i, ts);
-  if let Found::Token(Token::Ident(id)) = f {
+  if let Found::Token(Token::BigIdent(id)) = f {
     return Ok((i + 1, id));
   }
   Err(Error::Parse("a big identifier", f))
