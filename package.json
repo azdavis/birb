@@ -3,7 +3,7 @@
   "name": "birb",
   "version": "0.1.0",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --mode production",
     "start": "webpack-dev-server"
   },
   "devDependencies": {
