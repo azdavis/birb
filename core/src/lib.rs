@@ -47,7 +47,7 @@ mod tests {
           name: Ident::new("main"),
           big_params: vec![],
           params: vec![],
-          ret_type: Kinded::Ident(Ident::new("String"), vec![]),
+          ret_type: Kinded::Ident(Ident::new("Str"), vec![]),
           requires: None,
           ensures: None,
           body: Block {

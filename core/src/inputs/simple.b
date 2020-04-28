@@ -1,3 +1,3 @@
 struct Unit {}
 enum Void {}
-fn main(): String { "hello" }
+fn main(): Str { "hello" }
