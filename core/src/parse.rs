@@ -327,13 +327,14 @@ fn pat_hd(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
     return Ok((i, Pat::Struct(bi, fps)));
   }
   if let Ok((i, id)) = ident(i, ts) {
-    let i = eat(i, ts, Token::LRound)?;
-    let (i, p) = pat(i, ts)?;
-    let i = eat(i, ts, Token::RRound)?;
-    return Ok((i, Pat::Ctor(id, p.into())));
-  }
-  if let Ok((i, id)) = ident(i, ts) {
-    return Ok((i, Pat::Ident(id)));
+    return match eat(i, ts, Token::LRound) {
+      Ok(i) => {
+        let (i, p) = pat(i, ts)?;
+        let i = eat(i, ts, Token::RRound)?;
+        Ok((i, Pat::Ctor(id, p.into())))
+      }
+      Err(_) => Ok((i, Pat::Ident(id))),
+    };
   }
   err(i, ts, "a pattern")
 }
