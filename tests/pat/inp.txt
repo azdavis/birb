@@ -1,0 +1,14 @@
+fn main(): Nat {
+  let _: (Nat, Str, Bool) = (1, "e", true(()));
+  let (a, b) = (1, (1, 3));
+  let a = match "e" {
+    "e" { "a" }
+    _ { "b" }
+  };
+  let b = match b {
+    (1, 2) { 3 }
+    (_, 3) { 4 }
+    _ { 5 }
+  };
+  b
+}
