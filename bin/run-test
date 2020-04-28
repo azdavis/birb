@@ -18,7 +18,8 @@ cargo build --bin birb-cli
 for x in "$@"; do
   target/debug/birb-cli "$x/inp.txt" 1>out.tmp
   if ! diff "$x/out.txt" out.tmp; then
-    panic "$x: test failed"
+    panic "$x: fail"
   fi
   rm out.tmp
+  echo "$x: ok"
 done
