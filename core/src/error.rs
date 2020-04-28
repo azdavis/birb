@@ -42,6 +42,8 @@ pub enum Error {
   MismatchedTypes(Kinded, Kinded),
   /// There was a field get on something not of struct type.
   NotStruct(Ident),
+  /// A pattern didn't make sense for this match.
+  InvalidPattern(Kinded),
 }
 
 impl fmt::Display for Error {
@@ -83,6 +85,7 @@ impl fmt::Display for Error {
         expected, found
       ),
       Self::NotStruct(field) => write!(f, "cannot get field {} of non-struct type", field),
+      Self::InvalidPattern(typ) => write!(f, "invalid pattern for type {}", typ),
     }
   }
 }
@@ -105,7 +108,8 @@ impl std::error::Error for Error {
       | Self::DuplicateIdentifier(..)
       | Self::NoSuchField(..)
       | Self::MismatchedTypes(..)
-      | Self::NotStruct(..) => None,
+      | Self::NotStruct(..)
+      | Self::InvalidPattern(..) => None,
     }
   }
 }

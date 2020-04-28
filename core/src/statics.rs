@@ -3,7 +3,7 @@
 use crate::cst::{Arm, Block, Expr, Field, Kind, Kinded, Param, Pat, Stmt, TopDefn};
 use crate::error::{Error, Result};
 use crate::ident::Ident;
-use crate::std_lib::{effects, BOOL, INT, STR};
+use crate::std_lib::{effects, INT, STR};
 use std::collections::{HashMap, HashSet};
 
 /// Checks whether the sequence of top-level definitions is statically well-formed.
@@ -154,7 +154,10 @@ fn ck_top_defn(cx: &mut Cx, var_cx: &mut VarCx, td: &TopDefn) -> Result<()> {
       if fn_.ensures.is_some() {
         todo!("requires");
       }
-      // TODO check the body
+      let got = get_block_type(cx, var_cx.clone(), &fn_.body)?;
+      if fn_.ret_type != got {
+        return Err(Error::MismatchedTypes(fn_.ret_type.clone(), got));
+      }
       for p in fn_.big_params.iter() {
         var_cx.big_vars.remove(&p.ident).unwrap();
       }
@@ -260,8 +263,8 @@ fn mk_params_kind(params: &[Param<Ident, Kind>]) -> Kind {
 // TODO check effects
 fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
   match expr {
-    Expr::String_(_) => Ok(Kinded::Ident(Ident::new(STR), vec![])),
-    Expr::Number(_) => Ok(Kinded::Ident(Ident::new(INT), vec![])),
+    Expr::String_(_) => Ok(str_type()),
+    Expr::Number(_) => Ok(int_type()),
     Expr::Tuple(es) => {
       let mut ts = Vec::with_capacity(es.len());
       for e in es {
@@ -347,8 +350,11 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
         ));
       }
       for (p, a) in info.params.iter().zip(args) {
-        let t = subst_kinded(&big_vars, p.type_.clone());
-        ck_has_type(cx, var_cx, a, t)?;
+        let want = subst_kinded(&big_vars, p.type_.clone());
+        let got = get_expr_type(cx, var_cx, a)?;
+        if want != got {
+          return Err(Error::MismatchedTypes(want, got));
+        }
       }
       Ok(subst_kinded(&big_vars, info.ret_type))
     }
@@ -362,11 +368,11 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
         Some(x) => x,
         None => return Err(Error::NotStruct(field.clone())),
       };
-      assert_eq!(info.params.len(), args.len());
       let field_type = match info.fields.get(field) {
         Some(x) => x,
         None => return Err(Error::NoSuchField(name.clone(), field.clone())),
       };
+      assert_eq!(info.params.len(), args.len());
       let big_vars: HashMap<_, _> = info
         .params
         .iter()
@@ -402,15 +408,6 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
   }
 }
 
-fn ck_has_type(cx: &Cx, var_cx: &VarCx, expr: &Expr, want: Kinded) -> Result<()> {
-  let got = get_expr_type(cx, var_cx, expr)?;
-  if want == got {
-    Ok(())
-  } else {
-    Err(Error::MismatchedTypes(want, got))
-  }
-}
-
 fn subst_kinded(vars: &HashMap<Ident, Kinded>, kinded: Kinded) -> Kinded {
   match kinded {
     Kinded::Ident(id, args) => match vars.get(&id) {
@@ -438,12 +435,76 @@ fn subst_kinded(vars: &HashMap<Ident, Kinded>, kinded: Kinded) -> Kinded {
   }
 }
 
-fn match_pat(vars: &mut HashMap<Ident, Kinded>, pat: &Pat, typ: &Kinded) -> Result<()> {
-  todo!()
+fn match_pat(cx: &Cx, pat: &Pat, typ: &Kinded) -> Result<HashMap<Ident, Kinded>> {
+  match pat {
+    Pat::Wildcard => Ok(HashMap::new()),
+    Pat::String_(_) => {
+      let want = str_type();
+      if *typ == want {
+        Ok(HashMap::new())
+      } else {
+        Err(Error::MismatchedTypes(want, typ.clone()))
+      }
+    }
+    Pat::Number(_) => {
+      let want = int_type();
+      if *typ == want {
+        Ok(HashMap::new())
+      } else {
+        Err(Error::MismatchedTypes(want, typ.clone()))
+      }
+    }
+    Pat::Tuple(pats) => {
+      let types = match typ {
+        Kinded::Tuple(x) => x,
+        _ => return Err(Error::InvalidPattern(typ.clone())),
+      };
+      if pats.len() != types.len() {
+        return Err(Error::InvalidPattern(typ.clone()));
+      }
+      let mut ret = HashMap::new();
+      for (p, t) in pats.iter().zip(types) {
+        ret = match union_no_dupe(ret, match_pat(cx, p, t)?) {
+          Ok(x) => x,
+          Err(id) => return Err(Error::DuplicateIdentifier(id)),
+        };
+      }
+      Ok(ret)
+    }
+    Pat::Struct(..) => todo!("struct pattern"),
+    Pat::Ctor(ctor_name, pat) => {
+      let (enum_name, args) = match typ {
+        Kinded::Ident(enum_name, args) => (enum_name, args),
+        _ => return Err(Error::InvalidPattern(typ.clone())),
+      };
+      let info = match cx.enums.get(enum_name) {
+        Some(x) => x,
+        None => return Err(Error::InvalidPattern(typ.clone())),
+      };
+      let ctor_type = match info.ctors.get(ctor_name) {
+        Some(x) => x,
+        None => return Err(Error::InvalidPattern(typ.clone())),
+      };
+      assert_eq!(info.params.len(), args.len());
+      let big_vars: HashMap<_, _> = info
+        .params
+        .iter()
+        .zip(args)
+        .map(|(p, a)| (p.ident.clone(), a.clone()))
+        .collect();
+      match_pat(cx, &**pat, &subst_kinded(&big_vars, ctor_type.clone()))
+    }
+    Pat::Ident(name) => {
+      let mut ret = HashMap::new();
+      ret.insert(name.clone(), typ.clone());
+      Ok(ret)
+    }
+    Pat::Or(..) => todo!("or pattern"),
+  }
 }
 
 fn get_arm_type(cx: &Cx, mut var_cx: VarCx, arm: &Arm, typ: &Kinded) -> Result<Kinded> {
-  match_pat(&mut var_cx.vars, &arm.pat, typ)?;
+  var_cx.vars.extend(match_pat(cx, &arm.pat, typ)?);
   get_block_type(cx, var_cx, &arm.block)
 }
 
@@ -457,7 +518,7 @@ fn get_block_type(cx: &Cx, mut var_cx: VarCx, blk: &Block) -> Result<Kinded> {
             return Err(Error::MismatchedTypes(typ.clone(), got));
           }
         }
-        match_pat(&mut var_cx.vars, pat, &got)?;
+        var_cx.vars.extend(match_pat(cx, pat, &got)?);
       }
     }
   }
@@ -465,4 +526,29 @@ fn get_block_type(cx: &Cx, mut var_cx: VarCx, blk: &Block) -> Result<Kinded> {
     None => todo!("block with no expr"),
     Some(e) => get_expr_type(cx, &var_cx, e),
   }
+}
+
+fn str_type() -> Kinded {
+  Kinded::Ident(Ident::new(STR), vec![])
+}
+
+fn int_type() -> Kinded {
+  Kinded::Ident(Ident::new(INT), vec![])
+}
+
+fn union_no_dupe<K, V, S>(
+  mut xs: HashMap<K, V, S>,
+  ys: HashMap<K, V, S>,
+) -> std::result::Result<HashMap<K, V, S>, K>
+where
+  K: std::hash::Hash + Eq,
+  S: std::hash::BuildHasher,
+{
+  for (k, v) in ys {
+    if xs.contains_key(&k) {
+      return Err(k);
+    }
+    assert!(xs.insert(k, v).is_none());
+  }
+  Ok(xs)
 }
