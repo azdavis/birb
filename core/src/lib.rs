@@ -14,22 +14,21 @@ pub mod token;
 
 mod util;
 
-/// Turn a sequence of bytes into a statically-checked sequence of top-level definitions.
-pub fn get(bs: &[u8]) -> error::Result<Vec<cst::TopDefn>> {
-  let ts = lex::get(bs)?;
-  let mut top_defns = std_lib::top_defns();
-  top_defns.append(&mut parse::get(&ts)?);
-  statics::get(&top_defns)?;
-  Ok(top_defns)
-}
-
 #[cfg(test)]
 mod tests {
   use crate::cst::{
     Arm, Block, EnumDefn, Expr, Field, FnDefn, Kind, Kinded, Param, Pat, Stmt, StructDefn, TopDefn,
   };
-  use crate::get;
+  use crate::error::Result;
   use crate::ident::Ident;
+
+  fn get(bs: &[u8]) -> Result<Vec<TopDefn>> {
+    let ts = crate::lex::get(bs)?;
+    let mut top_defns = crate::std_lib::top_defns();
+    top_defns.append(&mut crate::parse::get(&ts)?);
+    crate::statics::get(&top_defns)?;
+    Ok(top_defns)
+  }
 
   #[test]
   fn simple() {
