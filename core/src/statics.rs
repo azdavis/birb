@@ -16,6 +16,13 @@ pub fn get(top_defns: &[TopDefn]) -> Result<()> {
     assert!(var_cx.big_vars.is_empty());
     assert!(var_cx.vars.is_empty());
   }
+  let has_main = top_defns.iter().any(|td| match td {
+    TopDefn::Fn_(info) => info.name == Ident::new("main"),
+    _ => false,
+  });
+  if !has_main {
+    return Err(Error::NoMain);
+  }
   Ok(())
 }
 

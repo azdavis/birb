@@ -44,6 +44,8 @@ pub enum Error {
   NotStruct(Ident),
   /// A pattern didn't make sense for this match.
   InvalidPattern(Kinded),
+  /// No main function.
+  NoMain,
 }
 
 impl fmt::Display for Error {
@@ -86,6 +88,7 @@ impl fmt::Display for Error {
       ),
       Self::NotStruct(field) => write!(f, "cannot get field {} of non-struct type", field),
       Self::InvalidPattern(typ) => write!(f, "invalid pattern for type {}", typ),
+      Self::NoMain => write!(f, "no main function"),
     }
   }
 }
@@ -109,7 +112,8 @@ impl std::error::Error for Error {
       | Self::NoSuchField(..)
       | Self::MismatchedTypes(..)
       | Self::NotStruct(..)
-      | Self::InvalidPattern(..) => None,
+      | Self::InvalidPattern(..)
+      | Self::NoMain => None,
     }
   }
 }
