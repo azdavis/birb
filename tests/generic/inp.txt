@@ -1,0 +1,2 @@
+fn id[T: Type](x: T): T { x }
+fn main(): Nat { id[Nat](3) }
