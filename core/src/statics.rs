@@ -449,19 +449,19 @@ fn match_pat(cx: &Cx, pat: &Pat, typ: &Kinded) -> Result<HashMap<Ident, Kinded>>
   match pat {
     Pat::Wildcard => Ok(HashMap::new()),
     Pat::String_(_) => {
-      let want = str_type();
-      if *typ == want {
+      let got = str_type();
+      if *typ == got {
         Ok(HashMap::new())
       } else {
-        Err(Error::MismatchedTypes(want, typ.clone()))
+        Err(Error::MismatchedTypes(typ.clone(), got))
       }
     }
     Pat::Number(_) => {
-      let want = nat_type();
-      if *typ == want {
+      let got = nat_type();
+      if *typ == got {
         Ok(HashMap::new())
       } else {
-        Err(Error::MismatchedTypes(want, typ.clone()))
+        Err(Error::MismatchedTypes(typ.clone(), got))
       }
     }
     Pat::Tuple(pats) => {
