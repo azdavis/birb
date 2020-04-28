@@ -14,7 +14,7 @@ if [ "$#" -eq 0 ]; then
 fi
 
 for x in "$@"; do
-  mkdir "$x"
-  touch "$x/inp.txt"
-  touch "$x/out.txt"
+  mkdir "tests/$x"
+  touch "tests/$x/inp.txt"
+  touch "tests/$x/out.txt"
 done
