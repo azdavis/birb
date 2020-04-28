@@ -23,7 +23,7 @@ pub fn top_defns() -> Vec<TopDefn> {
     }),
     // intrinsic
     TopDefn::Enum(EnumDefn {
-      name: Ident::new(INT),
+      name: Ident::new(NAT),
       params: vec![],
       ctors: vec![],
     }),
@@ -39,8 +39,8 @@ pub fn top_defns() -> Vec<TopDefn> {
 /// The name of the built-in boolean type.
 pub const BOOL: &str = "Bool";
 
-/// The name of the built-in integer type.
-pub const INT: &str = "Int";
+/// The name of the built-in natural number type.
+pub const NAT: &str = "Nat";
 
 /// The name of the built-in string type.
 pub const STR: &str = "Str";

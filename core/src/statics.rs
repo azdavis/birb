@@ -3,7 +3,7 @@
 use crate::cst::{Arm, Block, Expr, Field, Kind, Kinded, Param, Pat, Stmt, TopDefn};
 use crate::error::{Error, Result};
 use crate::ident::Ident;
-use crate::std_lib::{effects, INT, STR};
+use crate::std_lib::{effects, NAT, STR};
 use std::collections::{HashMap, HashSet};
 
 /// Checks whether the sequence of top-level definitions is statically well-formed.
@@ -271,7 +271,7 @@ fn mk_params_kind(params: &[Param<Ident, Kind>]) -> Kind {
 fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
   match expr {
     Expr::String_(_) => Ok(str_type()),
-    Expr::Number(_) => Ok(int_type()),
+    Expr::Number(_) => Ok(nat_type()),
     Expr::Tuple(es) => {
       let mut ts = Vec::with_capacity(es.len());
       for e in es {
@@ -454,7 +454,7 @@ fn match_pat(cx: &Cx, pat: &Pat, typ: &Kinded) -> Result<HashMap<Ident, Kinded>>
       }
     }
     Pat::Number(_) => {
-      let want = int_type();
+      let want = nat_type();
       if *typ == want {
         Ok(HashMap::new())
       } else {
@@ -539,8 +539,8 @@ fn str_type() -> Kinded {
   Kinded::Ident(Ident::new(STR), vec![])
 }
 
-fn int_type() -> Kinded {
-  Kinded::Ident(Ident::new(INT), vec![])
+fn nat_type() -> Kinded {
+  Kinded::Ident(Ident::new(NAT), vec![])
 }
 
 fn union_no_dupe<K, V, S>(

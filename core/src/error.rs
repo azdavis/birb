@@ -18,7 +18,7 @@ pub enum Error {
   InvalidNumber(std::num::ParseIntError),
   /// Parse error, where we expected one thing but found another thing.
   Parse(&'static str, Found),
-  /// Empty kinded params, like `struct Foo[] { x: Int }`.
+  /// Empty kinded params, like `struct Foo[] { x: Nat }`.
   EmptyKindedParams,
   /// Empty kinded arguments, like `Foo[] { x: 3 }`.
   EmptyKindedArgs,
