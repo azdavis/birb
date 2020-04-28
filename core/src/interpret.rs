@@ -1,8 +1,10 @@
 //! Interpretation.
 
-use crate::cst::{Field, Kinded, TopDefn};
+use crate::cst::{Field, TopDefn};
 use crate::ident::Ident;
+use crate::util::SliceDisplay;
 use std::collections::HashMap;
+use std::fmt;
 
 /// Steps the expression `main()` in the given context to a value. Requires that the context be
 /// statically checked and have a main function.
@@ -23,9 +25,19 @@ pub enum Value {
   /// A tuple, like `(1, "e")`.
   Tuple(Vec<Value>),
   /// A struct expression, like `Foo { x: 3 }`.
-  Struct(Ident, Vec<Kinded>, Vec<Field<Value>>),
+  Struct(Ident, Vec<Field<Value>>),
   /// A constructor, like `some(3)`.
-  Ctor(Ident, Vec<Kinded>, Box<Value>),
-  /// An identifier, like `a`.
-  Ident(Ident),
+  Ctor(Ident, Box<Value>),
+}
+
+impl fmt::Display for Value {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::String_(s) => s.fmt(f),
+      Self::Number(n) => n.fmt(f),
+      Self::Tuple(vs) => SliceDisplay::new("(", vs, ")").fmt(f),
+      Self::Struct(name, fs) => write!(f, "{} {{ {} }}", name, SliceDisplay::new("", fs, ""),),
+      Self::Ctor(name, v) => write!(f, "{}({})", name, v),
+    }
+  }
 }

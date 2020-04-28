@@ -190,6 +190,18 @@ pub enum Field<T> {
   IdentAnd(Ident, T),
 }
 
+impl<T> fmt::Display for Field<T>
+where
+  T: fmt::Display,
+{
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::Ident(id) => id.fmt(f),
+      Self::IdentAnd(id, val) => write!(f, "{}: {}", id, val),
+    }
+  }
+}
+
 /// A block.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Block {
