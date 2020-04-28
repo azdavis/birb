@@ -8,39 +8,39 @@ use std::fmt;
 /// An error.
 #[derive(Debug)]
 pub enum Error {
-  /// An invalid byte was found.
+  /// Invalid byte.
   InvalidByte(u8),
-  /// An unclosed string literal was found.
+  /// Unclosed string literal.
   UnclosedString,
-  /// Invalid UTF-8 was found in a string literal.
+  /// Invalid UTF-8 in a string literal.
   InvalidUTF8(std::str::Utf8Error),
-  /// A number literal was invalid.
+  /// Invalid number literal.
   InvalidNumber(std::num::ParseIntError),
-  /// A parse error occurred, where we expected one thing but found another thing.
+  /// Parse error, where we expected one thing but found another thing.
   Parse(&'static str, Found),
-  /// There were empty kinded params, like `struct Foo[] { x: Int }`.
+  /// Empty kinded params, like `struct Foo[] { x: Int }`.
   EmptyKindedParams,
-  /// There were empty kinded arguments, like `Foo[] { x: 3 }`.
+  /// Empty kinded arguments, like `Foo[] { x: 3 }`.
   EmptyKindedArgs,
-  /// There was an undefined identifier.
+  /// Undefined identifier.
   UndefinedIdentifier(Ident),
-  /// There was a kind mismatch, where we expected something to have the left Kind but it had the
-  /// right Kind instead.
+  /// Kind mismatch, where we expected something to have the left Kind but it had the right Kind
+  /// instead.
   MismatchedKinds(Kind, Kind),
-  /// There was an incorrect number of Kinded arguments.
+  /// Incorrect number of Kinded arguments.
   WrongNumArgs(Ident, usize, usize),
-  /// There was a application of a Kinded where the Kinded did not have Arrow kind.
+  /// Application of a Kinded where the Kinded did not have Arrow kind.
   InvalidKindedApp(Ident, Kind),
-  /// There was a duplicated field in a struct.
+  /// Duplicated field in a struct.
   DuplicateField(Ident, Ident),
-  /// There was a duplicated identifier.
+  /// Duplicated identifier.
   DuplicateIdentifier(Ident),
-  /// There was an undefined field in an struct expression or field get.
+  /// Undefined field in an struct expression or field get.
   NoSuchField(Ident, Ident),
-  /// There was a type mismatch, where we expected something to have the left Kinded but it had the
-  /// right Kinded instead.
+  /// Type mismatch, where we expected something to have the left Kinded but it had the right Kinded
+  /// instead.
   MismatchedTypes(Kinded, Kinded),
-  /// There was a field get on something not of struct type.
+  /// Field get on something not of struct type.
   NotStruct(Ident),
   /// A pattern didn't make sense for this match.
   InvalidPattern(Kinded),
