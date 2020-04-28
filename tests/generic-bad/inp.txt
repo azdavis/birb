@@ -1,0 +1,2 @@
+fn foo[T: Type](x: T): Nat { 3 }
+fn main(): () { foo[Str](3) }

@@ -1,0 +1,13 @@
+enum Option[T: Type] {
+  some(T),
+  none(()),
+}
+
+fn replace[T: Type, U: Type](opt: Option[T], y: U): Option[U] {
+  match opt {
+    some(x) { some[U](y) }
+    none(()) { none[U](()) }
+  }
+}
+
+fn main(): () { () }

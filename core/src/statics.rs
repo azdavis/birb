@@ -34,7 +34,7 @@ struct Cx {
   effects: HashSet<Ident>,
 }
 
-#[derive(Default, Clone)]
+#[derive(Debug, Default, Clone)]
 struct VarCx {
   big_vars: HashMap<Ident, Kind>,
   vars: HashMap<Ident, Kinded>,
@@ -330,7 +330,14 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
             ident: Ident::new("_"),
             type_: type_.clone(),
           }],
-          ret_type: Kinded::Ident(enum_name.clone(), vec![]),
+          ret_type: Kinded::Ident(
+            enum_name.clone(),
+            enum_info
+              .params
+              .iter()
+              .map(|x| Kinded::Ident(x.ident.clone(), vec![]))
+              .collect(),
+          ),
         })
       }) {
         info
@@ -417,22 +424,25 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
 
 fn subst_kinded(vars: &HashMap<Ident, Kinded>, kinded: Kinded) -> Kinded {
   match kinded {
-    Kinded::Ident(id, args) => match vars.get(&id) {
-      None => Kinded::Ident(id, args),
-      Some(var_kinded) => {
-        if args.is_empty() {
-          var_kinded.clone()
-        } else {
-          match var_kinded {
-            Kinded::Ident(var_id, var_args) => {
-              assert!(var_args.is_empty());
-              Kinded::Ident(var_id.clone(), args)
+    Kinded::Ident(id, args) => {
+      let args: Vec<_> = args.into_iter().map(|a| subst_kinded(vars, a)).collect();
+      match vars.get(&id) {
+        None => Kinded::Ident(id, args),
+        Some(var_kinded) => {
+          if args.is_empty() {
+            var_kinded.clone()
+          } else {
+            match var_kinded {
+              Kinded::Ident(var_id, var_args) => {
+                assert!(var_args.is_empty());
+                Kinded::Ident(var_id.clone(), args)
+              }
+              _ => unreachable!(),
             }
-            _ => unreachable!(),
           }
         }
       }
-    },
+    }
     Kinded::Tuple(ts) => Kinded::Tuple(ts.into_iter().map(|t| subst_kinded(vars, t)).collect()),
     Kinded::Set(es) => Kinded::Set(es.into_iter().map(|e| subst_kinded(vars, e)).collect()),
     Kinded::Arrow(t1, t2) => Kinded::Arrow(
