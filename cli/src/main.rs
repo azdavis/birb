@@ -3,6 +3,6 @@ fn main() {
   let bs = std::fs::read(&file).expect("could not read file");
   match birb_core::get(&bs) {
     Ok(v) => println!("{:?}", v),
-    Err(e) => eprintln!("{}", e),
+    Err(e) => println!("{}", e),
   }
 }
