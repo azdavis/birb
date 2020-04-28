@@ -1,0 +1,4 @@
+struct Foo { x: Nat }
+fn g(x: Nat): Foo { Foo { x } }
+fn f(): Foo { g(3) }
+fn main(): Foo { f() }

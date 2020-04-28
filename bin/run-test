@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -eu
+cd "$(dirname "$0")"
+cd ..
+
+panic() {
+  echo "$1"
+  exit 1
+}
+
+if [ "$#" -eq 0 ]; then
+  panic "usage: $0 <test>..."
+fi
+
+cargo build --bin birb-cli
+
+for x in "$@"; do
+  target/debug/birb-cli "$x/inp.txt" 1>out.tmp
+  if ! diff "$x/out.txt" out.tmp; then
+    panic "$x: test failed"
+  fi
+  rm out.tmp
+done

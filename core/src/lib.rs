@@ -15,24 +15,25 @@ pub mod token;
 mod util;
 
 /// Lex, parse, typecheck, and evaluate a Birb program.
-pub fn get(bs: &[u8]) -> error::Result<interpret::Value> {
-  use std::collections::HashMap;
+pub fn get(bs: &[u8]) -> error::Result<()> {
+  // use std::collections::HashMap;
   let ts = lex::get(bs)?;
   let mut top_defns = std_lib::top_defns();
   top_defns.append(&mut parse::get(&ts)?);
   statics::get(&top_defns)?;
-  let cx: HashMap<_, _> = top_defns
-    .into_iter()
-    .map(|td| {
-      let name = match &td {
-        cst::TopDefn::Struct(defn) => defn.name.clone(),
-        cst::TopDefn::Enum(defn) => defn.name.clone(),
-        cst::TopDefn::Fn_(defn) => defn.name.clone(),
-      };
-      (name, td)
-    })
-    .collect();
-  Ok(interpret::get(cx))
+  Ok(())
+  // let cx: HashMap<_, _> = top_defns
+  //   .into_iter()
+  //   .map(|td| {
+  //     let name = match &td {
+  //       cst::TopDefn::Struct(defn) => defn.name.clone(),
+  //       cst::TopDefn::Enum(defn) => defn.name.clone(),
+  //       cst::TopDefn::Fn_(defn) => defn.name.clone(),
+  //     };
+  //     (name, td)
+  //   })
+  //   .collect();
+  // Ok(interpret::get(cx))
 }
 
 #[cfg(test)]

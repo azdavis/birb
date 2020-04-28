@@ -6,3 +6,5 @@
 pkg
 # rust deps and build artifacts
 /target
+# test artifacts
+/out.tmp
