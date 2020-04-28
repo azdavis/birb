@@ -27,7 +27,7 @@ struct Cx {
   effects: HashSet<Ident>,
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 struct VarCx {
   big_vars: HashMap<Ident, Kind>,
   vars: HashMap<Ident, Kinded>,
@@ -148,7 +148,13 @@ fn ck_top_defn(cx: &mut Cx, var_cx: &mut VarCx, td: &TopDefn) -> Result<()> {
         }
       }
       ck_has_kind(&cx, &var_cx, &fn_.ret_type, Kind::Type)?;
-      // TODO check the requires, ensures, and body
+      if fn_.requires.is_some() {
+        todo!("requires");
+      }
+      if fn_.ensures.is_some() {
+        todo!("requires");
+      }
+      // TODO check the body
       for p in fn_.big_params.iter() {
         var_cx.big_vars.remove(&p.ident).unwrap();
       }
@@ -251,6 +257,7 @@ fn mk_params_kind(params: &[Param<Ident, Kind>]) -> Kind {
   }
 }
 
+// TODO check effects
 fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
   match expr {
     Expr::String_(_) => Ok(Kinded::Ident(Ident::new(STR), vec![])),
@@ -330,7 +337,6 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
       let mut big_vars = HashMap::with_capacity(big_args.len());
       for (p, a) in info.big_params.iter().zip(big_args) {
         ck_has_kind(&cx, var_cx, a, p.type_.clone())?;
-        ck_big_ident(&cx, &p.ident)?;
         big_vars.insert(p.ident.clone(), a.clone());
       }
       if info.params.len() != args.len() {
@@ -340,22 +346,123 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
           args.len(),
         ));
       }
-      // TODO handle generics
-      assert!(info.big_params.is_empty());
-      todo!()
+      for (p, a) in info.params.iter().zip(args) {
+        let t = subst_kinded(&big_vars, p.type_.clone());
+        ck_has_type(cx, var_cx, a, t)?;
+      }
+      Ok(subst_kinded(&big_vars, info.ret_type))
     }
-    Expr::FieldGet(struct_, name) => {
+    Expr::FieldGet(struct_, field) => {
       let type_ = get_expr_type(cx, var_cx, struct_)?;
-      let (bi, ks) = if let Kinded::Ident(bi, ks) = type_ {
-        (bi, ks)
-      } else {
-        return Err(Error::NotStruct(name.clone()));
+      let (name, args) = match type_ {
+        Kinded::Ident(name, args) => (name, args),
+        _ => return Err(Error::NotStruct(field.clone())),
       };
-      todo!()
+      let info = match cx.structs.get(&name) {
+        Some(x) => x,
+        None => return Err(Error::NotStruct(field.clone())),
+      };
+      assert_eq!(info.params.len(), args.len());
+      let field_type = match info.fields.get(field) {
+        Some(x) => x,
+        None => return Err(Error::NoSuchField(name.clone(), field.clone())),
+      };
+      let big_vars: HashMap<_, _> = info
+        .params
+        .iter()
+        .zip(args)
+        .map(|(p, a)| (p.ident.clone(), a))
+        .collect();
+      Ok(subst_kinded(&big_vars, field_type.clone()))
     }
-    Expr::MethodCall(receiver, name, big_args, args) => todo!(),
-    Expr::Return(expr) => todo!(),
-    Expr::Match(expr, arms) => todo!(),
-    Expr::Block(block) => todo!(),
+    Expr::MethodCall(receiver, name, big_args, args) => {
+      let receiver = (**receiver).clone();
+      let args: Vec<_> = std::iter::once(receiver).chain(args.clone()).collect();
+      let expr = Expr::FnCall(name.clone(), big_args.clone(), args);
+      get_expr_type(cx, var_cx, &expr)
+    }
+    Expr::Return(..) => todo!("return"),
+    Expr::Match(head, arms) => {
+      let head_type = get_expr_type(cx, var_cx, head)?;
+      let mut iter = arms.iter();
+      // TODO exhaustiveness
+      let res_type = match iter.next() {
+        Some(arm) => get_arm_type(cx, var_cx.clone(), arm, &head_type)?,
+        None => todo!("empty match"),
+      };
+      for arm in iter {
+        let got = get_arm_type(cx, var_cx.clone(), arm, &head_type)?;
+        if res_type != got {
+          return Err(Error::MismatchedTypes(res_type, got));
+        }
+      }
+      Ok(res_type)
+    }
+    Expr::Block(block) => get_block_type(cx, var_cx.clone(), block),
+  }
+}
+
+fn ck_has_type(cx: &Cx, var_cx: &VarCx, expr: &Expr, want: Kinded) -> Result<()> {
+  let got = get_expr_type(cx, var_cx, expr)?;
+  if want == got {
+    Ok(())
+  } else {
+    Err(Error::MismatchedTypes(want, got))
+  }
+}
+
+fn subst_kinded(vars: &HashMap<Ident, Kinded>, kinded: Kinded) -> Kinded {
+  match kinded {
+    Kinded::Ident(id, args) => match vars.get(&id) {
+      None => Kinded::Ident(id, args),
+      Some(var_kinded) => match args.is_empty() {
+        true => var_kinded.clone(),
+        false => match var_kinded {
+          Kinded::Ident(var_id, var_args) => {
+            assert!(var_args.is_empty());
+            Kinded::Ident(var_id.clone(), args)
+          }
+          _ => unreachable!(),
+        },
+      },
+    },
+    Kinded::Tuple(ts) => Kinded::Tuple(ts.into_iter().map(|t| subst_kinded(vars, t)).collect()),
+    Kinded::Set(es) => Kinded::Set(es.into_iter().map(|e| subst_kinded(vars, e)).collect()),
+    Kinded::Arrow(t1, t2) => Kinded::Arrow(
+      subst_kinded(vars, *t1).into(),
+      subst_kinded(vars, *t2).into(),
+    ),
+    Kinded::Effectful(t, e) => {
+      Kinded::Effectful(subst_kinded(vars, *t).into(), subst_kinded(vars, *e).into())
+    }
+  }
+}
+
+fn match_pat(vars: &mut HashMap<Ident, Kinded>, pat: &Pat, typ: &Kinded) -> Result<()> {
+  todo!()
+}
+
+fn get_arm_type(cx: &Cx, mut var_cx: VarCx, arm: &Arm, typ: &Kinded) -> Result<Kinded> {
+  match_pat(&mut var_cx.vars, &arm.pat, typ)?;
+  get_block_type(cx, var_cx, &arm.block)
+}
+
+fn get_block_type(cx: &Cx, mut var_cx: VarCx, blk: &Block) -> Result<Kinded> {
+  for stmt in blk.stmts.iter() {
+    match stmt {
+      Stmt::Let(pat, typ, expr) => {
+        let got = get_expr_type(cx, &var_cx, expr)?;
+        if let Some(typ) = typ {
+          if *typ != got {
+            return Err(Error::MismatchedTypes(typ.clone(), got));
+          }
+        }
+        match_pat(&mut var_cx.vars, pat, &got)?;
+      }
+    }
+  }
+  match &blk.expr {
+    None => todo!("block with no expr"),
+    Some(e) => get_expr_type(cx, &var_cx, e),
   }
 }

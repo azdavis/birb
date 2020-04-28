@@ -125,7 +125,7 @@ impl fmt::Display for Kinded {
 }
 
 /// An expression.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Expr {
   /// A string literal, like `"x"`.
   String_(String),
@@ -152,7 +152,7 @@ pub enum Expr {
 }
 
 /// An arm of a match expression.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Arm {
   /// The pattern to match on.
   pub pat: Pat,
@@ -161,7 +161,7 @@ pub struct Arm {
 }
 
 /// A pattern.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Pat {
   /// A wildcard, like `_`.
   Wildcard,
@@ -182,7 +182,7 @@ pub enum Pat {
 }
 
 /// A field.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Field<T> {
   /// An identifier. Shorthand for `x: x`.
   Ident(Ident),
@@ -191,7 +191,7 @@ pub enum Field<T> {
 }
 
 /// A block.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Block {
   /// The statements before the expression at the end.
   pub stmts: Vec<Stmt>,
@@ -200,7 +200,7 @@ pub struct Block {
 }
 
 /// A statement.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Stmt {
   /// A let-binding, which may define some variables, and may be type-annotated.
   Let(Pat, Option<Kinded>, Expr),
