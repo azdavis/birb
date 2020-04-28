@@ -10,6 +10,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "birb-cli"
+version = "0.1.0"
+dependencies = [
+ "birb-core",
+]
+
+[[package]]
 name = "birb-core"
 version = "0.1.0"
 dependencies = [
