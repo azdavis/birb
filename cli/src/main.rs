@@ -1,4 +1,4 @@
-const TEN_MIB: usize = 10 * 1024 * 1024;
+const BIG_STACK_SIZE: usize = 180 * 1024 * 1024;
 
 fn run() -> birb_core::error::Result<()> {
   let file = std::env::args().nth(1).expect("could not get filename");
@@ -9,7 +9,7 @@ fn run() -> birb_core::error::Result<()> {
 fn main() {
   match std::thread::Builder::new()
     .name("run".to_string())
-    .stack_size(TEN_MIB)
+    .stack_size(BIG_STACK_SIZE)
     .spawn(run)
     .expect("could not spawn thread")
     .join()
