@@ -3,3 +3,7 @@ name = "birb-core"
 version = "0.1.0"
 authors = ["Ariel Davis <ariel.z.davis@icloud.com>"]
 edition = "2018"
+
+[dev-dependencies]
+# insta = "0.11.0"
+pretty_assertions = "0.6.1"

@@ -21,13 +21,11 @@ mod tests {
   };
   use crate::error::Result;
   use crate::ident::Ident;
+  use pretty_assertions::assert_eq;
 
   fn get(bs: &[u8]) -> Result<Vec<TopDefn>> {
     let ts = crate::lex::get(bs)?;
-    let mut top_defns = crate::std_lib::top_defns();
-    top_defns.append(&mut crate::parse::get(&ts)?);
-    crate::statics::get(&top_defns)?;
-    Ok(top_defns)
+    crate::parse::get(&ts)
   }
 
   #[test]
