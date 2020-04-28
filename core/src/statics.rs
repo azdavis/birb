@@ -419,16 +419,19 @@ fn subst_kinded(vars: &HashMap<Ident, Kinded>, kinded: Kinded) -> Kinded {
   match kinded {
     Kinded::Ident(id, args) => match vars.get(&id) {
       None => Kinded::Ident(id, args),
-      Some(var_kinded) => match args.is_empty() {
-        true => var_kinded.clone(),
-        false => match var_kinded {
-          Kinded::Ident(var_id, var_args) => {
-            assert!(var_args.is_empty());
-            Kinded::Ident(var_id.clone(), args)
+      Some(var_kinded) => {
+        if args.is_empty() {
+          var_kinded.clone()
+        } else {
+          match var_kinded {
+            Kinded::Ident(var_id, var_args) => {
+              assert!(var_args.is_empty());
+              Kinded::Ident(var_id.clone(), args)
+            }
+            _ => unreachable!(),
           }
-          _ => unreachable!(),
-        },
-      },
+        }
+      }
     },
     Kinded::Tuple(ts) => Kinded::Tuple(ts.into_iter().map(|t| subst_kinded(vars, t)).collect()),
     Kinded::Set(es) => Kinded::Set(es.into_iter().map(|e| subst_kinded(vars, e)).collect()),

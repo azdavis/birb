@@ -65,7 +65,7 @@ mod tests {
           params: vec![],
           ctors: vec![],
         }),
-        TopDefn::Fn_(FnDefn {
+        TopDefn::Fn_(Box::new(FnDefn {
           name: Ident::new("main"),
           big_params: vec![],
           params: vec![],
@@ -76,7 +76,7 @@ mod tests {
             stmts: vec![],
             expr: Some(Expr::String_(String::from("hello")))
           },
-        }),
+        })),
       ]
     );
   }
@@ -97,7 +97,7 @@ mod tests {
             type_: Kinded::Ident(Ident::new("T"), vec![]),
           }]
         }),
-        TopDefn::Fn_(FnDefn {
+        TopDefn::Fn_(Box::new(FnDefn {
           name: Ident::new("call"),
           big_params: vec![
             Param {
@@ -181,7 +181,7 @@ mod tests {
             )),
           }
           .into(),
-        })
+        }))
       ]
     );
   }

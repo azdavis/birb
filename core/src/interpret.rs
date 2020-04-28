@@ -6,7 +6,10 @@ use std::collections::HashMap;
 
 /// Steps the expression `main()` in the given context to a value. Requires that the context be
 /// statically checked and have a main function.
-pub fn get(cx: HashMap<Ident, TopDefn>) -> Value {
+pub fn get<S>(_: HashMap<Ident, TopDefn, S>) -> Value
+where
+  S: std::hash::BuildHasher,
+{
   todo!()
 }
 

@@ -84,7 +84,7 @@ fn top_defn(i: usize, ts: &[Token]) -> Result<(usize, TopDefn)> {
     let (i, body) = block(i, ts)?;
     return Ok((
       i,
-      TopDefn::Fn_(FnDefn {
+      TopDefn::Fn_(Box::new(FnDefn {
         name,
         big_params,
         params,
@@ -92,7 +92,7 @@ fn top_defn(i: usize, ts: &[Token]) -> Result<(usize, TopDefn)> {
         requires,
         ensures,
         body,
-      }),
+      })),
     ));
   }
   err(i, ts, "a top-level definition")
@@ -142,7 +142,7 @@ fn kind_hd(i: usize, ts: &[Token]) -> Result<(usize, Kind)> {
     if bi == Ident::new("Effect") {
       return Ok((i, Kind::Effect));
     }
-    return Err(Error::UndefinedIdentifier(bi.into()));
+    return Err(Error::UndefinedIdentifier(bi));
   }
   if let Ok(i) = eat(i, ts, Token::LRound) {
     let (i, mut kinds) = comma_sep(i, ts, kind)?;
@@ -333,7 +333,7 @@ fn pat_hd(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
     return Ok((i, Pat::Ctor(id, p.into())));
   }
   if let Ok((i, id)) = ident(i, ts) {
-    return Ok((i, Pat::Ident(id.into())));
+    return Ok((i, Pat::Ident(id)));
   }
   err(i, ts, "a pattern")
 }
@@ -411,7 +411,9 @@ fn expr_hd(i: usize, ts: &[Token]) -> Result<(usize, Expr)> {
   err(i, ts, "an expression")
 }
 
-fn call_opt(i: usize, ts: &[Token]) -> Result<(usize, Option<(Vec<Kinded>, Vec<Expr>)>)> {
+type Call = (Vec<Kinded>, Vec<Expr>);
+
+fn call_opt(i: usize, ts: &[Token]) -> Result<(usize, Option<Call>)> {
   let (i, args, got) = kinded_args_opt(i, ts)?;
   let i = match eat(i, ts, Token::LRound) {
     Ok(i) => i,

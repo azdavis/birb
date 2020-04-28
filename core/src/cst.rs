@@ -12,7 +12,7 @@ pub enum TopDefn {
   /// An enum (sum type) definition.
   Enum(EnumDefn),
   /// A function definition.
-  Fn_(FnDefn),
+  Fn_(Box<FnDefn>),
 }
 
 /// A pair of identifier and type. Sometimes used for function parameters, but also re-used for
