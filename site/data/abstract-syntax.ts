@@ -1,6 +1,6 @@
-import { AbsSyntax } from "../abs-syntax";
+import { AbstractSyntax } from "../abstract-syntax";
 
-const absSyntax: AbsSyntax = [
+const abstractSyntax: AbstractSyntax = [
   {
     text: "Kind",
     math: String.raw`\kappa`,
@@ -84,4 +84,4 @@ const absSyntax: AbsSyntax = [
   },
 ];
 
-export default absSyntax;
+export default abstractSyntax;

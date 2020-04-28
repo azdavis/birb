@@ -1,4 +1,4 @@
-export type AbsSyntax = Production[];
+export type AbstractSyntax = Production[];
 
 export type Production = {
   text: string;
