@@ -19,6 +19,10 @@ code {
     background-color: #333;
     color: #ddd;
   }
+
+  .bg-gray {
+    background-color: #555;
+  }
 }
 
 .d-flex {
@@ -67,7 +71,7 @@ code {
 }
 
 .bg-gray {
-  background-color: #555;
+  background-color: #ddd;
 }
 
 .round-corners {
