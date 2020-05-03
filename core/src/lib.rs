@@ -53,7 +53,7 @@ mod tests {
   #[test]
   fn simple() {
     assert_eq!(
-      get(include_bytes!("inputs/simple.b")).unwrap(),
+      get(include_bytes!("inputs/simple.txt")).unwrap(),
       vec![
         TopDefn::Struct(StructDefn {
           name: Ident::new("Unit"),
@@ -84,7 +84,7 @@ mod tests {
   #[test]
   fn call() {
     assert_eq!(
-      get(include_bytes!("inputs/call.b")).unwrap(),
+      get(include_bytes!("inputs/call.txt")).unwrap(),
       vec![
         TopDefn::Struct(StructDefn {
           name: Ident::new("Guy"),
