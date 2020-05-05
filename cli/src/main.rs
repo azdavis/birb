@@ -1,4 +1,4 @@
-const BIG_STACK_SIZE: usize = 180 * 1024 * 1024;
+const BIG_STACK_SIZE: usize = 4 * 1024 * 1024;
 
 fn run() -> birb_core::error::Result<()> {
   let file = std::env::args().nth(1).expect("could not get filename");
