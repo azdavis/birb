@@ -24,7 +24,6 @@ export default function Sandbox() {
   );
   return (
     <div>
-      <h2>Sandbox</h2>
       <form onSubmit={onSubmit}>
         <div>{get(text)}</div>
         <textarea

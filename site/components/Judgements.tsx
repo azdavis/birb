@@ -14,7 +14,6 @@ function judgement(x: Judgement) {
 export default function Judgements() {
   return (
     <div>
-      <h2>Judgements</h2>
       <p>We introduce the judgements</p>
       <ol>
         <li>

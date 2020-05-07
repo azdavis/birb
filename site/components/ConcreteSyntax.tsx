@@ -14,7 +14,6 @@ function monoWord(x: string) {
 export default function ConcreteSyntax() {
   return (
     <div>
-      <h2>Concrete Syntax</h2>
       <h3>Lexical Tokens</h3>
       <p>Birb source code is first lexed into tokens, separated by whitespace or comments.</p>
       <h4>Special Tokens</h4>

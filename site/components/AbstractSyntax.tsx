@@ -29,10 +29,5 @@ function production(gi: A.Production) {
 }
 
 export default function AbstractSyntax() {
-  return (
-    <div>
-      <h2>Abstract Syntax</h2>
-      <div className="AbstractSyntax">{abstractSyntax.map(production)}</div>
-    </div>
-  );
+  return <div className="AbstractSyntax">{abstractSyntax.map(production)}</div>;
 }

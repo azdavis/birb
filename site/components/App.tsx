@@ -50,7 +50,7 @@ export default function App() {
     <div>
       <h1>Birb</h1>
       <p>Ariel Davis (azdavis), Vivian Huang (vivianh)</p>
-      <nav className="d-flex jc-center">{pages.map(navItem)}</nav>
+      <nav className="d-flex jc-center p-0-5-em">{pages.map(navItem)}</nav>
       {switcher(page)}
     </div>
   );
