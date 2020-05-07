@@ -3,14 +3,14 @@
 use crate::cst::{Arm, Block, Expr, Field, Kind, Kinded, Param, Pat, Stmt, TopDefn};
 use crate::error::{Error, Result};
 use crate::ident::Ident;
-use crate::std_lib::{effects, NAT, STR};
+use crate::std_lib as birb_std_lib;
 use std::collections::{HashMap, HashSet};
 
 /// Checks whether the sequence of top-level definitions is statically well-formed.
 pub fn get(top_defns: &[TopDefn]) -> Result<()> {
   let mut cx = Cx::default();
   let mut var_cx = VarCx::default();
-  cx.effects = effects();
+  cx.effects = birb_std_lib::effects();
   for td in top_defns {
     ck_top_defn(&mut cx, &mut var_cx, td)?;
     assert!(var_cx.big_vars.is_empty());
@@ -549,11 +549,11 @@ fn get_block_type(cx: &Cx, mut var_cx: VarCx, blk: &Block) -> Result<Kinded> {
 }
 
 fn str_type() -> Kinded {
-  Kinded::Ident(Ident::new(STR), vec![])
+  Kinded::Ident(Ident::new(birb_std_lib::STR), vec![])
 }
 
 fn nat_type() -> Kinded {
-  Kinded::Ident(Ident::new(NAT), vec![])
+  Kinded::Ident(Ident::new(birb_std_lib::NAT), vec![])
 }
 
 fn union_no_dupe<K, V, S>(
