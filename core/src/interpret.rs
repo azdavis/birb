@@ -99,20 +99,25 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
     }
     Expr::Ident(i) => m[i].clone(),
     Expr::FnCall(i, _, xs) => {
-      let f = &cx[i];
       let mut vs = Vec::with_capacity(xs.len());
       for x in xs {
         vs.push(expr_eval(x, m, cx));
       }
-      let f = match f {
-        TopDefn::Fn_(x) => x,
-        TopDefn::Struct(..) | TopDefn::Enum(..) => unreachable!(),
-      };
-      let mut m = m.clone();
-      for (p, v) in f.params.iter().zip(vs) {
-        m.insert(p.ident.clone(), v);
+      match cx.get(i) {
+        Some(TopDefn::Fn_(f)) => {
+          let mut m = m.clone();
+          for (p, v) in f.params.iter().zip(vs) {
+            m.insert(p.ident.clone(), v);
+          }
+          block_eval(&f.body, m, cx)
+        }
+        Some(TopDefn::Struct(..)) | Some(TopDefn::Enum(..)) => unreachable!(),
+        None => {
+          let v = vs.pop().unwrap();
+          assert!(vs.is_empty());
+          Value::Ctor(i.clone(), v.into())
+        }
       }
-      block_eval(&f.body, m, cx)
     }
     Expr::FieldGet(..) => todo!(),
     Expr::MethodCall(..) => todo!(),
