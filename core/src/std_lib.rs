@@ -1,6 +1,6 @@
 //! The Birb standard library.
 
-use crate::cst::{EnumDefn, Kinded, Param, TopDefn};
+use crate::cst::{Block, EnumDefn, FnDefn, Kinded, Param, TopDefn};
 use crate::ident::Ident;
 use std::collections::HashSet;
 
@@ -21,19 +21,45 @@ pub fn top_defns() -> Vec<TopDefn> {
         },
       ],
     }),
-    // intrinsic
     TopDefn::Enum(EnumDefn {
       name: Ident::new(NAT),
       params: vec![],
       ctors: vec![],
     }),
-    // intrinsic
     TopDefn::Enum(EnumDefn {
       name: Ident::new(STR),
       params: vec![],
       ctors: vec![],
     }),
+    math_bin_op(ADD),
+    math_bin_op(SUB),
+    math_bin_op(MUL),
+    math_bin_op(DIV),
   ]
+}
+
+fn math_bin_op(name: &str) -> TopDefn {
+  TopDefn::Fn_(Box::new(FnDefn {
+    name: Ident::new(name),
+    big_params: vec![],
+    params: vec![
+      Param {
+        ident: Ident::new("x"),
+        type_: Kinded::Ident(Ident::new(NAT), vec![]),
+      },
+      Param {
+        ident: Ident::new("y"),
+        type_: Kinded::Ident(Ident::new(NAT), vec![]),
+      },
+    ],
+    ret_type: Kinded::Ident(Ident::new(NAT), vec![]),
+    requires: None,
+    ensures: None,
+    body: Block {
+      stmts: vec![],
+      expr: None,
+    },
+  }))
 }
 
 /// The name of the built-in boolean type.
@@ -44,6 +70,18 @@ pub const NAT: &str = "Nat";
 
 /// The name of the built-in string type.
 pub const STR: &str = "Str";
+
+/// The function 'add'.
+pub const ADD: &str = "add";
+
+/// The function 'sub'.
+pub const SUB: &str = "sub";
+
+/// The function 'mul'.
+pub const MUL: &str = "mul";
+
+/// The function 'div'.
+pub const DIV: &str = "div";
 
 /// The pre-defined effects.
 pub fn effects() -> HashSet<Ident> {

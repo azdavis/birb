@@ -2,6 +2,7 @@
 
 use crate::cst::{Block, Expr, Field, Pat, Stmt, TopDefn};
 use crate::ident::Ident;
+use crate::std_lib as birb_std_lib;
 use crate::util::SliceDisplay;
 use std::collections::HashMap;
 use std::fmt;
@@ -105,6 +106,18 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
       for x in xs {
         vs.push(expr_eval(x, m, cx));
       }
+      if *i == Ident::new(birb_std_lib::ADD) {
+        return math_bin_op(vs, |x, y| x + y);
+      }
+      if *i == Ident::new(birb_std_lib::SUB) {
+        return math_bin_op(vs, |x, y| x - y);
+      }
+      if *i == Ident::new(birb_std_lib::MUL) {
+        return math_bin_op(vs, |x, y| x * y);
+      }
+      if *i == Ident::new(birb_std_lib::DIV) {
+        return math_bin_op(vs, |x, y| x / y);
+      }
       match cx.get(i) {
         Some(TopDefn::Fn_(f)) => {
           let mut m = m.clone();
@@ -127,6 +140,23 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
     Expr::Match(..) => todo!(),
     Expr::Block(b) => block_eval(&*b, m.clone(), cx),
   }
+}
+
+fn get_number(val: Value) -> u64 {
+  match val {
+    Value::Number(n) => n,
+    _ => unreachable!(),
+  }
+}
+
+fn math_bin_op<F>(mut vs: Vec<Value>, f: F) -> Value
+where
+  F: FnOnce(u64, u64) -> u64,
+{
+  let x = get_number(vs.pop().unwrap());
+  let y = get_number(vs.pop().unwrap());
+  assert!(vs.is_empty());
+  return Value::Number(f(x, y));
 }
 
 /// A value.
