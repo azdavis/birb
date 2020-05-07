@@ -5,15 +5,15 @@ const startingNum = 3;
 const otherNum = 5;
 
 export default function Sandbox() {
-  const input = React.useRef<HTMLInputElement | null>(null);
+  const textarea = React.useRef<HTMLTextAreaElement | null>(null);
   const [err, setErr] = React.useState<string | null>(null);
   const [num, setNum] = React.useState<number>(startingNum);
   const onSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      const { current } = input;
+      const { current } = textarea;
       if (current === null) {
-        setErr("no input element found");
+        setErr("no textarea element found");
         return;
       }
       const num = parseInt(current.value, 10);
@@ -24,7 +24,7 @@ export default function Sandbox() {
       setErr(null);
       setNum(num);
     },
-    [setErr, setNum, input],
+    [setErr, setNum, textarea],
   );
   return (
     <div>
@@ -33,7 +33,7 @@ export default function Sandbox() {
         <div>
           {otherNum} * {num} = {mul(otherNum, num)}
         </div>
-        <input type="text" ref={input} defaultValue={startingNum} />
+        <textarea ref={textarea}></textarea>
         <input type="submit" value="Run" />
         {err === null ? null : <div className="c-red fw-bold">{err}</div>}
       </form>
