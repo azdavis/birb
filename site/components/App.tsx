@@ -1,16 +1,19 @@
 import React from "react";
 import absurd from "../absurd";
 import Sandbox from "./Sandbox";
+import About from "./About";
 import ConcreteSyntax from "./ConcreteSyntax";
 import AbsSyntax from "./AbstractSyntax";
 import Judgements from "./Judgements";
 import classNames from "../classNames";
 
-type Page = "Sandbox" | "Concrete Syntax" | "Abstract Syntax" | "Judgements";
-const pages: Page[] = ["Sandbox", "Concrete Syntax", "Abstract Syntax", "Judgements"];
+type Page = "About" | "Sandbox" | "Concrete Syntax" | "Abstract Syntax" | "Judgements";
+const pages: Page[] = ["About", "Sandbox", "Concrete Syntax", "Abstract Syntax", "Judgements"];
 
 function switcher(page: Page) {
   switch (page) {
+    case "About":
+      return <About />;
     case "Sandbox":
       return <Sandbox />;
     case "Concrete Syntax":
@@ -25,7 +28,7 @@ function switcher(page: Page) {
 }
 
 export default function App() {
-  const [page, setPage] = React.useState<Page>("Sandbox");
+  const [page, setPage] = React.useState<Page>("About");
   const navItem = React.useCallback(
     (x: Page) => (
       <div
