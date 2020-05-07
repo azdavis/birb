@@ -37,7 +37,7 @@ fn get_expr(expr: Expr) -> Expr {
     Expr::MethodCall(recv, name, big_args, mut args) => {
       // the one thing we _actually_ do: get rid of MethodCall
       args.insert(0, *recv);
-      Expr::FnCall(name, big_args, args)
+      Expr::FnCall(name, big_args, args.into_iter().map(get_expr).collect())
     }
     Expr::Return(expr) => Expr::Return(get_expr(*expr).into()),
     Expr::Match(head, arms) => Expr::Match(

@@ -153,8 +153,8 @@ fn math_bin_op<F>(mut vs: Vec<Value>, f: F) -> Value
 where
   F: FnOnce(u64, u64) -> u64,
 {
-  let x = get_number(vs.pop().unwrap());
   let y = get_number(vs.pop().unwrap());
+  let x = get_number(vs.pop().unwrap());
   assert!(vs.is_empty());
   return Value::Number(f(x, y));
 }

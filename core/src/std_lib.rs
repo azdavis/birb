@@ -1,6 +1,6 @@
 //! The Birb standard library.
 
-use crate::cst::{Block, EnumDefn, FnDefn, Kinded, Param, TopDefn};
+use crate::cst::{Block, EnumDefn, Expr, FnDefn, Kinded, Param, TopDefn};
 use crate::ident::Ident;
 use std::collections::HashSet;
 
@@ -57,7 +57,7 @@ fn math_bin_op(name: &str) -> TopDefn {
     ensures: None,
     body: Block {
       stmts: vec![],
-      expr: None,
+      expr: Some(Expr::Number(0)),
     },
   }))
 }
