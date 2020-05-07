@@ -21,6 +21,7 @@ body {
   padding: 0.5em;
 }
 
+pre,
 code {
   font-family: Menlo, Consolas, monospace;
 }
@@ -104,8 +105,8 @@ code {
   width: 100%;
 }
 
-.h-10em {
-  height: 10em;
+.h-20em {
+  height: 20em;
 }
 
 .bg-none {

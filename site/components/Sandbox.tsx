@@ -17,10 +17,16 @@ function safeGet(x: string): string {
   }
 }
 
-const startingText = `fn foo(): () affects Stdout { () }
+const startingText = `// pretend this prints to standard output
+fn print_nat(x: Nat): Nat affects Stdout {
+  let _ = ();
+  x.add(1)
+}
+
+// try adding an 'affects' annotation here
 fn main(): Nat {
-  let _ = foo();
-  3
+  let x = print_nat(3);
+  x.mul(2)
 }`;
 
 export default function Sandbox() {
@@ -37,10 +43,10 @@ export default function Sandbox() {
   return (
     <div>
       <form onSubmit={onSubmit}>
-        <div>result: {safeGet(text)}</div>
+        <pre>{safeGet(text)}</pre>
         <textarea
           ref={textarea}
-          className="resize-none d-block ff-mono fz-inherit w-100 h-10em bg-none color-inherit"
+          className="resize-none d-block ff-mono fz-inherit w-100 h-20em bg-none color-inherit"
           defaultValue={startingText}
         ></textarea>
         <input
