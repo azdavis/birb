@@ -134,10 +134,41 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
         }
       }
     }
-    Expr::FieldGet(..) => todo!(),
+    Expr::FieldGet(e, i) => {
+      let v = expr_eval(e, m, cx);
+      match v {
+        Value::Struct(_, fs) => {
+          for f in fs {
+            match f {
+              Field::IdentAnd(q, t) => {
+                if q == *i {
+                  return t;
+                }
+              }
+              Field::Ident(..) => unreachable!(),
+            }
+          }
+          unreachable!()
+        }
+        _ => unreachable!(),
+      }
+    }
     Expr::MethodCall(..) => unreachable!("eval method call"),
     Expr::Return(..) => todo!("eval return"),
-    Expr::Match(..) => todo!(),
+    Expr::Match(e, xs) => {
+      let v = expr_eval(e, m, cx);
+      for x in xs {
+        match pat_match(&x.pat, &v) {
+          Some(map) => {
+            let mut m = m.clone();
+            m.extend(map);
+            return block_eval(&x.block, m, cx);
+          }
+          None => continue,
+        }
+      }
+      panic!("match failed")
+    }
     Expr::Block(b) => block_eval(&*b, m.clone(), cx),
   }
 }
