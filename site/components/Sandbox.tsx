@@ -43,7 +43,7 @@ export default function Sandbox() {
   return (
     <div>
       <form onSubmit={onSubmit}>
-        <pre>{safeGet(text)}</pre>
+        <pre className="p-0-5-em bg-gray round-corners">{safeGet(text)}</pre>
         <textarea
           ref={textarea}
           className="resize-none d-block ff-mono fz-inherit w-100 h-20em bg-none color-inherit"
