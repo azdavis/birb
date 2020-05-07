@@ -17,7 +17,11 @@ function safeGet(x: string): string {
   }
 }
 
-const startingText = "hey";
+const startingText = `fn foo(): () affects Stdout { () }
+fn main(): Nat {
+  let _ = foo();
+  3
+}`;
 
 export default function Sandbox() {
   const textarea = React.useRef<HTMLTextAreaElement | null>(null);
