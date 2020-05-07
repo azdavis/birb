@@ -52,7 +52,6 @@ export default function App() {
   return (
     <div>
       <h1>Birb</h1>
-      <p>Ariel Davis (azdavis), Vivian Huang (vivianh)</p>
       <nav className="d-flex jc-center p-0-5-em">{pages.map(navItem)}</nav>
       {switcher(page)}
     </div>

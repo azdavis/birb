@@ -4,7 +4,10 @@ export default function About() {
   return (
     <div>
       <h2>About</h2>
-      <p>Birb is a programming language.</p>
+      <p>
+        Birb is a programming language. It is designed and implemented by Vivian Huang (vivianh) and
+        Ariel Davis (azdavis).
+      </p>
       <p>
         The headline feature of Birb is compile-time effects checking. A function must statically
         declare all of the effects that it uses. If a caller calls a function that uses effects that
