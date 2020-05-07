@@ -4,6 +4,13 @@ html {
   color: #333;
 }
 
+@media (prefers-color-scheme: dark) {
+  html {
+    background-color: #333;
+    color: #ddd;
+  }
+}
+
 body {
   max-width: 70ch;
   margin: 0 auto;
@@ -12,13 +19,6 @@ body {
 
 code {
   font-family: Menlo, Consolas, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    background-color: #333;
-    color: #ddd;
-  }
 }
 
 .d-flex {
