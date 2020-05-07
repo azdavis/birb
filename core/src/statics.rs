@@ -161,9 +161,18 @@ fn ck_top_defn(cx: &mut Cx, var_cx: &mut VarCx, td: &TopDefn) -> Result<()> {
       if fn_.ensures.is_some() {
         todo!("requires");
       }
+      let (ret_type, effects) = match fn_.ret_type.clone() {
+        Kinded::Effectful(t, e) => (*t, flatten(*e)),
+        other => (other, HashSet::new()),
+      };
       let got = get_block_type(cx, var_cx.clone(), &fn_.body)?;
-      if fn_.ret_type != got {
-        return Err(Error::MismatchedTypes(fn_.ret_type.clone(), got));
+      if ret_type != got.typ {
+        return Err(Error::MismatchedTypes(fn_.ret_type.clone(), got.typ));
+      }
+      for e in got.effects {
+        if !effects.contains(&e) {
+          return Err(Error::InvalidEffectUse(fn_.name.clone(), e));
+        }
       }
       for p in fn_.big_params.iter() {
         var_cx.big_vars.remove(&p.ident).unwrap();
@@ -191,6 +200,8 @@ fn get_kind(cx: &Cx, var_cx: &VarCx, kinded: &Kinded) -> Result<Kind> {
         mk_params_kind(&si.params)
       } else if let Some(ei) = cx.enums.get(bi) {
         mk_params_kind(&ei.params)
+      } else if cx.effects.contains(bi) {
+        Kind::Effect
       } else if let Some(k) = var_cx.big_vars.get(bi) {
         k.clone()
       } else {
@@ -267,17 +278,38 @@ fn mk_params_kind(params: &[Param<Ident, Kind>]) -> Kind {
   }
 }
 
+struct ExprRes {
+  typ: Kinded,
+  effects: HashSet<Kinded>,
+}
+
+impl ExprRes {
+  fn pure_(typ: Kinded) -> Self {
+    Self {
+      typ,
+      effects: HashSet::new(),
+    }
+  }
+
+  fn effectful(typ: Kinded, effects: HashSet<Kinded>) -> Self {
+    Self { typ, effects }
+  }
+}
+
 // TODO check effects
-fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
+fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<ExprRes> {
   match expr {
-    Expr::String_(_) => Ok(str_type()),
-    Expr::Number(_) => Ok(nat_type()),
+    Expr::String_(_) => Ok(ExprRes::pure_(str_type())),
+    Expr::Number(_) => Ok(ExprRes::pure_(nat_type())),
     Expr::Tuple(es) => {
-      let mut ts = Vec::with_capacity(es.len());
+      let mut types = Vec::with_capacity(es.len());
+      let mut effects = HashSet::new();
       for e in es {
-        ts.push(get_expr_type(cx, var_cx, e)?);
+        let res = get_expr_type(cx, var_cx, e)?;
+        types.push(res.typ);
+        effects.extend(res.effects);
       }
-      Ok(Kinded::Tuple(ts))
+      Ok(ExprRes::effectful(Kinded::Tuple(types), effects))
     }
     Expr::Struct(name, args, fields) => {
       let info = match cx.structs.get(name) {
@@ -295,6 +327,7 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
         ck_has_kind(&cx, &var_cx, a, p.type_.clone())?;
       }
       let mut fields_seen = HashSet::with_capacity(info.fields.len());
+      let mut effects = HashSet::new();
       for f in fields {
         let (x, got) = match f {
           Field::Ident(x) => (x, get_expr_type(cx, var_cx, &Expr::Ident(x.clone()))?),
@@ -304,18 +337,22 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
           None => return Err(Error::NoSuchField(name.clone(), x.clone())),
           Some(t) => t,
         };
-        if *want != got {
-          return Err(Error::MismatchedTypes(want.clone(), got));
+        if *want != got.typ {
+          return Err(Error::MismatchedTypes(want.clone(), got.typ));
         }
         if !fields_seen.insert(x) {
           return Err(Error::DuplicateField(name.clone(), x.clone()));
         }
+        effects.extend(got.effects);
       }
-      Ok(Kinded::Ident(name.clone(), args.clone()))
+      Ok(ExprRes::effectful(
+        Kinded::Ident(name.clone(), args.clone()),
+        effects,
+      ))
     }
     Expr::Ident(name) => {
       if let Some(t) = var_cx.vars.get(name) {
-        return Ok(t.clone());
+        return Ok(ExprRes::pure_(t.clone()));
       }
       // TODO we currently forbid bare function and constructor names
       Err(Error::UndefinedIdentifier(name.clone()))
@@ -363,18 +400,27 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
           args.len(),
         ));
       }
+      let mut effects = HashSet::new();
       for (p, a) in info.params.iter().zip(args) {
         let want = subst_kinded(&big_vars, p.type_.clone());
         let got = get_expr_type(cx, var_cx, a)?;
-        if want != got {
-          return Err(Error::MismatchedTypes(want, got));
+        if want != got.typ {
+          return Err(Error::MismatchedTypes(want, got.typ));
         }
+        effects.extend(got.effects);
       }
-      Ok(subst_kinded(&big_vars, info.ret_type))
+      let ret_type = match subst_kinded(&big_vars, info.ret_type) {
+        Kinded::Effectful(typ, eff) => {
+          effects.extend(flatten(*eff));
+          *typ
+        }
+        other => other,
+      };
+      Ok(ExprRes::effectful(ret_type, effects))
     }
     Expr::FieldGet(struct_, field) => {
       let type_ = get_expr_type(cx, var_cx, struct_)?;
-      let (name, args) = match type_ {
+      let (name, args) = match type_.typ {
         Kinded::Ident(name, args) => (name, args),
         _ => return Err(Error::NotStruct(field.clone())),
       };
@@ -393,7 +439,10 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
         .zip(args)
         .map(|(p, a)| (p.ident.clone(), a))
         .collect();
-      Ok(subst_kinded(&big_vars, field_type.clone()))
+      Ok(ExprRes::effectful(
+        subst_kinded(&big_vars, field_type.clone()),
+        type_.effects,
+      ))
     }
     Expr::MethodCall(receiver, name, big_args, args) => {
       let receiver = (**receiver).clone();
@@ -407,16 +456,19 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<Kinded> {
       let mut iter = arms.iter();
       // TODO exhaustiveness
       let res_type = match iter.next() {
-        Some(arm) => get_arm_type(cx, var_cx.clone(), arm, &head_type)?,
+        Some(arm) => get_arm_type(cx, var_cx.clone(), arm, &head_type.typ)?,
         None => todo!("empty match"),
       };
+      let mut effects = head_type.effects;
       for arm in iter {
-        let got = get_arm_type(cx, var_cx.clone(), arm, &head_type)?;
-        if res_type != got {
-          return Err(Error::MismatchedTypes(res_type, got));
+        let got = get_arm_type(cx, var_cx.clone(), arm, &head_type.typ)?;
+        if res_type.typ != got.typ {
+          return Err(Error::MismatchedTypes(res_type.typ, got.typ));
         }
+        effects.extend(got.effects);
       }
-      Ok(res_type)
+      effects.extend(res_type.effects);
+      Ok(ExprRes::effectful(res_type.typ, effects))
     }
     Expr::Block(block) => get_block_type(cx, var_cx.clone(), block),
   }
@@ -523,28 +575,34 @@ fn match_pat(cx: &Cx, pat: &Pat, typ: &Kinded) -> Result<HashMap<Ident, Kinded>>
   }
 }
 
-fn get_arm_type(cx: &Cx, mut var_cx: VarCx, arm: &Arm, typ: &Kinded) -> Result<Kinded> {
+fn get_arm_type(cx: &Cx, mut var_cx: VarCx, arm: &Arm, typ: &Kinded) -> Result<ExprRes> {
   var_cx.vars.extend(match_pat(cx, &arm.pat, typ)?);
   get_block_type(cx, var_cx, &arm.block)
 }
 
-fn get_block_type(cx: &Cx, mut var_cx: VarCx, blk: &Block) -> Result<Kinded> {
+fn get_block_type(cx: &Cx, mut var_cx: VarCx, blk: &Block) -> Result<ExprRes> {
+  let mut effects = HashSet::new();
   for stmt in blk.stmts.iter() {
     match stmt {
       Stmt::Let(pat, typ, expr) => {
         let got = get_expr_type(cx, &var_cx, expr)?;
         if let Some(typ) = typ {
-          if *typ != got {
-            return Err(Error::MismatchedTypes(typ.clone(), got));
+          if *typ != got.typ {
+            return Err(Error::MismatchedTypes(typ.clone(), got.typ));
           }
         }
-        var_cx.vars.extend(match_pat(cx, pat, &got)?);
+        var_cx.vars.extend(match_pat(cx, pat, &got.typ)?);
+        effects.extend(got.effects);
       }
     }
   }
   match &blk.expr {
     None => todo!("block with no expr"),
-    Some(e) => get_expr_type(cx, &var_cx, e),
+    Some(e) => {
+      let mut got = get_expr_type(cx, &var_cx, e)?;
+      got.effects.extend(effects);
+      Ok(got)
+    }
   }
 }
 
@@ -554,6 +612,14 @@ fn str_type() -> Kinded {
 
 fn nat_type() -> Kinded {
   Kinded::Ident(Ident::new(birb_std_lib::NAT), vec![])
+}
+
+fn flatten(ef: Kinded) -> HashSet<Kinded> {
+  match ef {
+    Kinded::Ident(..) => std::iter::once(ef).collect(),
+    Kinded::Set(efs) => efs.into_iter().flat_map(flatten).collect(),
+    Kinded::Tuple(..) | Kinded::Arrow(..) | Kinded::Effectful(..) => unreachable!(),
+  }
 }
 
 fn union_no_dupe<K, V, S>(

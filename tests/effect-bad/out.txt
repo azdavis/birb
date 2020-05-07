@@ -1,0 +1,1 @@
+error: invalid use of effect Stdout in bar

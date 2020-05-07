@@ -46,6 +46,8 @@ pub enum Error {
   InvalidPattern(Kinded),
   /// No main function.
   NoMain,
+  /// Invalid use of an effect in a function.
+  InvalidEffectUse(Ident, Kinded),
 }
 
 impl fmt::Display for Error {
@@ -89,6 +91,7 @@ impl fmt::Display for Error {
       Self::NotStruct(field) => write!(f, "cannot get field {} of non-struct type", field),
       Self::InvalidPattern(typ) => write!(f, "invalid pattern for type {}", typ),
       Self::NoMain => write!(f, "no main function"),
+      Self::InvalidEffectUse(fn_, ef) => write!(f, "invalid use of effect {} in {}", ef, fn_),
     }
   }
 }
@@ -113,7 +116,8 @@ impl std::error::Error for Error {
       | Self::MismatchedTypes(..)
       | Self::NotStruct(..)
       | Self::InvalidPattern(..)
-      | Self::NoMain => None,
+      | Self::NoMain
+      | Self::InvalidEffectUse(..) => None,
     }
   }
 }

@@ -92,7 +92,7 @@ impl fmt::Display for Kind {
 }
 
 /// Something that is kinded, aka a type or an effect.
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub enum Kinded {
   /// The Vec<Kinded> will be empty iff no args were written in the source.
   Ident(Ident, Vec<Kinded>),

@@ -1,0 +1,7 @@
+fn foo(): () affects Stdout { () }
+fn bar(): () { foo() }
+fn main(): Nat affects Stdout {
+  let _ = foo();
+  let _ = bar();
+  3
+}
