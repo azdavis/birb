@@ -9,6 +9,14 @@ function must<T>(x: T | null): T {
   return x;
 }
 
+function safeGet(x: string): string {
+  try {
+    return get(x);
+  } catch (e) {
+    return String(e);
+  }
+}
+
 const startingText = "hey";
 
 export default function Sandbox() {
@@ -25,7 +33,7 @@ export default function Sandbox() {
   return (
     <div>
       <form onSubmit={onSubmit}>
-        <div>{get(text)}</div>
+        <div>result: {safeGet(text)}</div>
         <textarea
           ref={textarea}
           className="resize-none d-block ff-mono fz-inherit w-100 h-10em bg-none color-inherit"
