@@ -1,6 +1,6 @@
 //! Interpretation.
 
-use crate::cst::{Expr, Field, Kinded, Stmt, TopDefn};
+use crate::cst::{Block, Expr, Field, Pat, Stmt, TopDefn};
 use crate::ident::Ident;
 use crate::util::SliceDisplay;
 use std::collections::HashMap;
@@ -8,33 +8,81 @@ use std::fmt;
 
 /// Steps the expression `main()` in the given context to a value. Requires that the context be
 /// statically checked and have a main function.
-pub fn get<S>(cx: HashMap<Ident, TopDefn, S>) -> Value
-where
-  S: std::hash::BuildHasher,
-{
+pub fn get(cx: HashMap<Ident, TopDefn>) -> Value {
   let main = &cx[&Ident::new("main")];
   let main = match main {
     TopDefn::Fn_(x) => x,
     TopDefn::Struct(..) | TopDefn::Enum(..) => unreachable!(),
   };
-  let main_body = &main.body;
-  for stmt in &main_body.stmts {
-    let (pat, expr) = match stmt {
-      Stmt::Let(p, _, e) => (p, e),
-    };
-    let val = helper(expr);
-  }
-  todo!()
+  block_eval(&main.body, HashMap::new(), &cx)
 }
 
-fn helper(e: &Expr) -> Value {
+fn block_eval(b: &Block, mut m: HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) -> Value {
+  for s in b.stmts.iter() {
+    let (pat, expr) = match s {
+      Stmt::Let(p, _, e) => (p, e),
+    };
+    let val = expr_eval(expr, &m, cx);
+    let mm = pat_match(pat, &val);
+    let mm = mm.unwrap();
+    m.extend(mm);
+  }
+  expr_eval(b.expr.as_ref().unwrap(), &m, cx)
+}
+
+fn pat_match(p: &Pat, v: &Value) -> Option<HashMap<Ident, Value>> {
+  match (p, v) {
+    (Pat::Wildcard, _) => Some(HashMap::new()),
+    (Pat::String_(x), Value::String_(y)) => {
+      if x == y {
+        Some(HashMap::new())
+      } else {
+        None
+      }
+    }
+    (Pat::Number(x), Value::Number(y)) => {
+      if x == y {
+        Some(HashMap::new())
+      } else {
+        None
+      }
+    }
+    (Pat::Tuple(xs), Value::Tuple(ys)) => {
+      let mut m = HashMap::new();
+      for (x, y) in xs.iter().zip(ys) {
+        match pat_match(x, y) {
+          None => return None,
+          Some(x) => m.extend(x),
+        }
+      }
+      Some(m)
+    }
+    (Pat::Struct(..), _) => todo!("struct pat"),
+    (Pat::Ctor(x, p), Value::Ctor(y, q)) => {
+      if x == y {
+        pat_match(&*p, &*q)
+      } else {
+        None
+      }
+    }
+    (Pat::Ident(i), _) => {
+      let mut m = HashMap::new();
+      m.insert(i.clone(), v.clone());
+      Some(m)
+    }
+    (Pat::Or(..), _) => todo!("or pat"),
+    _ => None,
+  }
+}
+
+fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) -> Value {
   match e {
     Expr::String_(x) => Value::String_(x.clone()),
     Expr::Number(x) => Value::Number(x.clone()),
     Expr::Tuple(xs) => {
       let mut t = Vec::with_capacity(xs.len());
       for x in xs {
-        t.push(helper(x));
+        t.push(expr_eval(x, m, cx));
       }
       Value::Tuple(t)
     }
@@ -45,22 +93,37 @@ fn helper(e: &Expr) -> Value {
           Field::Ident(i) => (i, Expr::Ident(i.clone())),
           Field::IdentAnd(i, j) => (i, j.clone()),
         };
-        t.push(Field::IdentAnd(i.clone(), helper(&a)));
+        t.push(Field::IdentAnd(i.clone(), expr_eval(&a, m, cx)));
       }
       Value::Struct(w.clone(), t)
     }
-    Expr::Ident(i) => todo!(),
-    Expr::FnCall(..) => todo!(),
+    Expr::Ident(i) => m[i].clone(),
+    Expr::FnCall(i, _, xs) => {
+      let f = &cx[i];
+      let mut vs = Vec::with_capacity(xs.len());
+      for x in xs {
+        vs.push(expr_eval(x, m, cx));
+      }
+      let f = match f {
+        TopDefn::Fn_(x) => x,
+        TopDefn::Struct(..) | TopDefn::Enum(..) => unreachable!(),
+      };
+      let mut m = m.clone();
+      for (p, v) in f.params.iter().zip(vs) {
+        m.insert(p.ident.clone(), v);
+      }
+      block_eval(&f.body, m, cx)
+    }
     Expr::FieldGet(..) => todo!(),
     Expr::MethodCall(..) => todo!(),
-    Expr::Return(..) => todo!(),
+    Expr::Return(..) => todo!("eval return"),
     Expr::Match(..) => todo!(),
-    Expr::Block(..) => todo!(),
+    Expr::Block(b) => block_eval(&*b, m.clone(), cx),
   }
 }
 
 /// A value.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Value {
   /// A string literal, like `"x"`.
   String_(String),
