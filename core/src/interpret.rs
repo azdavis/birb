@@ -89,11 +89,13 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
     Expr::Struct(w, _, xs) => {
       let mut t = Vec::with_capacity(xs.len());
       for x in xs {
-        let (i, a) = match x {
-          Field::Ident(i) => (i, Expr::Ident(i.clone())),
-          Field::IdentAnd(i, j) => (i, j.clone()),
+        match x {
+          Field::Ident(i) => t.push(Field::IdentAnd(
+            i.clone(),
+            expr_eval(&Expr::Ident(i.clone()), m, cx),
+          )),
+          Field::IdentAnd(i, j) => t.push(Field::IdentAnd(i.clone(), expr_eval(j, m, cx))),
         };
-        t.push(Field::IdentAnd(i.clone(), expr_eval(&a, m, cx)));
       }
       Value::Struct(w.clone(), t)
     }
@@ -120,7 +122,7 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
       }
     }
     Expr::FieldGet(..) => todo!(),
-    Expr::MethodCall(..) => todo!(),
+    Expr::MethodCall(..) => unreachable!("eval method call"),
     Expr::Return(..) => todo!("eval return"),
     Expr::Match(..) => todo!(),
     Expr::Block(b) => block_eval(&*b, m.clone(), cx),

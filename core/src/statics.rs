@@ -444,13 +444,8 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<ExprRes> {
         type_.effects,
       ))
     }
-    Expr::MethodCall(receiver, name, big_args, args) => {
-      let receiver = (**receiver).clone();
-      let args: Vec<_> = std::iter::once(receiver).chain(args.clone()).collect();
-      let expr = Expr::FnCall(name.clone(), big_args.clone(), args);
-      get_expr_type(cx, var_cx, &expr)
-    }
-    Expr::Return(..) => todo!("return"),
+    Expr::MethodCall(..) => unreachable!("check method call"),
+    Expr::Return(..) => todo!("check return"),
     Expr::Match(head, arms) => {
       let head_type = get_expr_type(cx, var_cx, head)?;
       let mut iter = arms.iter();
