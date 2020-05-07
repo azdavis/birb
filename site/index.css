@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 html {
   font-family: Verdana, sans-serif;
   line-height: 1.4;
@@ -78,4 +82,68 @@ code {
 
 .round-corners {
   border-radius: 0.5em;
+}
+
+.resize-none {
+  resize: none;
+}
+
+.d-block {
+  display: block;
+}
+
+.ff-mono {
+  font-family: Menlo, Consolas, monospace;
+}
+
+.fz-inherit {
+  font-size: inherit;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.h-10em {
+  height: 10em;
+}
+
+.bg-none {
+  background: none;
+}
+
+.color-inherit {
+  color: inherit;
+}
+
+.p-0 {
+  padding: 0;
+}
+
+.border-0 {
+  border: 0;
+}
+
+.fz-1-5-em {
+  font-size: 1.5em;
+}
+
+.bg-green {
+  background-color: #6a6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bg-green {
+    background-color: #383;
+  }
+}
+
+.active-bg-light-green:active {
+  background-color: #8b8;
+}
+
+@media (prefers-color-scheme: dark) {
+  .active-bg-light-green:active {
+    background-color: #595;
+  }
 }
