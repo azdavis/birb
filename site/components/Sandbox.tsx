@@ -48,6 +48,7 @@ export default function Sandbox() {
           ref={textarea}
           className="resize-none d-block ff-mono fz-inherit w-100 h-20em bg-none color-inherit"
           defaultValue={startingText}
+          spellCheck="false"
         ></textarea>
         <input
           type="submit"
