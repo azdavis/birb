@@ -48,6 +48,9 @@ pub const STR: &str = "Str";
 /// The pre-defined effects.
 pub fn effects() -> HashSet<Ident> {
   let mut ret = HashSet::new();
+  ret.insert(Ident::new("Stdin"));
   ret.insert(Ident::new("Stdout"));
+  ret.insert(Ident::new("Stderr"));
+  ret.insert(Ident::new("Randomness"));
   ret
 }
