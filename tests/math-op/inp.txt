@@ -1,0 +1,5 @@
+fn main(): Nat {
+  let six = 3.add(9).div(2);
+  let seven = 9.sub(6).mul(2).add(1);
+  seven.sub(six)
+}
