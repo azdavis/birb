@@ -148,3 +148,7 @@ code {
     background-color: #595;
   }
 }
+
+.overflow-auto {
+  overflow: auto;
+}

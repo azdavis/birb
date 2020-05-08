@@ -4,10 +4,10 @@ import Katex from "./Katex";
 
 function judgement(x: Judgement) {
   return (
-    <React.Fragment key={x.name}>
+    <div key={x.name} className="overflow-auto">
       <h4>{x.name}</h4>
       <Katex block v={x.math} />
-    </React.Fragment>
+    </div>
   );
 }
 

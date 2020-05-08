@@ -52,7 +52,7 @@ export default function App() {
   return (
     <div>
       <h1>Birb</h1>
-      <nav className="d-flex jc-center p-0-5-em">{pages.map(navItem)}</nav>
+      <nav className="d-flex flex-wrap jc-center p-0-5-em">{pages.map(navItem)}</nav>
       {switcher(page)}
     </div>
   );
