@@ -26,8 +26,6 @@ const abstractSyntax: AbstractSyntax = [
       { math: String.raw`\forall (t : \kappa) \ \tau`, text: "universal" },
       { math: String.raw`\lambda (t : \kappa) \ \tau`, text: "function" },
       { math: String.raw`\tau_1[\tau_2]`, text: "application" },
-      { math: String.raw`\textsf{Sender}[\tau]`, text: "channel sender" },
-      { math: String.raw`\textsf{Receiver}[\tau]`, text: "channel receiver" },
     ],
   },
   {
@@ -77,9 +75,6 @@ const abstractSyntax: AbstractSyntax = [
       { math: String.raw`v_1(v_2)`, text: "value application" },
       { math: String.raw`v[\tau]`, text: "type application" },
       { math: String.raw`v[E]`, text: "effect application" },
-      { math: String.raw`\textsf{newchan}[\tau]`, text: "channel creation" },
-      { math: String.raw`\textsf{send}(v)`, text: "channel send" },
-      { math: String.raw`\textsf{recv}(v)`, text: "channel receive" },
     ],
   },
 ];

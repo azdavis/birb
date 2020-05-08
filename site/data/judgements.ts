@@ -1,5 +1,5 @@
 // TODO define union of effects?
-// TODO add rules for newchan, send, recv. TODO define subst?
+// TODO define subst?
 // TODO define subset relation for effects?
 
 export type Judgement = {
@@ -275,43 +275,6 @@ export const compType: Judgement[] = [
   \Gamma \vdash E_1 : \kappa
 }{
   \Gamma \vdash v[E_1] : ([E_1/e] E_2)!\langle \rangle
-}`,
-  },
-  {
-    name: "C-ChanNew",
-    math: String.raw`\frac{
-  \Gamma \vdash \tau : \textsf{Type}
-}{
-  \Gamma \vdash \textsf{newchan}[\tau] :
-  \langle 1 : \textsf{Sender}[\tau], 2 : \textsf{Receiver}[\tau] \rangle
-  !
-  \langle \textsf{newchan} : \langle \rangle \rightarrow \textsf{Nat} \rangle
-}`,
-  },
-  {
-    name: "C-ChanSend",
-    math: String.raw`\frac{
-  \Gamma \vdash v : \langle 1 : \textsf{Sender}[\tau], 2 : \tau \rangle
-}{
-  \Gamma \vdash \textsf{send}(v) :
-  \textsf{Sender}[\tau]
-  !
-  \langle
-    \textsf{send} :
-      \langle 1 : \textsf{Nat}, 2 : \tau \rangle
-      \rightarrow \langle \rangle
-  \rangle
-}`,
-  },
-  {
-    name: "C-ChanRecv",
-    math: String.raw`\frac{
-  \Gamma \vdash v : \textsf{Receiver}[\tau]
-}{
-  \Gamma \vdash \textsf{recv}(v) :
-  \langle 1 : \textsf{Receiver}[\tau], 2 : \tau \rangle
-  !
-  \langle \textsf{recv} : \textsf{Nat} \rightarrow \tau \rangle
 }`,
   },
 ];
