@@ -157,16 +157,34 @@ fn ck_top_defn(cx: &mut Cx, var_cx: &mut VarCx, td: &TopDefn) -> Result<()> {
         }
       }
       ck_has_kind(&cx, &var_cx, &fn_.ret_type, Kind::Type)?;
-      if fn_.requires.is_some() {
-        todo!("requires");
-      }
-      if fn_.ensures.is_some() {
-        todo!("requires");
+      if let Some(req) = &fn_.requires {
+        let got = get_expr_type(&cx, &var_cx, req)?;
+        if got.typ != bool_type() {
+          return Err(Error::MismatchedTypes(bool_type(), got.typ));
+        }
+        // just get the first one if it exists.
+        for e in got.effects {
+          return Err(Error::InvalidEffectUse(fn_.name.clone(), e));
+        }
       }
       let (ret_type, effects) = match fn_.ret_type.clone() {
         Kinded::Effectful(t, e) => (*t, flatten(*e)),
         other => (other, HashSet::new()),
       };
+      if let Some(req) = &fn_.ensures {
+        if var_cx.vars.insert(ret_ident(), ret_type.clone()).is_some() {
+          return Err(Error::DuplicateIdentifier(ret_ident()));
+        }
+        let got = get_expr_type(&cx, &var_cx, req)?;
+        if got.typ != bool_type() {
+          return Err(Error::MismatchedTypes(bool_type(), got.typ));
+        }
+        // just get the first one if it exists.
+        for e in got.effects {
+          return Err(Error::InvalidEffectUse(fn_.name.clone(), e));
+        }
+        var_cx.vars.remove(&ret_ident());
+      }
       let got = get_block_type(cx, var_cx.clone(), &fn_.body)?;
       if ret_type != got.typ {
         return Err(Error::MismatchedTypes(fn_.ret_type.clone(), got.typ));
@@ -605,6 +623,14 @@ fn str_type() -> Kinded {
 
 fn nat_type() -> Kinded {
   Kinded::Ident(Ident::new(birb_std_lib::NAT), vec![])
+}
+
+fn bool_type() -> Kinded {
+  Kinded::Ident(Ident::new(birb_std_lib::BOOL), vec![])
+}
+
+fn ret_ident() -> Ident {
+  Ident::new("ret")
 }
 
 fn flatten(ef: Kinded) -> HashSet<Kinded> {
