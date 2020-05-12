@@ -296,7 +296,6 @@ impl ExprRes {
   }
 }
 
-// TODO check effects
 fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<ExprRes> {
   match expr {
     Expr::String_(_) => Ok(ExprRes::pure_(str_type())),
@@ -354,7 +353,7 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<ExprRes> {
       if let Some(t) = var_cx.vars.get(name) {
         return Ok(ExprRes::pure_(t.clone()));
       }
-      // TODO we currently forbid bare function and constructor names
+      // NOTE we currently forbid bare function and constructor names
       Err(Error::UndefinedIdentifier(name.clone()))
     }
     Expr::FnCall(name, big_args, args) => {
@@ -448,7 +447,7 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<ExprRes> {
     Expr::Match(head, arms) => {
       let head_type = get_expr_type(cx, var_cx, head)?;
       let mut iter = arms.iter();
-      // TODO exhaustiveness
+      // NOTE does not check exhaustiveness
       let res_type = match iter.next() {
         Some(arm) => get_arm_type(cx, var_cx.clone(), arm, &head_type.typ)?,
         None => return Err(Error::EmptyMatch),
