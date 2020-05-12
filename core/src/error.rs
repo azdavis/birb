@@ -27,7 +27,7 @@ pub enum Error {
   /// Kind mismatch, where we expected something to have the left Kind but it had the right Kind
   /// instead.
   MismatchedKinds(Kind, Kind),
-  /// Incorrect number of Kinded arguments.
+  /// Incorrect number of arguments.
   WrongNumArgs(Ident, usize, usize),
   /// Application of a Kinded where the Kinded did not have Arrow kind.
   InvalidKindedApp(Ident, Kind),
