@@ -33,14 +33,23 @@ pub fn top_defns() -> Vec<TopDefn> {
       params: vec![],
       ctors: vec![],
     }),
-    bin_op(ADD, NAT, NAT, NAT),
-    bin_op(SUB, NAT, NAT, NAT),
-    bin_op(MUL, NAT, NAT, NAT),
-    bin_op(DIV, NAT, NAT, NAT),
+    bin_op(ADD, NAT, NAT, NAT, Expr::Number(0)),
+    bin_op(SUB, NAT, NAT, NAT, Expr::Number(0)),
+    bin_op(MUL, NAT, NAT, NAT, Expr::Number(0)),
+    bin_op(DIV, NAT, NAT, NAT, Expr::Number(0)),
+    bin_op(EQ, NAT, NAT, BOOL, fake_bool()),
+    bin_op(LT, NAT, NAT, BOOL, fake_bool()),
+    bin_op(GT, NAT, NAT, BOOL, fake_bool()),
+    bin_op(AND, BOOL, BOOL, BOOL, fake_bool()),
+    bin_op(OR, BOOL, BOOL, BOOL, fake_bool()),
   ]
 }
 
-fn bin_op(name: &str, lhs_type: &str, rhs_type: &str, ret_type: &str) -> TopDefn {
+fn fake_bool() -> Expr {
+  Expr::FnCall(Ident::new("true"), vec![], vec![Expr::Tuple(vec![])])
+}
+
+fn bin_op(name: &str, lhs_type: &str, rhs_type: &str, ret_type: &str, ret_val: Expr) -> TopDefn {
   TopDefn::Fn_(Box::new(FnDefn {
     name: Ident::new(name),
     big_params: vec![],
@@ -59,7 +68,7 @@ fn bin_op(name: &str, lhs_type: &str, rhs_type: &str, ret_type: &str) -> TopDefn
     ensures: None,
     body: Block {
       stmts: vec![],
-      expr: Some(Expr::Number(0)),
+      expr: Some(ret_val),
     },
   }))
 }
@@ -71,6 +80,11 @@ pub const ADD: &str = "add";
 pub const SUB: &str = "sub";
 pub const MUL: &str = "mul";
 pub const DIV: &str = "div";
+pub const EQ: &str = "eq";
+pub const LT: &str = "lt";
+pub const GT: &str = "gt";
+pub const AND: &str = "and";
+pub const OR: &str = "or";
 
 /// The pre-defined effects.
 pub fn effects() -> HashSet<Ident> {

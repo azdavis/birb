@@ -116,6 +116,21 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
       if *i == Ident::new(birb_std_lib::DIV) {
         return nat_math_op(vs, |x, y| x / y);
       }
+      if *i == Ident::new(birb_std_lib::EQ) {
+        return nat_cmp_op(vs, |x, y| x == y);
+      }
+      if *i == Ident::new(birb_std_lib::LT) {
+        return nat_cmp_op(vs, |x, y| x < y);
+      }
+      if *i == Ident::new(birb_std_lib::GT) {
+        return nat_cmp_op(vs, |x, y| x > y);
+      }
+      if *i == Ident::new(birb_std_lib::AND) {
+        return bool_op(vs, |x, y| x && y);
+      }
+      if *i == Ident::new(birb_std_lib::OR) {
+        return bool_op(vs, |x, y| x || y);
+      }
       match cx.get(i) {
         Some(TopDefn::Fn_(f)) => {
           let mut m = m.clone();
@@ -177,6 +192,29 @@ fn get_number(val: Value) -> u64 {
   }
 }
 
+fn mk_bool(b: bool) -> Value {
+  Value::Ctor(
+    Ident::new(if b { "true" } else { "false" }),
+    Value::Tuple(vec![]).into(),
+  )
+}
+
+fn get_bool(val: Value) -> bool {
+  match val {
+    Value::Ctor(name, val) => {
+      assert_eq!(*val, Value::Tuple(vec![]));
+      if name == Ident::new("true") {
+        return true;
+      }
+      if name == Ident::new("false") {
+        return false;
+      }
+      unreachable!()
+    }
+    _ => unreachable!(),
+  }
+}
+
 fn nat_math_op<F>(mut vs: Vec<Value>, f: F) -> Value
 where
   F: FnOnce(u64, u64) -> u64,
@@ -185,6 +223,26 @@ where
   let x = get_number(vs.pop().unwrap());
   assert!(vs.is_empty());
   return Value::Number(f(x, y));
+}
+
+fn nat_cmp_op<F>(mut vs: Vec<Value>, f: F) -> Value
+where
+  F: FnOnce(u64, u64) -> bool,
+{
+  let y = get_number(vs.pop().unwrap());
+  let x = get_number(vs.pop().unwrap());
+  assert!(vs.is_empty());
+  return mk_bool(f(x, y));
+}
+
+fn bool_op<F>(mut vs: Vec<Value>, f: F) -> Value
+where
+  F: FnOnce(bool, bool) -> bool,
+{
+  let y = get_bool(vs.pop().unwrap());
+  let x = get_bool(vs.pop().unwrap());
+  assert!(vs.is_empty());
+  return mk_bool(f(x, y));
 }
 
 /// A value.
