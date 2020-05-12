@@ -1,21 +1,19 @@
-const BIG_STACK_SIZE: usize = 4 * 1024 * 1024;
-
-fn run() -> birb_core::error::Result<birb_core::interpret::Value> {
-  let file = std::env::args().nth(1).expect("could not get filename");
-  let bs = std::fs::read(&file).expect("could not read file");
-  birb_core::get(&bs)
+fn run() -> Result<birb_core::interpret::Value, Box<dyn std::error::Error>> {
+  let file = match std::env::args().nth(1) {
+    Some(x) => x,
+    None => return Err("give exactly 1 argument (a filename)".into()),
+  };
+  let bs = std::fs::read(&file)?;
+  let res = birb_core::get(&bs)?;
+  Ok(res)
 }
 
 fn main() {
-  match std::thread::Builder::new()
-    .name("run".to_string())
-    .stack_size(BIG_STACK_SIZE)
-    .spawn(run)
-    .expect("could not spawn thread")
-    .join()
-  {
-    Ok(Ok(v)) => println!("{}", v),
-    Ok(Err(e)) => println!("error: {}", e),
-    Err(e) => eprintln!("panic: {:?}", e),
+  match run() {
+    Ok(v) => println!("{}", v),
+    Err(e) => {
+      eprintln!("error: {}", e);
+      std::process::exit(1)
+    }
   }
 }
