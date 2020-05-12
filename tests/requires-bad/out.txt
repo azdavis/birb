@@ -1,0 +1,1 @@
+error: requires failed for foo

@@ -1,0 +1,7 @@
+fn foo(x: Nat): Nat requires x.ge(3) {
+  x
+}
+
+fn main(): Nat {
+  foo(1)
+}

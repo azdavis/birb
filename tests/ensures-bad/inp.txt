@@ -1,0 +1,7 @@
+fn foo(): Nat ensures ret.ge(3) {
+  1
+}
+
+fn main(): Nat {
+  foo()
+}

@@ -1,0 +1,5 @@
+fn main(): Nat {
+  match 3 {
+    4 { 5 }
+  }
+}

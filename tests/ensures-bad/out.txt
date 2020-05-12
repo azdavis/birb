@@ -1,0 +1,1 @@
+error: ensures failed for foo
