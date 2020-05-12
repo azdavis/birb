@@ -54,6 +54,8 @@ pub enum Error {
   EmptyMatch,
   /// Invalid main function.
   InvalidMain,
+  /// Non-exhaustive match.
+  NonExhaustiveMatch,
 }
 
 impl fmt::Display for Error {
@@ -101,6 +103,7 @@ impl fmt::Display for Error {
       Self::NoExprForBlock => write!(f, "no expression at the end of the block"),
       Self::EmptyMatch => write!(f, "empty match expression"),
       Self::InvalidMain => write!(f, "invalid main"),
+      Self::NonExhaustiveMatch => write!(f, "non-exhaustive match"),
     }
   }
 }
@@ -129,7 +132,8 @@ impl std::error::Error for Error {
       | Self::InvalidEffectUse(..)
       | Self::NoExprForBlock
       | Self::EmptyMatch
-      | Self::InvalidMain => None,
+      | Self::InvalidMain
+      | Self::NonExhaustiveMatch => None,
     }
   }
 }

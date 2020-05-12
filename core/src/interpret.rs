@@ -184,7 +184,7 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
           None => continue,
         }
       }
-      panic!("match failed")
+      return Err(Error::NonExhaustiveMatch);
     }
     Expr::Block(b) => block_eval(&*b, m.clone(), cx)?,
   };
