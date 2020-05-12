@@ -61,7 +61,7 @@ pub enum Error {
 impl fmt::Display for Error {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
-      Self::InvalidByte(b) => write!(f, "invalid byte: {:x}", b),
+      Self::InvalidByte(b) => write!(f, "invalid byte: {}", (*b as char)),
       Self::UnclosedString => write!(f, "unclosed string literal"),
       Self::InvalidUTF8(e) => write!(f, "invalid utf-8: {}", e),
       Self::InvalidNumber(e) => write!(f, "invalid number: {}", e),

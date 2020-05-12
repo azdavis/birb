@@ -33,7 +33,7 @@ impl fmt::Display for Found {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::EOF => write!(f, "end of file"),
-      Self::Token(t) => write!(f, "`{}`", t),
+      Self::Token(t) => write!(f, "{}", t),
     }
   }
 }
