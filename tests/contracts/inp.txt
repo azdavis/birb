@@ -1,0 +1,5 @@
+fn double(x: Nat): Nat requires x.gt(3) ensures ret.eq(x.mul(2)) {
+  x.add(x)
+}
+
+fn main(): Nat { double(double(4)) }

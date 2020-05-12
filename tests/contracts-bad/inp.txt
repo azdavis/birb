@@ -1,0 +1,7 @@
+fn f(x: Nat): Bool requires x {
+  false(())
+}
+
+fn main(): Nat {
+  f(3)
+}
