@@ -34,7 +34,7 @@ pub fn get(bs: &[u8]) -> error::Result<interpret::Value> {
       (name, td)
     })
     .collect();
-  Ok(interpret::get(cx))
+  interpret::get(cx)
 }
 
 #[cfg(test)]

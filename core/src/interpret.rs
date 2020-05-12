@@ -1,6 +1,7 @@
 //! Interpretation.
 
 use crate::cst::{Block, Expr, Field, Pat, Stmt, TopDefn};
+use crate::error::{Error, Result};
 use crate::ident::Ident;
 use crate::std_lib as birb_std_lib;
 use crate::util::SliceDisplay;
@@ -9,7 +10,7 @@ use std::fmt;
 
 /// Steps the expression `main()` in the given context to a value. Requires that the context be
 /// statically checked and have a main function.
-pub fn get(cx: HashMap<Ident, TopDefn>) -> Value {
+pub fn get(cx: HashMap<Ident, TopDefn>) -> Result<Value> {
   let main = &cx[&Ident::new("main")];
   let main = match main {
     TopDefn::Fn_(x) => x,
@@ -18,12 +19,16 @@ pub fn get(cx: HashMap<Ident, TopDefn>) -> Value {
   block_eval(&main.body, HashMap::new(), &cx)
 }
 
-fn block_eval(b: &Block, mut m: HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) -> Value {
+fn block_eval(
+  b: &Block,
+  mut m: HashMap<Ident, Value>,
+  cx: &HashMap<Ident, TopDefn>,
+) -> Result<Value> {
   for s in b.stmts.iter() {
     let (pat, expr) = match s {
       Stmt::Let(p, _, e) => (p, e),
     };
-    let val = expr_eval(expr, &m, cx);
+    let val = expr_eval(expr, &m, cx)?;
     let mm = pat_match(pat, &val);
     let mm = mm.unwrap();
     m.extend(mm);
@@ -74,14 +79,14 @@ fn pat_match(p: &Pat, v: &Value) -> Option<HashMap<Ident, Value>> {
   }
 }
 
-fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) -> Value {
-  match e {
+fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) -> Result<Value> {
+  let ret = match e {
     Expr::String_(x) => Value::String_(x.clone()),
     Expr::Number(x) => Value::Number(x.clone()),
     Expr::Tuple(xs) => {
       let mut t = Vec::with_capacity(xs.len());
       for x in xs {
-        t.push(expr_eval(x, m, cx));
+        t.push(expr_eval(x, m, cx)?);
       }
       Value::Tuple(t)
     }
@@ -91,9 +96,9 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
         match x {
           Field::Ident(i) => t.push(Field::IdentAnd(
             i.clone(),
-            expr_eval(&Expr::Ident(i.clone()), m, cx),
+            expr_eval(&Expr::Ident(i.clone()), m, cx)?,
           )),
-          Field::IdentAnd(i, j) => t.push(Field::IdentAnd(i.clone(), expr_eval(j, m, cx))),
+          Field::IdentAnd(i, j) => t.push(Field::IdentAnd(i.clone(), expr_eval(j, m, cx)?)),
         };
       }
       Value::Struct(w.clone(), t)
@@ -102,34 +107,34 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
     Expr::FnCall(i, _, xs) => {
       let mut vs = Vec::with_capacity(xs.len());
       for x in xs {
-        vs.push(expr_eval(x, m, cx));
+        vs.push(expr_eval(x, m, cx)?);
       }
       if *i == Ident::new(birb_std_lib::ADD) {
-        return nat_math_op(vs, |x, y| x + y);
+        return Ok(nat_math_op(vs, |x, y| x + y));
       }
       if *i == Ident::new(birb_std_lib::SUB) {
-        return nat_math_op(vs, |x, y| x - y);
+        return Ok(nat_math_op(vs, |x, y| x - y));
       }
       if *i == Ident::new(birb_std_lib::MUL) {
-        return nat_math_op(vs, |x, y| x * y);
+        return Ok(nat_math_op(vs, |x, y| x * y));
       }
       if *i == Ident::new(birb_std_lib::DIV) {
-        return nat_math_op(vs, |x, y| x / y);
+        return Ok(nat_math_op(vs, |x, y| x / y));
       }
       if *i == Ident::new(birb_std_lib::EQ) {
-        return nat_cmp_op(vs, |x, y| x == y);
+        return Ok(nat_cmp_op(vs, |x, y| x == y));
       }
       if *i == Ident::new(birb_std_lib::LT) {
-        return nat_cmp_op(vs, |x, y| x < y);
+        return Ok(nat_cmp_op(vs, |x, y| x < y));
       }
       if *i == Ident::new(birb_std_lib::GT) {
-        return nat_cmp_op(vs, |x, y| x > y);
+        return Ok(nat_cmp_op(vs, |x, y| x > y));
       }
       if *i == Ident::new(birb_std_lib::AND) {
-        return bool_op(vs, |x, y| x && y);
+        return Ok(bool_op(vs, |x, y| x && y));
       }
       if *i == Ident::new(birb_std_lib::OR) {
-        return bool_op(vs, |x, y| x || y);
+        return Ok(bool_op(vs, |x, y| x || y));
       }
       match cx.get(i) {
         Some(TopDefn::Fn_(f)) => {
@@ -137,7 +142,7 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
           for (p, v) in f.params.iter().zip(vs) {
             m.insert(p.ident.clone(), v);
           }
-          block_eval(&f.body, m, cx)
+          block_eval(&f.body, m, cx)?
         }
         Some(TopDefn::Struct(..)) | Some(TopDefn::Enum(..)) => unreachable!(),
         None => {
@@ -148,14 +153,14 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
       }
     }
     Expr::FieldGet(e, i) => {
-      let v = expr_eval(e, m, cx);
+      let v = expr_eval(e, m, cx)?;
       match v {
         Value::Struct(_, fs) => {
           for f in fs {
             match f {
               Field::IdentAnd(q, t) => {
                 if q == *i {
-                  return t;
+                  return Ok(t);
                 }
               }
               Field::Ident(..) => unreachable!(),
@@ -168,7 +173,7 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
     }
     Expr::MethodCall(..) => unreachable!("eval method call"),
     Expr::Match(e, xs) => {
-      let v = expr_eval(e, m, cx);
+      let v = expr_eval(e, m, cx)?;
       for x in xs {
         match pat_match(&x.pat, &v) {
           Some(map) => {
@@ -181,8 +186,9 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
       }
       panic!("match failed")
     }
-    Expr::Block(b) => block_eval(&*b, m.clone(), cx),
-  }
+    Expr::Block(b) => block_eval(&*b, m.clone(), cx)?,
+  };
+  Ok(ret)
 }
 
 fn get_number(val: Value) -> u64 {
