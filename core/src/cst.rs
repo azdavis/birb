@@ -143,9 +143,9 @@ pub enum Expr {
   FieldGet(Box<Expr>, Ident),
   /// A function call written like a method call, like `x.f()`. Semantically equivalent to `f(x)`.
   MethodCall(Box<Expr>, Ident, Vec<Kinded>, Vec<Expr>),
-  /// A match expression, like `match x { 3 => 4, _ => 5 }`.
+  /// A match expression, like `match x { 3 { 4 } _ { 5 } }`.
   Match(Box<Expr>, Vec<Arm>),
-  /// A block, like `{ let x = 3; x + 4 }`.
+  /// A block, like `{ let x = 3; x.add(4) }`.
   Block(Box<Block>),
 }
 
