@@ -10,7 +10,7 @@ A programming language
 [rust]: https://rustup.rs
 [node]: https://nodejs.org/en/download/
 
-## Development
+## Development and Testing
 
 ### CLI
 
