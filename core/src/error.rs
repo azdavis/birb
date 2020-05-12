@@ -52,6 +52,8 @@ pub enum Error {
   NoExprForBlock,
   /// An empty match expression.
   EmptyMatch,
+  /// Invalid main function.
+  InvalidMain,
 }
 
 impl fmt::Display for Error {
@@ -98,6 +100,7 @@ impl fmt::Display for Error {
       Self::InvalidEffectUse(fn_, ef) => write!(f, "invalid use of effect {} in {}", ef, fn_),
       Self::NoExprForBlock => write!(f, "no expression at the end of the block"),
       Self::EmptyMatch => write!(f, "empty match expression"),
+      Self::InvalidMain => write!(f, "invalid main"),
     }
   }
 }
@@ -125,7 +128,8 @@ impl std::error::Error for Error {
       | Self::NoMain
       | Self::InvalidEffectUse(..)
       | Self::NoExprForBlock
-      | Self::EmptyMatch => None,
+      | Self::EmptyMatch
+      | Self::InvalidMain => None,
     }
   }
 }
