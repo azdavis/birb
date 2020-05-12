@@ -16,7 +16,7 @@ fi
 cargo build --bin birb-cli
 
 for x in "$@"; do
-  target/debug/birb-cli "$x/inp.txt" 1>out.tmp
+  target/debug/birb-cli "$x/inp.txt" 1>out.tmp || true
   if ! diff "$x/out.txt" out.tmp; then
     panic "$x: fail"
   fi
