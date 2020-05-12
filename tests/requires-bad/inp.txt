@@ -1,4 +1,4 @@
-fn foo(x: Nat): Nat requires x.ge(3) {
+fn foo(x: Nat): Nat requires x.gt(3) {
   x
 }
 

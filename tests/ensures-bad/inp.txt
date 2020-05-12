@@ -1,4 +1,4 @@
-fn foo(): Nat ensures ret.ge(3) {
+fn foo(): Nat ensures ret.gt(3) {
   1
 }
 
