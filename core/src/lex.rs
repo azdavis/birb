@@ -77,9 +77,11 @@ pub fn get(bs: &[u8]) -> Result<Vec<Token>> {
       let mut digits = vec![bs[i]];
       i += 1;
       while i < n {
-        if bs[i].is_ascii_digit() {
+        if bs[i].is_ascii_alphanumeric() {
           digits.push(bs[i]);
-        } else if bs[i] != b'_' {
+        } else if bs[i] == b'_' {
+          continue;
+        } else {
           break;
         }
         i += 1;
