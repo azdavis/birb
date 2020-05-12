@@ -537,7 +537,6 @@ fn match_pat(cx: &Cx, pat: &Pat, typ: &Kinded) -> Result<HashMap<Ident, Kinded>>
       }
       Ok(ret)
     }
-    Pat::Struct(..) => todo!("struct pattern"),
     Pat::Ctor(ctor_name, pat) => {
       let (enum_name, args) = match typ {
         Kinded::Ident(enum_name, args) => (enum_name, args),
@@ -565,7 +564,6 @@ fn match_pat(cx: &Cx, pat: &Pat, typ: &Kinded) -> Result<HashMap<Ident, Kinded>>
       ret.insert(name.clone(), typ.clone());
       Ok(ret)
     }
-    Pat::Or(..) => todo!("or pattern"),
   }
 }
 

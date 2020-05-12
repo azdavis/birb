@@ -104,27 +104,16 @@ const syntax: Grammar = verify(imported, exported, [
   },
   {
     name: "pat",
-    def: [a(n("pat-hd"), n("pat-or"))],
-  },
-  {
-    name: "pat-hd",
     def: [
       t("_"),
       n("string"),
       n("number"),
       a(t("("), n("pat-list"), t(")")),
-      a(n("big-ident"), t("{"), n("field-pat-list"), t("}")),
       a(n("ident"), t("("), n("pat"), t(")")),
       n("ident"),
     ],
   },
   { name: "pat-list", def: [e, n("pat"), a(n("pat"), t(","), n("pat-list"))] },
-  { name: "pat-or", def: [e, a(t("|"), n("pat"))] },
-  {
-    name: "field-pat-list",
-    def: [e, n("field-pat"), a(n("field-pat"), t(","), n("field-pat-list"))],
-  },
-  { name: "field-pat", def: [n("ident"), a(n("ident"), t(":"), n("pat"))] },
   {
     name: "expr",
     def: [a(n("expr-hd"), n("expr-tl-list"))],

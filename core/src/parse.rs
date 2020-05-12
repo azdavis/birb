@@ -292,15 +292,6 @@ fn type_annotation(i: usize, ts: &[Token]) -> Result<(usize, Option<Kinded>)> {
 }
 
 fn pat(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
-  let (i, p) = pat_hd(i, ts)?;
-  if let Ok(i) = eat(i, ts, Token::Bar) {
-    let (i, p2) = pat(i, ts)?;
-    return Ok((i, Pat::Or(p.into(), p2.into())));
-  }
-  Ok((i, p))
-}
-
-fn pat_hd(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
   if let Ok(i) = eat(i, ts, Token::Underscore) {
     return Ok((i, Pat::Wildcard));
   }
@@ -320,12 +311,6 @@ fn pat_hd(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
     };
     return Ok((i, p));
   }
-  if let Ok((i, bi)) = big_ident(i, ts) {
-    let i = eat(i, ts, Token::LCurly)?;
-    let (i, fps) = comma_sep(i, ts, field_pat)?;
-    let i = eat(i, ts, Token::RCurly)?;
-    return Ok((i, Pat::Struct(bi, fps)));
-  }
   if let Ok((i, id)) = ident(i, ts) {
     return match eat(i, ts, Token::LRound) {
       Ok(i) => {
@@ -337,17 +322,6 @@ fn pat_hd(i: usize, ts: &[Token]) -> Result<(usize, Pat)> {
     };
   }
   err(i, ts, "a pattern")
-}
-
-fn field_pat(i: usize, ts: &[Token]) -> Result<(usize, Field<Pat>)> {
-  let (i, id) = ident(i, ts)?;
-  match eat(i, ts, Token::Colon) {
-    Ok(i) => {
-      let (i, p) = pat(i, ts)?;
-      Ok((i, Field::IdentAnd(id, p)))
-    }
-    Err(_) => Ok((i, Field::Ident(id))),
-  }
 }
 
 fn expr(i: usize, ts: &[Token]) -> Result<(usize, Expr)> {

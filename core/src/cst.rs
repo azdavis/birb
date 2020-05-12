@@ -169,14 +169,10 @@ pub enum Pat {
   Number(u64),
   /// A tuple, like `(4, x)`.
   Tuple(Vec<Pat>),
-  /// A struct pattern, like `Foo { x, y: 3 }`.
-  Struct(Ident, Vec<Field<Pat>>),
   /// A constructor pattern, like `some(x)`.
   Ctor(Ident, Box<Pat>),
   /// An identifier pattern, like `x`.
   Ident(Ident),
-  /// An or pattern, like `3 | 4`.
-  Or(Box<Pat>, Box<Pat>),
 }
 
 /// A field.

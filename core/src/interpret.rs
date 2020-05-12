@@ -58,7 +58,6 @@ fn pat_match(p: &Pat, v: &Value) -> Option<HashMap<Ident, Value>> {
       }
       Some(m)
     }
-    (Pat::Struct(..), _) => todo!("struct pat"),
     (Pat::Ctor(x, p), Value::Ctor(y, q)) => {
       if x == y {
         pat_match(&*p, &*q)
@@ -71,7 +70,6 @@ fn pat_match(p: &Pat, v: &Value) -> Option<HashMap<Ident, Value>> {
       m.insert(i.clone(), v.clone());
       Some(m)
     }
-    (Pat::Or(..), _) => todo!("or pat"),
     _ => None,
   }
 }
