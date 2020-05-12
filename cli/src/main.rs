@@ -12,7 +12,7 @@ fn main() {
   match run() {
     Ok(v) => println!("{}", v),
     Err(e) => {
-      eprintln!("error: {}", e);
+      println!("error: {}", e);
       std::process::exit(1)
     }
   }
