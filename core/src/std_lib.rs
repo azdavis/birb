@@ -1,5 +1,7 @@
 //! The Birb standard library.
 
+#![allow(missing_docs)]
+
 use crate::cst::{Block, EnumDefn, Expr, FnDefn, Kinded, Param, TopDefn};
 use crate::ident::Ident;
 use std::collections::HashSet;
@@ -62,25 +64,12 @@ fn bin_op(name: &str, lhs_type: &str, rhs_type: &str, ret_type: &str) -> TopDefn
   }))
 }
 
-/// The name of the built-in boolean type.
 pub const BOOL: &str = "Bool";
-
-/// The name of the built-in natural number type.
 pub const NAT: &str = "Nat";
-
-/// The name of the built-in string type.
 pub const STR: &str = "Str";
-
-/// The function 'add'.
 pub const ADD: &str = "add";
-
-/// The function 'sub'.
 pub const SUB: &str = "sub";
-
-/// The function 'mul'.
 pub const MUL: &str = "mul";
-
-/// The function 'div'.
 pub const DIV: &str = "div";
 
 /// The pre-defined effects.
