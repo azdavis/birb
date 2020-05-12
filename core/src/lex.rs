@@ -79,9 +79,7 @@ pub fn get(bs: &[u8]) -> Result<Vec<Token>> {
       while i < n {
         if bs[i].is_ascii_alphanumeric() {
           digits.push(bs[i]);
-        } else if bs[i] == b'_' {
-          continue;
-        } else {
+        } else if bs[i] != b'_' {
           break;
         }
         i += 1;
