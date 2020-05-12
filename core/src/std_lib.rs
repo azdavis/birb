@@ -4,7 +4,7 @@ use crate::cst::{Block, EnumDefn, Expr, FnDefn, Kinded, Param, TopDefn};
 use crate::ident::Ident;
 use std::collections::HashSet;
 
-/// The pre-defined top definitions.
+/// The pre-defined top definitions. This isn't the prettiest way to do this.
 pub fn top_defns() -> Vec<TopDefn> {
   vec![
     TopDefn::Enum(EnumDefn {
