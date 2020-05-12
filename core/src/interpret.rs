@@ -269,7 +269,7 @@ pub enum Value {
 impl fmt::Display for Value {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
-      Self::String_(s) => s.fmt(f),
+      Self::String_(s) => write!(f, "\"{}\"", s),
       Self::Number(n) => n.fmt(f),
       Self::Tuple(vs) => SliceDisplay::new("(", vs, ")").fmt(f),
       Self::Struct(name, fs) => write!(f, "{} {{ {} }}", name, SliceDisplay::new("", fs, ""),),
