@@ -445,7 +445,6 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<ExprRes> {
       ))
     }
     Expr::MethodCall(..) => unreachable!("check method call"),
-    Expr::Return(..) => todo!("check return"),
     Expr::Match(head, arms) => {
       let head_type = get_expr_type(cx, var_cx, head)?;
       let mut iter = arms.iter();

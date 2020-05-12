@@ -395,10 +395,6 @@ fn expr_hd(i: usize, ts: &[Token]) -> Result<(usize, Expr)> {
       Some((args, es)) => Ok((i, Expr::FnCall(id, args, es))),
     };
   }
-  if let Ok(i) = eat(i, ts, Token::Return) {
-    let (i, e) = expr(i, ts)?;
-    return Ok((i, Expr::Return(e.into())));
-  }
   if let Ok(i) = eat(i, ts, Token::Match) {
     let (i, e) = expr(i, ts)?;
     let i = eat(i, ts, Token::LCurly)?;

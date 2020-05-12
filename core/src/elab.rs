@@ -39,7 +39,6 @@ fn get_expr(expr: Expr) -> Expr {
       args.insert(0, *recv);
       Expr::FnCall(name, big_args, args.into_iter().map(get_expr).collect())
     }
-    Expr::Return(expr) => Expr::Return(get_expr(*expr).into()),
     Expr::Match(head, arms) => Expr::Match(
       get_expr(*head).into(),
       arms.into_iter().map(get_arm).collect(),

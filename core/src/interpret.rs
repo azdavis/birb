@@ -154,7 +154,6 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
       }
     }
     Expr::MethodCall(..) => unreachable!("eval method call"),
-    Expr::Return(..) => todo!("eval return"),
     Expr::Match(e, xs) => {
       let v = expr_eval(e, m, cx);
       for x in xs {

@@ -137,7 +137,6 @@ const syntax: Grammar = verify(imported, exported, [
       a(t("("), n("expr-list"), t(")")),
       a(n("big-ident"), n("kinded-args-opt"), t("{"), n("field-expr-list"), t("}")),
       a(n("ident"), n("call-opt")),
-      a(t("return"), n("expr")),
       a(t("match"), n("expr"), t("{"), n("arm-list"), t("}")),
       n("block"),
     ],
