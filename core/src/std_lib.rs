@@ -31,28 +31,28 @@ pub fn top_defns() -> Vec<TopDefn> {
       params: vec![],
       ctors: vec![],
     }),
-    math_bin_op(ADD),
-    math_bin_op(SUB),
-    math_bin_op(MUL),
-    math_bin_op(DIV),
+    bin_op(ADD, NAT, NAT, NAT),
+    bin_op(SUB, NAT, NAT, NAT),
+    bin_op(MUL, NAT, NAT, NAT),
+    bin_op(DIV, NAT, NAT, NAT),
   ]
 }
 
-fn math_bin_op(name: &str) -> TopDefn {
+fn bin_op(name: &str, lhs_type: &str, rhs_type: &str, ret_type: &str) -> TopDefn {
   TopDefn::Fn_(Box::new(FnDefn {
     name: Ident::new(name),
     big_params: vec![],
     params: vec![
       Param {
-        ident: Ident::new("x"),
-        type_: Kinded::Ident(Ident::new(NAT), vec![]),
+        ident: Ident::new("lhs"),
+        type_: Kinded::Ident(Ident::new(lhs_type), vec![]),
       },
       Param {
-        ident: Ident::new("y"),
-        type_: Kinded::Ident(Ident::new(NAT), vec![]),
+        ident: Ident::new("rhs"),
+        type_: Kinded::Ident(Ident::new(rhs_type), vec![]),
       },
     ],
-    ret_type: Kinded::Ident(Ident::new(NAT), vec![]),
+    ret_type: Kinded::Ident(Ident::new(ret_type), vec![]),
     requires: None,
     ensures: None,
     body: Block {
