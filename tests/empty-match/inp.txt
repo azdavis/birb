@@ -1,0 +1,10 @@
+enum Void {}
+
+fn mk_nat(v: Void): Nat {
+  // would be nice if this could work, since you can't call this fn anyway.
+  match v {}
+}
+
+fn main(): Nat {
+  3
+}

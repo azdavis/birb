@@ -1,0 +1,2 @@
+fn main(): Nat { 3 }
+fn main(): Nat { 4 }

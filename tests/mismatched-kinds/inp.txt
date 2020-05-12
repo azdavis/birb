@@ -1,0 +1,5 @@
+struct S[T: Type] { }
+fn foo(): Nat {
+  let _ = S[Stdout] {};
+  3
+}

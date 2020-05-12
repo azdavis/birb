@@ -1,0 +1,2 @@
+struct S[T: Type] { val: T }
+fn foo(): S[] { S { val: 5 } }

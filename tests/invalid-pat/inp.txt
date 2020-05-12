@@ -1,0 +1,6 @@
+fn main(): Nat {
+  match (3, 2) {
+    (a, b, c) { a.add(b).add(c) }
+    _ { 5 }
+  }
+}

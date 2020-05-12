@@ -1,0 +1,5 @@
+struct S[T: Type, U: Type] { one: T, two: U }
+fn main(): Nat {
+  let _ = S[Nat] { one: 3, two: 4 };
+  3
+}

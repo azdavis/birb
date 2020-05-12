@@ -1,0 +1,4 @@
+struct S {}
+fn main(): Nat {
+  (S {}).foo
+}

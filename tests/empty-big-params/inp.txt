@@ -1,0 +1,2 @@
+struct Foo[] { x: Nat }
+fn main(): Nat { 3 }

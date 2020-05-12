@@ -1,0 +1,6 @@
+struct S {
+  foo: Nat,
+  foo: Str,
+}
+
+fn main(): Nat { 3 }

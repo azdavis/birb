@@ -1,0 +1,1 @@
+error: parse error: expected a top-level definition, found `func`
