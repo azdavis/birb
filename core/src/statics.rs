@@ -451,7 +451,7 @@ fn get_expr_type(cx: &Cx, var_cx: &VarCx, expr: &Expr) -> Result<ExprRes> {
       // TODO exhaustiveness
       let res_type = match iter.next() {
         Some(arm) => get_arm_type(cx, var_cx.clone(), arm, &head_type.typ)?,
-        None => todo!("empty match"),
+        None => return Err(Error::EmptyMatch),
       };
       let mut effects = head_type.effects;
       for arm in iter {
@@ -589,7 +589,7 @@ fn get_block_type(cx: &Cx, mut var_cx: VarCx, blk: &Block) -> Result<ExprRes> {
     }
   }
   match &blk.expr {
-    None => todo!("block with no expr"),
+    None => Err(Error::NoExprForBlock),
     Some(e) => {
       let mut got = get_expr_type(cx, &var_cx, e)?;
       got.effects.extend(effects);

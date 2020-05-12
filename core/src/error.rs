@@ -48,6 +48,10 @@ pub enum Error {
   NoMain,
   /// Invalid use of an effect in a function.
   InvalidEffectUse(Ident, Kinded),
+  /// No expression given at the end of a block.
+  NoExprForBlock,
+  /// An empty match expression.
+  EmptyMatch,
 }
 
 impl fmt::Display for Error {
@@ -92,6 +96,8 @@ impl fmt::Display for Error {
       Self::InvalidPattern(typ) => write!(f, "invalid pattern for type {}", typ),
       Self::NoMain => write!(f, "no main function"),
       Self::InvalidEffectUse(fn_, ef) => write!(f, "invalid use of effect {} in {}", ef, fn_),
+      Self::NoExprForBlock => write!(f, "no expression at the end of the block"),
+      Self::EmptyMatch => write!(f, "empty match expression"),
     }
   }
 }
@@ -117,7 +123,9 @@ impl std::error::Error for Error {
       | Self::NotStruct(..)
       | Self::InvalidPattern(..)
       | Self::NoMain
-      | Self::InvalidEffectUse(..) => None,
+      | Self::InvalidEffectUse(..)
+      | Self::NoExprForBlock
+      | Self::EmptyMatch => None,
     }
   }
 }
