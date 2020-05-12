@@ -105,16 +105,16 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
         vs.push(expr_eval(x, m, cx));
       }
       if *i == Ident::new(birb_std_lib::ADD) {
-        return math_bin_op(vs, |x, y| x + y);
+        return nat_math_op(vs, |x, y| x + y);
       }
       if *i == Ident::new(birb_std_lib::SUB) {
-        return math_bin_op(vs, |x, y| x - y);
+        return nat_math_op(vs, |x, y| x - y);
       }
       if *i == Ident::new(birb_std_lib::MUL) {
-        return math_bin_op(vs, |x, y| x * y);
+        return nat_math_op(vs, |x, y| x * y);
       }
       if *i == Ident::new(birb_std_lib::DIV) {
-        return math_bin_op(vs, |x, y| x / y);
+        return nat_math_op(vs, |x, y| x / y);
       }
       match cx.get(i) {
         Some(TopDefn::Fn_(f)) => {
@@ -177,7 +177,7 @@ fn get_number(val: Value) -> u64 {
   }
 }
 
-fn math_bin_op<F>(mut vs: Vec<Value>, f: F) -> Value
+fn nat_math_op<F>(mut vs: Vec<Value>, f: F) -> Value
 where
   F: FnOnce(u64, u64) -> u64,
 {
