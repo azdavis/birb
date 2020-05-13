@@ -1,0 +1,11 @@
+fn fib(x: Nat): Nat ensures ret.gt(0) {
+  match x {
+    0 { 1 }
+    1 { 1 }
+    _ { x.sub(1).fib().add(x.sub(2).fib()) }
+  }
+}
+
+fn main(): Nat {
+  fib(6)
+}

@@ -197,6 +197,15 @@ fn ck_top_defn(cx: &mut Cx, var_cx: &mut VarCx, td: &TopDefn) -> Result<()> {
         }
         var_cx.vars.remove(&ret_ident());
       }
+      // register the type here, so that we can have recursive functions.
+      cx.fns.insert(
+        fn_.name.clone(),
+        FnInfo {
+          big_params: fn_.big_params.clone(),
+          params: fn_.params.clone(),
+          ret_type: fn_.ret_type.clone(),
+        },
+      );
       let got = get_block_type(cx, var_cx.clone(), &fn_.body)?;
       if ret_type != got.typ {
         return Err(Error::MismatchedTypes(fn_.ret_type.clone(), got.typ));
@@ -212,14 +221,6 @@ fn ck_top_defn(cx: &mut Cx, var_cx: &mut VarCx, td: &TopDefn) -> Result<()> {
       for p in fn_.params.iter() {
         var_cx.vars.remove(&p.ident).unwrap();
       }
-      cx.fns.insert(
-        fn_.name.clone(),
-        FnInfo {
-          big_params: fn_.big_params.clone(),
-          params: fn_.params.clone(),
-          ret_type: fn_.ret_type.clone(),
-        },
-      );
     }
   }
   Ok(())
