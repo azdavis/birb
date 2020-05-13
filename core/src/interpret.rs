@@ -20,11 +20,11 @@ pub fn get(cx: HashMap<Ident, TopDefn>) -> Result<Value> {
 }
 
 fn block_eval(
-  b: &Block,
+  blk: &Block,
   mut m: HashMap<Ident, Value>,
   cx: &HashMap<Ident, TopDefn>,
 ) -> Result<Value> {
-  for s in b.stmts.iter() {
+  for s in blk.stmts.iter() {
     let (pat, expr) = match s {
       Stmt::Let(p, _, e) => (p, e),
     };
@@ -33,11 +33,11 @@ fn block_eval(
     let mm = mm.unwrap();
     m.extend(mm);
   }
-  expr_eval(b.expr.as_ref().unwrap(), &m, cx)
+  expr_eval(blk.expr.as_ref().unwrap(), &m, cx)
 }
 
-fn pat_match(p: &Pat, v: &Value) -> Option<HashMap<Ident, Value>> {
-  match (p, v) {
+fn pat_match(pat: &Pat, val: &Value) -> Option<HashMap<Ident, Value>> {
+  match (pat, val) {
     (Pat::Wildcard, _) => Some(HashMap::new()),
     (Pat::String_(x), Value::String_(y)) => {
       if x == y {
@@ -63,26 +63,30 @@ fn pat_match(p: &Pat, v: &Value) -> Option<HashMap<Ident, Value>> {
       }
       Some(m)
     }
-    (Pat::Ctor(x, p), Value::Ctor(y, q)) => {
-      if x == y {
-        pat_match(&*p, &*q)
+    (Pat::Ctor(name_lt, pat_lt), Value::Ctor(name_rt, pat_rt)) => {
+      if name_lt == name_rt {
+        pat_match(&*pat_lt, &*pat_rt)
       } else {
         None
       }
     }
-    (Pat::Ident(i), _) => {
+    (Pat::Ident(name), _) => {
       let mut m = HashMap::new();
-      m.insert(i.clone(), v.clone());
+      m.insert(name.clone(), val.clone());
       Some(m)
     }
     _ => None,
   }
 }
 
-fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) -> Result<Value> {
-  let ret = match e {
+fn expr_eval(
+  expr: &Expr,
+  m: &HashMap<Ident, Value>,
+  cx: &HashMap<Ident, TopDefn>,
+) -> Result<Value> {
+  let ret = match expr {
     Expr::String_(x) => Value::String_(x.clone()),
-    Expr::Number(x) => Value::Number(x.clone()),
+    Expr::Number(x) => Value::Number(*x),
     Expr::Tuple(xs) => {
       let mut t = Vec::with_capacity(xs.len());
       for x in xs {
@@ -90,53 +94,53 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
       }
       Value::Tuple(t)
     }
-    Expr::Struct(w, _, xs) => {
-      let mut t = Vec::with_capacity(xs.len());
-      for x in xs {
-        match x {
-          Field::Ident(i) => t.push(Field::IdentAnd(
+    Expr::Struct(name, _, fs) => {
+      let mut vs = Vec::with_capacity(fs.len());
+      for field in fs {
+        match field {
+          Field::Ident(i) => vs.push(Field::IdentAnd(
             i.clone(),
             expr_eval(&Expr::Ident(i.clone()), m, cx)?,
           )),
-          Field::IdentAnd(i, j) => t.push(Field::IdentAnd(i.clone(), expr_eval(j, m, cx)?)),
+          Field::IdentAnd(i, j) => vs.push(Field::IdentAnd(i.clone(), expr_eval(j, m, cx)?)),
         };
       }
-      Value::Struct(w.clone(), t)
+      Value::Struct(name.clone(), vs)
     }
-    Expr::Ident(i) => m[i].clone(),
-    Expr::FnCall(i, _, xs) => {
+    Expr::Ident(name) => m[name].clone(),
+    Expr::FnCall(name, _, xs) => {
       let mut vs = Vec::with_capacity(xs.len());
       for x in xs {
         vs.push(expr_eval(x, m, cx)?);
       }
-      if *i == Ident::new(birb_std_lib::ADD) {
+      if *name == Ident::new(birb_std_lib::ADD) {
         return Ok(nat_math_op(vs, |x, y| x + y));
       }
-      if *i == Ident::new(birb_std_lib::SUB) {
+      if *name == Ident::new(birb_std_lib::SUB) {
         return Ok(nat_math_op(vs, |x, y| x - y));
       }
-      if *i == Ident::new(birb_std_lib::MUL) {
+      if *name == Ident::new(birb_std_lib::MUL) {
         return Ok(nat_math_op(vs, |x, y| x * y));
       }
-      if *i == Ident::new(birb_std_lib::DIV) {
+      if *name == Ident::new(birb_std_lib::DIV) {
         return Ok(nat_math_op(vs, |x, y| x / y));
       }
-      if *i == Ident::new(birb_std_lib::EQ) {
+      if *name == Ident::new(birb_std_lib::EQ) {
         return Ok(nat_cmp_op(vs, |x, y| x == y));
       }
-      if *i == Ident::new(birb_std_lib::LT) {
+      if *name == Ident::new(birb_std_lib::LT) {
         return Ok(nat_cmp_op(vs, |x, y| x < y));
       }
-      if *i == Ident::new(birb_std_lib::GT) {
+      if *name == Ident::new(birb_std_lib::GT) {
         return Ok(nat_cmp_op(vs, |x, y| x > y));
       }
-      if *i == Ident::new(birb_std_lib::AND) {
+      if *name == Ident::new(birb_std_lib::AND) {
         return Ok(bool_op(vs, |x, y| x && y));
       }
-      if *i == Ident::new(birb_std_lib::OR) {
+      if *name == Ident::new(birb_std_lib::OR) {
         return Ok(bool_op(vs, |x, y| x || y));
       }
-      match cx.get(i) {
+      match cx.get(name) {
         Some(TopDefn::Fn_(f)) => {
           let mut m = m.clone();
           for (p, v) in f.params.iter().zip(vs) {
@@ -145,7 +149,7 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
           if let Some(req) = &f.requires {
             let e = expr_eval(req, &m, cx)?;
             if !get_bool(e) {
-              return Err(Error::RequiresFailed(i.clone()));
+              return Err(Error::RequiresFailed(name.clone()));
             }
           }
           let ret = block_eval(&f.body, m.clone(), cx)?;
@@ -153,7 +157,7 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
             m.insert(Ident::new("ret"), ret.clone());
             let e = expr_eval(ens, &m, cx)?;
             if !get_bool(e) {
-              return Err(Error::EnsuresFailed(i.clone()));
+              return Err(Error::EnsuresFailed(name.clone()));
             }
           }
           ret
@@ -162,19 +166,19 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
         None => {
           let v = vs.pop().unwrap();
           assert!(vs.is_empty());
-          Value::Ctor(i.clone(), v.into())
+          Value::Ctor(name.clone(), v.into())
         }
       }
     }
-    Expr::FieldGet(e, i) => {
-      let v = expr_eval(e, m, cx)?;
-      match v {
+    Expr::FieldGet(inner, name) => {
+      let val = expr_eval(inner, m, cx)?;
+      match val {
         Value::Struct(_, fs) => {
           for f in fs {
             match f {
-              Field::IdentAnd(q, t) => {
-                if q == *i {
-                  return Ok(t);
+              Field::IdentAnd(other, v) => {
+                if other == *name {
+                  return Ok(v);
                 }
               }
               Field::Ident(..) => unreachable!(),
@@ -242,7 +246,7 @@ where
   let y = get_number(vs.pop().unwrap());
   let x = get_number(vs.pop().unwrap());
   assert!(vs.is_empty());
-  return Value::Number(f(x, y));
+  Value::Number(f(x, y))
 }
 
 fn nat_cmp_op<F>(mut vs: Vec<Value>, f: F) -> Value
@@ -252,7 +256,7 @@ where
   let y = get_number(vs.pop().unwrap());
   let x = get_number(vs.pop().unwrap());
   assert!(vs.is_empty());
-  return mk_bool(f(x, y));
+  mk_bool(f(x, y))
 }
 
 fn bool_op<F>(mut vs: Vec<Value>, f: F) -> Value
@@ -262,7 +266,7 @@ where
   let y = get_bool(vs.pop().unwrap());
   let x = get_bool(vs.pop().unwrap());
   assert!(vs.is_empty());
-  return mk_bool(f(x, y));
+  mk_bool(f(x, y))
 }
 
 /// A value.

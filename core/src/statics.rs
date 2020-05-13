@@ -32,8 +32,8 @@ pub fn get(top_defns: &[TopDefn]) -> Result<()> {
   };
   if !main.big_params.is_empty()
     || !main.params.is_empty()
-    || !main.requires.is_none()
-    || !main.ensures.is_none()
+    || main.requires.is_some()
+    || main.ensures.is_some()
   {
     return Err(Error::InvalidMain);
   }
@@ -174,8 +174,7 @@ fn ck_top_defn(cx: &mut Cx, var_cx: &mut VarCx, td: &TopDefn) -> Result<()> {
         if got.typ != bool_type() {
           return Err(Error::MismatchedTypes(bool_type(), got.typ));
         }
-        // just get the first one if it exists.
-        for e in got.effects {
+        if let Some(e) = got.effects.into_iter().next() {
           return Err(Error::InvalidEffectUse(fn_.name.clone(), e));
         }
       }
@@ -191,8 +190,7 @@ fn ck_top_defn(cx: &mut Cx, var_cx: &mut VarCx, td: &TopDefn) -> Result<()> {
         if got.typ != bool_type() {
           return Err(Error::MismatchedTypes(bool_type(), got.typ));
         }
-        // just get the first one if it exists.
-        for e in got.effects {
+        if let Some(e) = got.effects.into_iter().next() {
           return Err(Error::InvalidEffectUse(fn_.name.clone(), e));
         }
         var_cx.vars.remove(&ret_ident());
