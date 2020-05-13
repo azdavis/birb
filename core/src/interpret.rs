@@ -142,7 +142,21 @@ fn expr_eval(e: &Expr, m: &HashMap<Ident, Value>, cx: &HashMap<Ident, TopDefn>) 
           for (p, v) in f.params.iter().zip(vs) {
             m.insert(p.ident.clone(), v);
           }
-          block_eval(&f.body, m, cx)?
+          if let Some(req) = &f.requires {
+            let e = expr_eval(req, &m, cx)?;
+            if !get_bool(e) {
+              return Err(Error::RequiresFailed(i.clone()));
+            }
+          }
+          let ret = block_eval(&f.body, m.clone(), cx)?;
+          if let Some(ens) = &f.ensures {
+            m.insert(Ident::new("ret"), ret.clone());
+            let e = expr_eval(ens, &m, cx)?;
+            if !get_bool(e) {
+              return Err(Error::EnsuresFailed(i.clone()));
+            }
+          }
+          ret
         }
         Some(TopDefn::Struct(..)) | Some(TopDefn::Enum(..)) => unreachable!(),
         None => {

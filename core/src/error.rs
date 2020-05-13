@@ -56,6 +56,10 @@ pub enum Error {
   InvalidMain,
   /// Non-exhaustive match.
   NonExhaustiveMatch,
+  /// Requires contract failed.
+  RequiresFailed(Ident),
+  /// Ensures contract failed.
+  EnsuresFailed(Ident),
 }
 
 impl fmt::Display for Error {
@@ -104,6 +108,8 @@ impl fmt::Display for Error {
       Self::EmptyMatch => write!(f, "empty match expression"),
       Self::InvalidMain => write!(f, "invalid main"),
       Self::NonExhaustiveMatch => write!(f, "non-exhaustive match"),
+      Self::RequiresFailed(func) => write!(f, "requires failed for {}", func),
+      Self::EnsuresFailed(func) => write!(f, "ensures failed for {}", func),
     }
   }
 }
@@ -133,7 +139,9 @@ impl std::error::Error for Error {
       | Self::NoExprForBlock
       | Self::EmptyMatch
       | Self::InvalidMain
-      | Self::NonExhaustiveMatch => None,
+      | Self::NonExhaustiveMatch
+      | Self::RequiresFailed(..)
+      | Self::EnsuresFailed(..) => None,
     }
   }
 }
