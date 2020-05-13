@@ -19,10 +19,10 @@ export default function About() {
         checked dynamically at runtime, and execution is halted if they are not satisfied.
       </p>
       <p>
-        Birb also has some of the usual features of a general-purpose programming languages, like
+        Birb also has some of the usual features of a general-purpose programming language, like
         user-definable product types (structs), sum types (enums), and functions. It has some
         built-in types. Nat is the type of natural numbers, and Str is the type of strings. It also
-        has tuples.
+        has anonymous products (tuples).
       </p>
     </div>
   );
