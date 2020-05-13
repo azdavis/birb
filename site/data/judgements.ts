@@ -83,22 +83,6 @@ export const typeKind: Judgement[] = [
   \Gamma \vdash \tau_1[\tau_2] : \kappa_2
 }`,
   },
-  {
-    name: "T-Sender",
-    math: String.raw`\frac{
-  \Gamma \vdash \tau : \textsf{Type}
-}{
-  \Gamma \vdash \textsf{Sender}[\tau] : \textsf{Type}
-}`,
-  },
-  {
-    name: "T-Receiver",
-    math: String.raw`\frac{
-  \Gamma \vdash \tau : \textsf{Type}
-}{
-  \Gamma \vdash \textsf{Receiver}[\tau] : \textsf{Type}
-}`,
-  },
 ];
 
 export const effKind: Judgement[] = [
