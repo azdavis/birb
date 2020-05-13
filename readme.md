@@ -2,6 +2,10 @@
 
 A programming language
 
+By Vivian Huang (vivianh) and Ariel Davis (azdavis)
+
+Website deployed at https://azdavis.xyz/birb/
+
 ## Dependencies
 
 - [rustc + cargo][rust] (for the CLI and website)
