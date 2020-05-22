@@ -29,4 +29,8 @@ module.exports = {
   },
   mode: "development",
   plugins: [new CopyWebpackPlugin(["./site/index.html"])],
+  devServer: {
+    host: "0.0.0.0",
+    port: 8080,
+  },
 };
