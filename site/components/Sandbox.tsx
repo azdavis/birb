@@ -35,8 +35,7 @@ export default function Sandbox() {
   const onSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      const { current } = textarea;
-      setText(must(current).value);
+      setText(must(textarea.current).value);
     },
     [setText, textarea],
   );
