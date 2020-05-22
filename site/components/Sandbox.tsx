@@ -49,9 +49,8 @@ export default function Sandbox() {
           defaultValue={startingText}
           spellCheck="false"
         ></textarea>
-        <input
+        <button
           type="submit"
-          value="Run"
           className={classNames(
             "d-block",
             "w-100",
@@ -63,7 +62,9 @@ export default function Sandbox() {
             "active-bg-light-green",
             "color-inherit",
           )}
-        />
+        >
+          Run
+        </button>
       </form>
     </div>
   );
