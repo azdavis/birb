@@ -3,7 +3,6 @@ import React from "react";
 export default function About() {
   return (
     <div>
-      <h2>About</h2>
       <p>
         Birb is a programming language. It is designed and implemented by Vivian Huang (vivianh) and
         Ariel Davis (azdavis). Its source code is available on{" "}

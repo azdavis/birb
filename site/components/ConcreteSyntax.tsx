@@ -14,9 +14,9 @@ function monoWord(x: string) {
 export default function ConcreteSyntax() {
   return (
     <div>
-      <h3>Lexical Tokens</h3>
+      <h2>Lexical Tokens</h2>
       <p>Birb source code is first lexed into tokens, separated by whitespace or comments.</p>
-      <h4>Special Tokens</h4>
+      <h3>Special Tokens</h3>
       <p>Some tokens are composed of special characters. They are listed below.</p>
       <div className="d-flex flex-wrap jc-center">{special.map(monoWord)}</div>
       <h3>Reserved Words</h3>
@@ -25,7 +25,7 @@ export default function ConcreteSyntax() {
       <h3>Other Tokens</h3>
       <p>The other tokens are strings, numbers, and identifiers.</p>
       <Grammar g={tokens} />
-      <h3>Grammar</h3>
+      <h2>Grammar</h2>
       <Grammar g={syntax} />
     </div>
   );

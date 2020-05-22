@@ -34,25 +34,25 @@ export default function Judgements() {
           <Katex v="c \mapsto c'" />, the stepping judgement for computations.
         </li>
       </ol>
-      <h3>
+      <h2>
         <Katex v="\Gamma \vdash \tau : \kappa" />
-      </h3>
+      </h2>
       {typeKind.map(judgement)}
-      <h3>
+      <h2>
         <Katex v="\Gamma \vdash E : \kappa" />
-      </h3>
+      </h2>
       {effKind.map(judgement)}
-      <h3>
+      <h2>
         <Katex v="\Gamma \vdash v : \tau" />
-      </h3>
+      </h2>
       {valueType.map(judgement)}
-      <h3>
+      <h2>
         <Katex v="\Gamma \vdash c : \tau!E" />
-      </h3>
+      </h2>
       {compType.map(judgement)}
-      <h3>
+      <h2>
         <Katex v="c \mapsto c'" />
-      </h3>
+      </h2>
       {compStep.map(judgement)}
     </div>
   );
