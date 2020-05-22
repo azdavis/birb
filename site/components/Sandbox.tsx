@@ -18,15 +18,34 @@ function safeGet(x: string): string {
 }
 
 const startingText = `// pretend this prints to standard output
-fn print_nat(x: Nat): Nat affects Stdout {
-  let _ = ();
+fn print_nat(x: Nat): Nat affects Stdout ensures ret.gt(x) {
   x.add(1)
+}
+
+enum Option[T: Type] {
+  some(T),
+  none(()),
+}
+
+fn combine
+  [T: Type, U: Type]
+  (x: Option[T], y: Option[U])
+  : Option[(T, U)]
+{
+  match (x, y) {
+    (some(a), some(b)) { some[(T, U)]((a, b)) }
+    (_, _) { none[(T, U)](()) }
+  }
 }
 
 // try adding an 'affects' annotation here
 fn main(): Nat {
-  let x = print_nat(3);
-  x.mul(2)
+  let num = match some[Nat](150).combine[Nat, Nat](some[Nat](151)) {
+    some((a, b)) { a.mul(100).add(b) }
+    none(()) { 321 }
+  };
+  let x = print_nat(num);
+  x.sub(2)
 }`;
 
 export default function Sandbox() {
