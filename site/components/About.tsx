@@ -38,10 +38,7 @@ export default function About() {
         Birb allows for user-definable structs (product types) and enums (sum types). It also has
         tuples (anonymous products types).
       </p>
-      <p>
-        Birb also allows for type variables (parametric polymorphism) in types. This allows for
-        generic collection types and functions.
-      </p>
+      <p>Birb also allows for generic types and functions via parametric polymorphism.</p>
     </div>
   );
 }
