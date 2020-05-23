@@ -12,9 +12,9 @@ export default function About() {
       <h2>Features</h2>
       <h3>Compile-time effects checking</h3>
       <p>
-        A function must declare all of the effects that it may use. If a caller calls a function
-        that uses effects that the caller does not have access to, the compiler rejects the code
-        before it runs.
+        A function must statically declare all of the effects that it may use. If a caller calls a
+        function that uses effects that the caller itself does not have access to, the compiler
+        rejects the code before it runs.
       </p>
       <h3>Contracts</h3>
       <p>
@@ -24,10 +24,10 @@ export default function About() {
       </p>
       <h3>Unified function call syntax</h3>
       <p>
-        Birb permits writing function call syntax the usual way, like <code>f(x)</code> or{" "}
-        <code>g(a, b, c)</code>. But Birb also supports a "method call"-like syntactic sugar. Thus{" "}
-        <code>x.f()</code> is exactly equivalent to <code>f(x)</code>. And <code>a.g(b, c)</code> is
-        exactly equivalent to <code>g(a, b, c)</code>. And so on.
+        Birb permits writing function calls like <code>f(x)</code> or <code>g(a, b, c)</code>. But
+        Birb also supports a "method call" syntactic sugar. Thus <code>x.f()</code> is exactly
+        equivalent to <code>f(x)</code>. And <code>a.g(b, c)</code> is exactly equivalent to{" "}
+        <code>g(a, b, c)</code>. And so on.
       </p>
       <h3>Rich type system</h3>
       <p>
@@ -38,7 +38,7 @@ export default function About() {
         Birb allows for user-definable structs (product types) and enums (sum types). It also has
         tuples (anonymous products types).
       </p>
-      <p>Birb also allows for generic types and functions via parametric polymorphism.</p>
+      <p>Birb supports generic types and functions via parametric polymorphism.</p>
     </div>
   );
 }
