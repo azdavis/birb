@@ -28,7 +28,11 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js", ".wasm"],
   },
   mode: "development",
-  plugins: [new CopyWebpackPlugin(["./site/index.html"])],
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [{ from: "./site/index.html", to: "./dist/index.html" }],
+    }),
+  ],
   devServer: {
     host: "0.0.0.0",
     port: 8080,
