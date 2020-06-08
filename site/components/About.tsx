@@ -25,9 +25,17 @@ export default function About() {
       <h3>Unified function call syntax</h3>
       <p>
         Birb permits writing function calls like <code>f(x)</code> or <code>g(a, b, c)</code>. But
-        Birb also supports a "method call" syntactic sugar. Thus <code>x.f()</code> is exactly
-        equivalent to <code>f(x)</code>. And <code>a.g(b, c)</code> is exactly equivalent to{" "}
-        <code>g(a, b, c)</code>. And so on.
+        Birb also supports a "method call" syntactic sugar. Thus the following are exactly
+        equivalent:
+        <ul>
+          <li>
+            <code>x.f()</code> and <code>f(x)</code>
+          </li>
+          <li>
+            <code>a.g(b, c)</code> and <code>g(a, b, c)</code>
+          </li>
+        </ul>
+        And so on.
       </p>
       <h3>Rich type system</h3>
       <p>
