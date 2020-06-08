@@ -30,7 +30,7 @@ module.exports = {
   mode: "development",
   plugins: [
     new CopyWebpackPlugin({
-      patterns: [{ from: "./site/index.html", to: "./dist/index.html" }],
+      patterns: [{ from: "./site/index.html", to: "./index.html" }],
     }),
   ],
   devServer: {
