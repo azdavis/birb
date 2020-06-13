@@ -1,20 +1,11 @@
 import React from "react";
 import classNames from "../classNames";
-import { get } from "../../wasm/pkg/birb_wasm";
 
 function must<T>(x: T | null): T {
   if (x == null) {
     throw new Error("must(null)");
   }
   return x;
-}
-
-function safeGet(x: string): string {
-  try {
-    return get(x);
-  } catch (e) {
-    return String(e);
-  }
 }
 
 const startingText = `// pretend this prints to standard output
@@ -48,9 +39,12 @@ fn main(): Nat {
   x.sub(2)
 }`;
 
+type Run = (inp: string) => string;
+
 export default function Sandbox() {
   const textarea = React.useRef<HTMLTextAreaElement | null>(null);
   const [text, setText] = React.useState<string>(startingText);
+  const [run, setRun] = React.useState<Run | null>(null);
   const onSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -58,10 +52,23 @@ export default function Sandbox() {
     },
     [setText, textarea],
   );
+  React.useEffect(() => {
+    import("../../wasm/pkg/birb_wasm").then(({ get }) => {
+      setRun(() => (inp: string) => {
+        try {
+          return get(inp);
+        } catch (e) {
+          return String(e);
+        }
+      });
+    });
+  }, []);
   return (
     <div>
       <form onSubmit={onSubmit}>
-        <pre className="p-0-5-em bg-gray round-corners overflow-auto">{safeGet(text)}</pre>
+        <pre className="p-0-5-em bg-gray round-corners overflow-auto">
+          {run === null ? "loading..." : run(text)}
+        </pre>
         <textarea
           ref={textarea}
           className="resize-none d-block ff-mono fz-inherit w-100 h-20em bg-none color-inherit"
