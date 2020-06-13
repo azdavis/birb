@@ -27,16 +27,16 @@ export default function About() {
         Birb permits writing function calls like <code>f(x)</code> or <code>g(a, b, c)</code>. But
         Birb also supports a "method call" syntactic sugar. Thus the following are exactly
         equivalent:
-        <ul>
-          <li>
-            <code>x.f()</code> and <code>f(x)</code>
-          </li>
-          <li>
-            <code>a.g(b, c)</code> and <code>g(a, b, c)</code>
-          </li>
-        </ul>
-        And so on.
       </p>
+      <ul>
+        <li>
+          <code>x.f()</code> and <code>f(x)</code>
+        </li>
+        <li>
+          <code>a.g(b, c)</code> and <code>g(a, b, c)</code>
+        </li>
+      </ul>
+      <p>And so on.</p>
       <h3>Rich type system</h3>
       <p>
         Birb has some built-in types. Nat is the type of natural numbers, and Str is the type of
