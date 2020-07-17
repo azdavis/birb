@@ -3,7 +3,7 @@
 # js deps
 /node_modules
 # wasm build artifacts
-pkg
+/wasm/pkg
 # rust deps and build artifacts
 /target
 # test artifacts
