@@ -44,7 +44,6 @@ mod tests {
   };
   use crate::error::Result;
   use crate::ident::Ident;
-  use pretty_assertions::assert_eq;
 
   fn get(bs: &[u8]) -> Result<Vec<TopDefn>> {
     let ts = crate::lex::get(bs)?;
