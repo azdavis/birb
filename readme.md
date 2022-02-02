@@ -21,7 +21,7 @@ Website deployed at https://azdavis.xyz/birb/
 ```
 $ cargo build
 $ cargo test
-$ bin/run-test tests/*
+$ bin/run-test.sh tests/*
 ```
 
 ### Website
