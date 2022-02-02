@@ -16,10 +16,16 @@ Website deployed at https://azdavis.xyz/birb/
 
 ## Development and Testing
 
+### One-time setup
+
+```
+$ cargo install wasm-pack
+$ npm install
+```
+
 ### CLI
 
 ```
-$ cargo build
 $ cargo test
 $ bin/run-test.sh tests/*
 ```
@@ -27,8 +33,13 @@ $ bin/run-test.sh tests/*
 ### Website
 
 ```
-$ cargo install wasm-pack
 $ wasm-pack build crates/wasm
-$ npm install
 $ npm start
+```
+
+## Deploy
+
+```
+$ wasm-pack build crates/wasm
+$ npm run build
 ```
