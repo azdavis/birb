@@ -1,18 +1,13 @@
 # birb
 
-A programming language
+A toy programming language with effects and contracts.
 
-By Vivian Huang (vivianh) and Ariel Davis (azdavis)
-
-Website deployed at https://azdavis.xyz/birb/
+Check out the [website][].
 
 ## Dependencies
 
 - [rustc + cargo][rust] (for the CLI and website)
 - [node + npm][node] (for the website)
-
-[rust]: https://rustup.rs
-[node]: https://nodejs.org/en/download/
 
 ## Development
 
@@ -41,3 +36,7 @@ $ npm start
 ```
 $ npm run build
 ```
+
+[website]: https://birb-lang.netlify.app
+[rust]: https://rustup.rs
+[node]: https://nodejs.org/en/download/
