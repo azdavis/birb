@@ -11,7 +11,7 @@ module.exports = {
     rules: [
       {
         test: /\.(woff2?)|(ttf)$/,
-        use: ["file-loader"],
+        type: "asset/resource",
       },
       {
         test: /\.css$/,
@@ -24,7 +24,7 @@ module.exports = {
       },
       {
         test: /\.wasm$/,
-        type: "webassembly/experimental",
+        type: "webassembly/async",
       },
     ],
   },
@@ -41,4 +41,5 @@ module.exports = {
     host: "0.0.0.0",
     port: 8080,
   },
+  experiments: { asyncWebAssembly: true },
 };
