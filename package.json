@@ -7,8 +7,8 @@
     "start": "webpack-dev-server"
   },
   "devDependencies": {
-    "@types/react": "^16.9.49",
-    "@types/react-dom": "^16.9.8",
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.11",
     "copy-webpack-plugin": "^6.1.1",
     "css-loader": "^4.3.0",
     "style-loader": "^1.2.1",
@@ -20,8 +20,8 @@
   },
   "dependencies": {
     "@types/katex": "^0.11.0",
-    "katex": "^0.12.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "katex": "^0.15.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   }
 }
