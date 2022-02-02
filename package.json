@@ -3,8 +3,9 @@
   "name": "birb",
   "version": "0.1.0",
   "scripts": {
-    "build": "webpack --mode production",
-    "start": "webpack-dev-server"
+    "wasm": "wasm-pack build crates/wasm",
+    "build": "npm run wasm && webpack --mode production",
+    "start": "npm run wasm && webpack-dev-server"
   },
   "devDependencies": {
     "@types/react": "^17.0.38",

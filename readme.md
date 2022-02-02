@@ -14,7 +14,7 @@ Website deployed at https://azdavis.xyz/birb/
 [rust]: https://rustup.rs
 [node]: https://nodejs.org/en/download/
 
-## Development and Testing
+## Development
 
 ### One-time setup
 
@@ -23,23 +23,21 @@ $ cargo install wasm-pack
 $ npm install
 ```
 
-### CLI
+### CLI dev
 
 ```
 $ cargo test
 $ bin/run-test.sh tests/*
 ```
 
-### Website
+### Website dev
 
 ```
-$ wasm-pack build crates/wasm
 $ npm start
 ```
 
-## Deploy
+### Build website (for production)
 
 ```
-$ wasm-pack build crates/wasm
 $ npm run build
 ```
