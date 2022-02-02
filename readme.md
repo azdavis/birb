@@ -28,7 +28,7 @@ $ bin/run-test tests/*
 
 ```
 $ cargo install wasm-pack
-$ wasm-pack build wasm
+$ wasm-pack build crates/wasm
 $ npm install
 $ npm start
 ```

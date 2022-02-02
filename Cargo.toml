@@ -1,2 +1,2 @@
 [workspace]
-members = ["cli", "core", "wasm"]
+members = ["crates/*"]
