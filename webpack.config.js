@@ -10,6 +10,10 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(woff2?)|(ttf)$/,
+        use: ["file-loader"],
+      },
+      {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
       },
