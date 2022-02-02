@@ -2,8 +2,6 @@
 /dist
 # js deps
 /node_modules
-# wasm build artifacts
-/wasm/pkg
 # rust deps and build artifacts
 /target
 # test artifacts
