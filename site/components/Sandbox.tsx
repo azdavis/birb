@@ -53,7 +53,7 @@ export default function Sandbox() {
     [setText, textarea],
   );
   React.useEffect(() => {
-    import("../../wasm/pkg/birb_wasm").then(({ get }) => {
+    import("../../crates/wasm/pkg/birb_wasm").then(({ get }) => {
       setRun(() => (inp: string) => {
         try {
           return get(inp);
